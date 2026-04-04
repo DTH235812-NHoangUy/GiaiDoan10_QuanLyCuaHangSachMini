@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
+using QuanLyCuaHangSachMini.Reports;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
@@ -256,8 +257,11 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnInHoaDon_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Phần in hóa đơn bạn làm sau như yêu cầu.", "Thông báo",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value.ToString());
+            using (frmInHoaDon inHoaDon = new frmInHoaDon(id))
+            {
+                inHoaDon.ShowDialog();
+            }
         }
 
         private void btnTimKiem_Click(object sender, EventArgs e)
