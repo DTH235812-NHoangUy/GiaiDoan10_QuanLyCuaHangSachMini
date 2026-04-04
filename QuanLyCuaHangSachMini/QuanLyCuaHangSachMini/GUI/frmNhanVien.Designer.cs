@@ -118,6 +118,7 @@
             txtMatKhau.Name = "txtMatKhau";
             txtMatKhau.Size = new Size(131, 27);
             txtMatKhau.TabIndex = 22;
+            txtMatKhau.UseSystemPasswordChar = true;
             // 
             // txtTenDangNhap
             // 

@@ -11,7 +11,7 @@ namespace QuanLyCuaHangSachMini
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new frmHoaDon());
+            Application.Run(new frmMain());
         }
     }
 }

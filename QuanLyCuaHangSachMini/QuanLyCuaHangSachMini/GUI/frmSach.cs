@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.EntityFrameworkCore;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
@@ -10,6 +11,7 @@ namespace QuanLyCuaHangSachMini.GUI
     {
         AppDbContext context = new AppDbContext();
         bool xuLyThem = false;
+        bool daTaiForm = false;
         int id = 0;
 
         string imagesFolder = Path.GetFullPath(
@@ -18,6 +20,51 @@ namespace QuanLyCuaHangSachMini.GUI
         public frmSach()
         {
             InitializeComponent();
+            this.Activated += frmSach_Activated;
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            context.Dispose();
+            base.OnFormClosed(e);
+        }
+
+        private void LamMoiContext()
+        {
+            context.Dispose();
+            context = new AppDbContext();
+        }
+
+        private void NapDanhMuc()
+        {
+            cboTheLoai.DataSource = context.TheLoai
+                .OrderBy(r => r.TenTheLoai)
+                .ToList();
+            cboTheLoai.ValueMember = "ID";
+            cboTheLoai.DisplayMember = "TenTheLoai";
+
+            cboNhaXuatBan.DataSource = context.NhaXuatBan
+                .OrderBy(r => r.TenNhaXuatBan)
+                .ToList();
+            cboNhaXuatBan.ValueMember = "ID";
+            cboNhaXuatBan.DisplayMember = "TenNhaXuatBan";
+        }
+
+        private void TaiLaiToanBoDuLieu()
+        {
+            LamMoiContext();
+            NapDanhMuc();
+            TaiDanhSachTenSach();
+            TaiDuLieuLenForm();
+        }
+
+        private void frmSach_Activated(object? sender, EventArgs e)
+        {
+            if (!daTaiForm) return;
+            if (btnLuu.Enabled) return;
+
+            TaiLaiToanBoDuLieu();
+            BatTatChucNang(false);
         }
 
         private void BatTatChucNang(bool giaTri)
@@ -26,10 +73,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
             cboTheLoai.Enabled = giaTri;
             cboNhaXuatBan.Enabled = giaTri;
-            cboTenSach.Enabled = true;
+            cboTenSach.Enabled = true; // luôn cho gõ để tìm kiếm
             txtTacGia.Enabled = giaTri;
             numSoLuongTon.Enabled = giaTri;
-            numGiaNhap.Enabled = false; // chỉ cho nhảy theo tên sách / dữ liệu có sẵn
+            numGiaNhap.Enabled = false;
             numGiaBan.Enabled = giaTri;
             txtMoTa.Enabled = giaTri;
             btnDoiAnh.Enabled = giaTri;
@@ -67,58 +114,61 @@ namespace QuanLyCuaHangSachMini.GUI
             numGiaBan.Maximum = 1000000000;
             numGiaBan.ThousandsSeparator = true;
 
-            cboTheLoai.DataSource = context.TheLoai.OrderBy(r => r.TenTheLoai).ToList();
-            cboTheLoai.ValueMember = "ID";
-            cboTheLoai.DisplayMember = "TenTheLoai";
+            cboTenSach.DropDownStyle = ComboBoxStyle.DropDown;
+            cboTenSach.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboTenSach.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboTenSach.KeyDown += cboTenSach_KeyDown;
 
-            cboNhaXuatBan.DataSource = context.NhaXuatBan.OrderBy(r => r.TenNhaXuatBan).ToList();
-            cboNhaXuatBan.ValueMember = "ID";
-            cboNhaXuatBan.DisplayMember = "TenNhaXuatBan";
-
+            NapDanhMuc();
             TaiDanhSachTenSach();
             TaiDuLieuLenForm();
+
+            daTaiForm = true;
         }
 
         private void TaiDanhSachTenSach()
         {
-            cboTenSach.DataSource = null;
-            cboTenSach.Items.Clear();
-
             List<string> dsTenSach = context.Sach
+                .AsNoTracking()
                 .OrderBy(r => r.TenSach)
                 .Select(r => r.TenSach)
                 .Distinct()
                 .ToList();
 
+            cboTenSach.DataSource = null;
+            cboTenSach.Items.Clear();
+
             foreach (string item in dsTenSach)
                 cboTenSach.Items.Add(item);
 
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(dsTenSach.ToArray());
+            cboTenSach.DropDownStyle = ComboBoxStyle.DropDown;
             cboTenSach.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            cboTenSach.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            cboTenSach.AutoCompleteCustomSource = auto;
+            cboTenSach.AutoCompleteSource = AutoCompleteSource.ListItems;
         }
 
         private void TaiDuLieuLenForm()
         {
-            List<DanhSachSach> dsSach = context.Sach.Select(r => new DanhSachSach
-            {
-                ID = r.ID,
-                TheLoaiID = r.TheLoaiID,
-                TenTheLoai = r.TheLoai.TenTheLoai,
-                NhaXuatBanID = r.NhaXuatBanID,
-                TenNhaXuatBan = r.NhaXuatBan.TenNhaXuatBan,
-                MaSach = r.MaSach,
-                TenSach = r.TenSach,
-                TacGia = r.TacGia,
-                GiaNhap = r.GiaNhap,
-                GiaBan = r.GiaBan,
-                SoLuongTon = r.SoLuongTon,
-                HinhAnh = r.HinhAnh,
-                MoTa = r.MoTa,
-                TrangThai = r.TrangThai
-            }).OrderBy(r => r.ID).ToList();
+            List<DanhSachSach> dsSach = context.Sach
+                .AsNoTracking()
+                .Select(r => new DanhSachSach
+                {
+                    ID = r.ID,
+                    TheLoaiID = r.TheLoaiID,
+                    TenTheLoai = r.TheLoai.TenTheLoai,
+                    NhaXuatBanID = r.NhaXuatBanID,
+                    TenNhaXuatBan = r.NhaXuatBan.TenNhaXuatBan,
+                    MaSach = r.MaSach,
+                    TenSach = r.TenSach,
+                    TacGia = r.TacGia,
+                    GiaNhap = r.GiaNhap,
+                    GiaBan = r.GiaBan,
+                    SoLuongTon = r.SoLuongTon,
+                    HinhAnh = r.HinhAnh,
+                    MoTa = r.MoTa,
+                    TrangThai = r.TrangThai
+                })
+                .OrderBy(r => r.ID)
+                .ToList();
 
             GanBinding(dsSach);
 
@@ -141,6 +191,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 numGiaBan.Value = 0;
                 picHinhAnh.Image = null;
                 picHinhAnh.ImageLocation = null;
+                picHinhAnh.Tag = null;
                 btnSua.Enabled = false;
                 btnXoa.Enabled = false;
                 btnXuat.Enabled = false;
@@ -180,6 +231,7 @@ namespace QuanLyCuaHangSachMini.GUI
             txtMoTa.DataBindings.Add("Text", bindingSource, "MoTa", false, DataSourceUpdateMode.Never);
 
             picHinhAnh.DataBindings.Clear();
+
             Binding hinhAnh = new Binding("ImageLocation", bindingSource, "HinhAnh");
             hinhAnh.Format += (s, ev) =>
             {
@@ -187,11 +239,12 @@ namespace QuanLyCuaHangSachMini.GUI
                     ev.Value = null;
                 else
                 {
-                    string duongDan = Path.Combine(imagesFolder, ev.Value.ToString());
+                    string duongDan = Path.Combine(imagesFolder, ev.Value.ToString()!);
                     ev.Value = File.Exists(duongDan) ? duongDan : null;
                 }
             };
             picHinhAnh.DataBindings.Add(hinhAnh);
+            picHinhAnh.DataBindings.Add("Tag", bindingSource, "HinhAnh", false, DataSourceUpdateMode.Never);
 
             dgvSach.DataSource = bindingSource;
         }
@@ -203,7 +256,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
             string tenSach = cboTenSach.Text.Trim();
 
-            Sach? sach = context.Sach.FirstOrDefault(r => r.TenSach == tenSach);
+            Sach? sach = context.Sach
+                .AsNoTracking()
+                .FirstOrDefault(r => r.TenSach == tenSach);
+
             if (sach == null)
                 return;
 
@@ -218,6 +274,8 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (context.NhaXuatBan.Any(r => r.ID == sach.NhaXuatBanID))
                 cboNhaXuatBan.SelectedValue = sach.NhaXuatBanID;
+
+            picHinhAnh.Tag = sach.HinhAnh;
 
             if (!string.IsNullOrWhiteSpace(sach.HinhAnh))
             {
@@ -278,6 +336,7 @@ namespace QuanLyCuaHangSachMini.GUI
             numGiaBan.Value = 0;
             picHinhAnh.Image = null;
             picHinhAnh.ImageLocation = null;
+            picHinhAnh.Tag = null;
             cboTenSach.Focus();
         }
 
@@ -386,6 +445,9 @@ namespace QuanLyCuaHangSachMini.GUI
                             return;
                         }
 
+                        if (string.IsNullOrWhiteSpace(tenFileHinhAnh))
+                            tenFileHinhAnh = s.HinhAnh ?? "";
+
                         s.TheLoaiID = Convert.ToInt32(cboTheLoai.SelectedValue);
                         s.NhaXuatBanID = Convert.ToInt32(cboNhaXuatBan.SelectedValue);
                         s.TenSach = cboTenSach.Text.Trim();
@@ -402,8 +464,9 @@ namespace QuanLyCuaHangSachMini.GUI
                     }
                 }
 
-                TaiDanhSachTenSach();
-                frmSach_Load(sender, e);
+                TaiLaiToanBoDuLieu();
+                BatTatChucNang(false);
+                xuLyThem = false;
             }
             catch (Exception ex)
             {
@@ -436,8 +499,9 @@ namespace QuanLyCuaHangSachMini.GUI
                             context.SaveChanges();
                         }
 
-                        TaiDanhSachTenSach();
-                        frmSach_Load(sender, e);
+                        TaiLaiToanBoDuLieu();
+                        BatTatChucNang(false);
+                        xuLyThem = false;
                     }
                     catch (Exception ex)
                     {
@@ -463,7 +527,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnHuyBo_Click(object sender, EventArgs e)
         {
-            frmSach_Load(sender, e);
+            TaiLaiToanBoDuLieu();
+            BatTatChucNang(false);
+            xuLyThem = false;
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
@@ -473,58 +539,81 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnTimKiem_Click(object sender, EventArgs e)
         {
-            string tenSach = cboTenSach.Text.Trim();
-            string tacGia = txtTacGia.Text.Trim();
-            string theLoai = cboTheLoai.Text.Trim();
-            string nxb = cboNhaXuatBan.Text.Trim();
+            string tuKhoa = cboTenSach.Text.Trim().ToLower();
 
-            List<DanhSachSach> dsSach = context.Sach.Select(r => new DanhSachSach
+            List<DanhSachSach> dsSach = context.Sach
+                .AsNoTracking()
+                .Select(r => new DanhSachSach
+                {
+                    ID = r.ID,
+                    TheLoaiID = r.TheLoaiID,
+                    TenTheLoai = r.TheLoai.TenTheLoai,
+                    NhaXuatBanID = r.NhaXuatBanID,
+                    TenNhaXuatBan = r.NhaXuatBan.TenNhaXuatBan,
+                    MaSach = r.MaSach,
+                    TenSach = r.TenSach,
+                    TacGia = r.TacGia,
+                    GiaNhap = r.GiaNhap,
+                    GiaBan = r.GiaBan,
+                    SoLuongTon = r.SoLuongTon,
+                    HinhAnh = r.HinhAnh,
+                    MoTa = r.MoTa,
+                    TrangThai = r.TrangThai
+                })
+                .OrderBy(r => r.ID)
+                .ToList();
+
+            if (!string.IsNullOrWhiteSpace(tuKhoa))
             {
-                ID = r.ID,
-                TheLoaiID = r.TheLoaiID,
-                TenTheLoai = r.TheLoai.TenTheLoai,
-                NhaXuatBanID = r.NhaXuatBanID,
-                TenNhaXuatBan = r.NhaXuatBan.TenNhaXuatBan,
-                MaSach = r.MaSach,
-                TenSach = r.TenSach,
-                TacGia = r.TacGia,
-                GiaNhap = r.GiaNhap,
-                GiaBan = r.GiaBan,
-                SoLuongTon = r.SoLuongTon,
-                HinhAnh = r.HinhAnh,
-                MoTa = r.MoTa,
-                TrangThai = r.TrangThai
-            })
-            .Where(r =>
-                (string.IsNullOrWhiteSpace(tenSach) || r.TenSach.Contains(tenSach)) &&
-                (string.IsNullOrWhiteSpace(tacGia) || r.TacGia.Contains(tacGia)) &&
-                (string.IsNullOrWhiteSpace(theLoai) || r.TenTheLoai.Contains(theLoai)) &&
-                (string.IsNullOrWhiteSpace(nxb) || r.TenNhaXuatBan.Contains(nxb)))
-            .OrderBy(r => r.ID)
-            .ToList();
+                dsSach = dsSach
+                    .Where(r => !string.IsNullOrWhiteSpace(r.TenSach) &&
+                                r.TenSach.ToLower().StartsWith(tuKhoa))
+                    .ToList();
+            }
 
             GanBinding(dsSach);
 
-            if (dgvSach.Rows.Count > 0 && dgvSach.CurrentRow != null)
+            if (dsSach.Count > 0)
             {
-                id = Convert.ToInt32(dgvSach.CurrentRow.Cells["ID"].Value.ToString());
+                id = dsSach[0].ID;
+                btnSua.Enabled = true;
+                btnXoa.Enabled = true;
+                btnXuat.Enabled = true;
             }
             else
             {
+                id = 0;
                 txtMaSach.Clear();
+                txtTacGia.Clear();
+                txtMoTa.Clear();
                 numSoLuongTon.Value = 0;
                 numGiaNhap.Value = 0;
                 numGiaBan.Value = 0;
                 picHinhAnh.Image = null;
                 picHinhAnh.ImageLocation = null;
+                picHinhAnh.Tag = null;
+                btnSua.Enabled = false;
+                btnXoa.Enabled = false;
+                btnXuat.Enabled = false;
+
                 MessageBox.Show("Không tìm thấy sách phù hợp.", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
+        private void cboTenSach_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnTimKiem.PerformClick();
+                e.SuppressKeyPress = true;
+            }
+        }
+
         private void cboTenSach_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            NapThongTinTheoTenSach();
+            if (btnLuu.Enabled)
+                NapThongTinTheoTenSach();
         }
 
         private void btnDoiAnh_Click(object sender, EventArgs e)
@@ -544,7 +633,6 @@ namespace QuanLyCuaHangSachMini.GUI
                     string tenFile = Path.GetFileName(openFileDialog.FileName);
                     string duongDanMoi = Path.Combine(imagesFolder, tenFile);
 
-                    // Nhả ảnh cũ ra trước
                     picHinhAnh.ImageLocation = null;
                     if (picHinhAnh.Image != null)
                     {
@@ -552,19 +640,17 @@ namespace QuanLyCuaHangSachMini.GUI
                         picHinhAnh.Image = null;
                     }
 
-                    // Nếu chọn đúng file đã nằm sẵn trong Images thì khỏi copy đè
                     if (!string.Equals(openFileDialog.FileName, duongDanMoi, StringComparison.OrdinalIgnoreCase))
                     {
                         File.Copy(openFileDialog.FileName, duongDanMoi, true);
                     }
 
-                    // Nạp ảnh lại không bị khóa file
                     using (FileStream fs = new FileStream(duongDanMoi, FileMode.Open, FileAccess.Read))
                     {
                         picHinhAnh.Image = Image.FromStream(fs);
                     }
 
-                    picHinhAnh.Tag = tenFile; // lưu tên file để lát lưu DB
+                    picHinhAnh.Tag = tenFile;
                 }
                 catch (Exception ex)
                 {
@@ -734,8 +820,10 @@ namespace QuanLyCuaHangSachMini.GUI
                     }
 
                     context.SaveChanges();
-                    TaiDanhSachTenSach();
-                    frmSach_Load(sender, e);
+
+                    TaiLaiToanBoDuLieu();
+                    BatTatChucNang(false);
+                    xuLyThem = false;
 
                     MessageBox.Show("Nhập Excel thành công.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -758,23 +846,25 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 try
                 {
-                    List<DanhSachSach> dsSach = context.Sach.Select(r => new DanhSachSach
-                    {
-                        ID = r.ID,
-                        TheLoaiID = r.TheLoaiID,
-                        TenTheLoai = r.TheLoai.TenTheLoai,
-                        NhaXuatBanID = r.NhaXuatBanID,
-                        TenNhaXuatBan = r.NhaXuatBan.TenNhaXuatBan,
-                        MaSach = r.MaSach,
-                        TenSach = r.TenSach,
-                        TacGia = r.TacGia,
-                        GiaNhap = r.GiaNhap,
-                        GiaBan = r.GiaBan,
-                        SoLuongTon = r.SoLuongTon,
-                        HinhAnh = r.HinhAnh,
-                        MoTa = r.MoTa,
-                        TrangThai = r.TrangThai
-                    }).OrderBy(r => r.ID).ToList();
+                    List<DanhSachSach> dsSach = context.Sach
+                        .AsNoTracking()
+                        .Select(r => new DanhSachSach
+                        {
+                            ID = r.ID,
+                            TheLoaiID = r.TheLoaiID,
+                            TenTheLoai = r.TheLoai.TenTheLoai,
+                            NhaXuatBanID = r.NhaXuatBanID,
+                            TenNhaXuatBan = r.NhaXuatBan.TenNhaXuatBan,
+                            MaSach = r.MaSach,
+                            TenSach = r.TenSach,
+                            TacGia = r.TacGia,
+                            GiaNhap = r.GiaNhap,
+                            GiaBan = r.GiaBan,
+                            SoLuongTon = r.SoLuongTon,
+                            HinhAnh = r.HinhAnh,
+                            MoTa = r.MoTa,
+                            TrangThai = r.TrangThai
+                        }).OrderBy(r => r.ID).ToList();
 
                     using XLWorkbook workbook = new XLWorkbook();
                     IXLWorksheet worksheet = workbook.Worksheets.Add("Sach");

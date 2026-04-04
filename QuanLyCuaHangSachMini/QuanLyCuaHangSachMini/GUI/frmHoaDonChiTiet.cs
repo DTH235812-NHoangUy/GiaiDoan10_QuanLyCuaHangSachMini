@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Microsoft.EntityFrameworkCore;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
@@ -10,18 +11,32 @@ namespace QuanLyCuaHangSachMini.GUI
         private readonly AppDbContext context = new AppDbContext();
         private int id;
         private bool chiXem = false;
+        private int nhanVienDangNhapID = 0;
+        private string quyenHanNguoiDung = "";
         private BindingList<DanhSachHoaDonChiTiet> hoaDonChiTiet = new BindingList<DanhSachHoaDonChiTiet>();
 
-        public frmHoaDon_ChiTiet(int maHoaDon = 0, bool chiXemChiTiet = false)
+        public frmHoaDon_ChiTiet(int maHoaDon = 0, bool chiXemChiTiet = false, int nhanVienID = 0, string quyenHan = "")
         {
             InitializeComponent();
             id = maHoaDon;
             chiXem = chiXemChiTiet;
+            nhanVienDangNhapID = nhanVienID;
+            quyenHanNguoiDung = quyenHan ?? "";
         }
 
         public void LayNhanVienVaoComboBox()
         {
-            cboNhanVien.DataSource = context.NhanVien.ToList();
+            if (quyenHanNguoiDung == "nhanvien")
+            {
+                cboNhanVien.DataSource = context.NhanVien
+                    .Where(r => r.ID == nhanVienDangNhapID)
+                    .ToList();
+            }
+            else
+            {
+                cboNhanVien.DataSource = context.NhanVien.ToList();
+            }
+
             cboNhanVien.ValueMember = "ID";
             cboNhanVien.DisplayMember = "HoVaTen";
         }
@@ -53,6 +68,24 @@ namespace QuanLyCuaHangSachMini.GUI
             btnXacNhanBan.Enabled = giaTri;
             btnXoa.Enabled = giaTri;
             btnLuuHoaDon.Enabled = giaTri;
+
+            if (quyenHanNguoiDung == "nhanvien")
+            {
+                cboNhanVien.Enabled = false;
+            }
+
+            if (chiXem)
+            {
+                cboNhanVien.Enabled = false;
+                cboKhachHang.Enabled = false;
+                txtGhiChuHoaDon.Enabled = false;
+                cboSach.Enabled = false;
+                numSoLuongBan.Enabled = false;
+                numDonGiaBan.Enabled = false;
+                btnXacNhanBan.Enabled = false;
+                btnXoa.Enabled = false;
+                btnLuuHoaDon.Enabled = false;
+            }
         }
 
         private void frmHoaDon_ChiTiet_Load(object sender, EventArgs e)
@@ -77,8 +110,26 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (id == 0)
             {
+                if (quyenHanNguoiDung == "admin")
+                {
+                    MessageBox.Show("Quản trị viên chỉ được xem hóa đơn, không được lập hóa đơn bán.",
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Close();
+                    return;
+                }
+
                 BatTatChucNang(true);
-                cboNhanVien.SelectedIndex = -1;
+
+                if (quyenHanNguoiDung == "nhanvien")
+                {
+                    cboNhanVien.SelectedValue = nhanVienDangNhapID;
+                    cboNhanVien.Enabled = false;
+                }
+                else
+                {
+                    cboNhanVien.SelectedIndex = -1;
+                }
+
                 cboKhachHang.SelectedIndex = -1;
                 cboSach.SelectedIndex = 0;
                 txtGhiChuHoaDon.Clear();
@@ -92,6 +143,14 @@ namespace QuanLyCuaHangSachMini.GUI
                 HoaDon? hoaDon = context.HoaDon.SingleOrDefault(r => r.ID == id);
                 if (hoaDon != null)
                 {
+                    if (quyenHanNguoiDung == "nhanvien" && hoaDon.NhanVienID != nhanVienDangNhapID)
+                    {
+                        MessageBox.Show("Bạn chỉ được xem hoặc sửa hóa đơn do chính bạn lập.",
+                            "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        Close();
+                        return;
+                    }
+
                     cboNhanVien.SelectedValue = hoaDon.NhanVienID;
                     cboKhachHang.SelectedValue = hoaDon.KhachHangID;
                     txtGhiChuHoaDon.Text = hoaDon.GhiChuHoaDon;
@@ -115,7 +174,7 @@ namespace QuanLyCuaHangSachMini.GUI
                     TaiLaiLuoiChiTiet();
                 }
 
-                if (chiXem)
+                if (chiXem || quyenHanNguoiDung == "admin")
                     BatTatChucNang(false);
                 else
                     BatTatChucNang(true);
@@ -154,8 +213,8 @@ namespace QuanLyCuaHangSachMini.GUI
                 XoaTrangThongTinSachBan();
             }
 
-            btnLuuHoaDon.Enabled = hoaDonChiTiet.Count > 0 && !chiXem;
-            btnXoa.Enabled = hoaDonChiTiet.Count > 0 && !chiXem;
+            btnLuuHoaDon.Enabled = hoaDonChiTiet.Count > 0 && !chiXem && quyenHanNguoiDung != "admin";
+            btnXoa.Enabled = hoaDonChiTiet.Count > 0 && !chiXem && quyenHanNguoiDung != "admin";
         }
 
         private void HienThiThongTinSachBan()
@@ -210,6 +269,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnXacNhanBan_Click(object sender, EventArgs e)
         {
+            if (chiXem || quyenHanNguoiDung == "admin")
+                return;
+
             if (string.IsNullOrWhiteSpace(cboSach.Text))
             {
                 MessageBox.Show("Vui lòng chọn sách.", "Lỗi",
@@ -261,6 +323,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
+            if (chiXem || quyenHanNguoiDung == "admin")
+                return;
+
             if (dataGridView.CurrentRow == null)
             {
                 MessageBox.Show("Vui lòng chọn dòng chi tiết cần xóa.", "Thông báo",
@@ -281,9 +346,16 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnLuuHoaDon_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(cboNhanVien.Text))
+            if (quyenHanNguoiDung == "admin")
             {
-                MessageBox.Show("Vui lòng chọn nhân viên lập hóa đơn.", "Lỗi",
+                MessageBox.Show("Quản trị viên chỉ được xem hóa đơn, không được lập hóa đơn bán.",
+                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (nhanVienDangNhapID <= 0)
+            {
+                MessageBox.Show("Không xác định được nhân viên đang đăng nhập.", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -313,6 +385,14 @@ namespace QuanLyCuaHangSachMini.GUI
                     if (hd == null)
                     {
                         MessageBox.Show("Không tìm thấy hóa đơn cần cập nhật.", "Lỗi",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        transaction.Rollback();
+                        return;
+                    }
+
+                    if (hd.NhanVienID != nhanVienDangNhapID)
+                    {
+                        MessageBox.Show("Bạn chỉ được sửa hóa đơn do chính bạn lập.", "Lỗi",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                         transaction.Rollback();
                         return;
@@ -352,7 +432,7 @@ namespace QuanLyCuaHangSachMini.GUI
                         }
                     }
 
-                    hd.NhanVienID = Convert.ToInt32(cboNhanVien.SelectedValue.ToString());
+                    hd.NhanVienID = nhanVienDangNhapID;
                     hd.KhachHangID = Convert.ToInt32(cboKhachHang.SelectedValue.ToString());
                     hd.GhiChuHoaDon = txtGhiChuHoaDon.Text;
                     context.HoaDon.Update(hd);
@@ -418,7 +498,7 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     HoaDon hd = new HoaDon();
                     hd.MaHoaDon = PhatSinhMaHoaDon();
-                    hd.NhanVienID = Convert.ToInt32(cboNhanVien.SelectedValue.ToString());
+                    hd.NhanVienID = nhanVienDangNhapID;
                     hd.KhachHangID = Convert.ToInt32(cboKhachHang.SelectedValue.ToString());
                     hd.NgayLap = DateTime.Now;
                     hd.GhiChuHoaDon = txtGhiChuHoaDon.Text;
