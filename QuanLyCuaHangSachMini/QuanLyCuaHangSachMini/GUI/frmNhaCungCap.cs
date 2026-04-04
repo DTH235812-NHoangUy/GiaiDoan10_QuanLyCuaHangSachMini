@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
+using QuanLyCuaHangSachMini.Helpers;
 using System.Data;
 
 namespace QuanLyCuaHangSachMini.GUI
@@ -14,6 +15,50 @@ namespace QuanLyCuaHangSachMini.GUI
         public frmNhaCungCap()
         {
             InitializeComponent();
+            txtDienThoai.KeyPress += txtDienThoai_KeyPress;
+        }
+
+        private void txtDienThoai_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private bool KiemTraDuLieu()
+        {
+            if (string.IsNullOrWhiteSpace(cboTenNhaCungCap.Text))
+            {
+                MessageBox.Show("Vui lòng nhập tên nhà cung cấp.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cboTenNhaCungCap.Focus();
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(txtDienThoai.Text))
+            {
+                if (!txtDienThoai.Text.All(char.IsDigit))
+                {
+                    MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return false;
+                }
+
+                if (txtDienThoai.Text.Length != 10)
+                {
+                    MessageBox.Show("Điện thoại phải đủ 10 số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return false;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text) &&
+                !txtEmail.Text.Contains("@"))
+            {
+                MessageBox.Show("Email không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtEmail.Focus();
+                return false;
+            }
+
+            return true;
         }
 
         private void BatTatChucNang(bool giaTri)
@@ -30,15 +75,18 @@ namespace QuanLyCuaHangSachMini.GUI
             btnXuat.Enabled = !giaTri;
 
             cboTenNhaCungCap.Enabled = true;
+            txtDienThoai.Enabled = giaTri;
+            txtEmail.Enabled = giaTri;
+            txtDiaChi.Enabled = giaTri;
         }
 
         private void frmNhaCungCap_Load(object sender, EventArgs e)
         {
             BatTatChucNang(false);
+            txtDienThoai.MaxLength = 10;
             dgvNhaCungCap.AutoGenerateColumns = false;
 
-            List<NhaCungCap> ncc = new List<NhaCungCap>();
-            ncc = context.NhaCungCap.OrderBy(r => r.ID).ToList();
+            List<NhaCungCap> ncc = context.NhaCungCap.OrderBy(r => r.ID).ToList();
 
             BindingSource bindingSource = new BindingSource();
             bindingSource.DataSource = ncc;
@@ -49,12 +97,22 @@ namespace QuanLyCuaHangSachMini.GUI
             cboTenNhaCungCap.DataBindings.Clear();
             cboTenNhaCungCap.DataBindings.Add("Text", bindingSource, "TenNhaCungCap", false, DataSourceUpdateMode.Never);
 
+            txtDienThoai.DataBindings.Clear();
+            txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+
+            txtEmail.DataBindings.Clear();
+            txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
+
+            txtDiaChi.DataBindings.Clear();
+            txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
+
             dgvNhaCungCap.DataSource = bindingSource;
 
             cboTenNhaCungCap.Items.Clear();
             List<string> dsTenNhaCungCap = context.NhaCungCap
                 .OrderBy(r => r.TenNhaCungCap)
                 .Select(r => r.TenNhaCungCap)
+                .Distinct()
                 .ToList();
 
             foreach (string item in dsTenNhaCungCap)
@@ -78,6 +136,9 @@ namespace QuanLyCuaHangSachMini.GUI
                 id = 0;
                 txtMaNhaCungCap.Clear();
                 cboTenNhaCungCap.Text = "";
+                txtDienThoai.Clear();
+                txtEmail.Clear();
+                txtDiaChi.Clear();
                 btnSua.Enabled = false;
                 btnXoa.Enabled = false;
                 btnXuat.Enabled = false;
@@ -106,9 +167,17 @@ namespace QuanLyCuaHangSachMini.GUI
                     .Max();
             }
 
-            txtMaNhaCungCap.Text = "NCC" + (soLonNhat + 1).ToString("000");
+            txtMaNhaCungCap.DataBindings.Clear();
             cboTenNhaCungCap.DataBindings.Clear();
+            txtDienThoai.DataBindings.Clear();
+            txtEmail.DataBindings.Clear();
+            txtDiaChi.DataBindings.Clear();
+
+            txtMaNhaCungCap.Text = "NCC" + (soLonNhat + 1).ToString("000");
             cboTenNhaCungCap.Text = "";
+            txtDienThoai.Text = "";
+            txtEmail.Text = "";
+            txtDiaChi.Text = "";
             cboTenNhaCungCap.Focus();
         }
 
@@ -129,18 +198,44 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(cboTenNhaCungCap.Text))
+            if (!KiemTraDuLieu())
+                return;
+
+            try
             {
-                MessageBox.Show("Vui lòng nhập tên nhà cung cấp.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cboTenNhaCungCap.Focus();
-            }
-            else
-            {
-                try
+                if (xuLyThem)
                 {
-                    if (xuLyThem)
+                    bool tonTai = context.NhaCungCap.Any(r => r.TenNhaCungCap == cboTenNhaCungCap.Text.Trim());
+                    if (tonTai)
                     {
-                        bool tonTai = context.NhaCungCap.Any(r => r.TenNhaCungCap == cboTenNhaCungCap.Text.Trim());
+                        MessageBox.Show("Tên nhà cung cấp đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        cboTenNhaCungCap.Focus();
+                        return;
+                    }
+
+                    NhaCungCap ncc = new NhaCungCap();
+                    ncc.MaNhaCungCap = txtMaNhaCungCap.Text.Trim();
+                    ncc.TenNhaCungCap = cboTenNhaCungCap.Text.Trim();
+                    ncc.DienThoai = txtDienThoai.Text.Trim();
+                    ncc.Email = txtEmail.Text.Trim();
+                    ncc.DiaChi = txtDiaChi.Text.Trim();
+
+                    context.NhaCungCap.Add(ncc);
+                    context.SaveChanges();
+
+                    NhatKyHelper.GhiLog(
+                        "Thêm",
+                        "NhaCungCap",
+                        ncc.ID.ToString(),
+                        "Thêm nhà cung cấp: " + ncc.TenNhaCungCap
+                    );
+                }
+                else
+                {
+                    NhaCungCap ncc = context.NhaCungCap.Find(id);
+                    if (ncc != null)
+                    {
+                        bool tonTai = context.NhaCungCap.Any(r => r.TenNhaCungCap == cboTenNhaCungCap.Text.Trim() && r.ID != id);
                         if (tonTai)
                         {
                             MessageBox.Show("Tên nhà cung cấp đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -148,38 +243,28 @@ namespace QuanLyCuaHangSachMini.GUI
                             return;
                         }
 
-                        NhaCungCap ncc = new NhaCungCap();
-                        ncc.MaNhaCungCap = txtMaNhaCungCap.Text.Trim();
                         ncc.TenNhaCungCap = cboTenNhaCungCap.Text.Trim();
+                        ncc.DienThoai = txtDienThoai.Text.Trim();
+                        ncc.Email = txtEmail.Text.Trim();
+                        ncc.DiaChi = txtDiaChi.Text.Trim();
 
-                        context.NhaCungCap.Add(ncc);
+                        context.NhaCungCap.Update(ncc);
                         context.SaveChanges();
-                    }
-                    else
-                    {
-                        NhaCungCap ncc = context.NhaCungCap.Find(id);
-                        if (ncc != null)
-                        {
-                            bool tonTai = context.NhaCungCap.Any(r => r.TenNhaCungCap == cboTenNhaCungCap.Text.Trim() && r.ID != id);
-                            if (tonTai)
-                            {
-                                MessageBox.Show("Tên nhà cung cấp đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                cboTenNhaCungCap.Focus();
-                                return;
-                            }
 
-                            ncc.TenNhaCungCap = cboTenNhaCungCap.Text.Trim();
-                            context.NhaCungCap.Update(ncc);
-                            context.SaveChanges();
-                        }
+                        NhatKyHelper.GhiLog(
+                            "Sửa",
+                            "NhaCungCap",
+                            ncc.ID.ToString(),
+                            "Sửa nhà cung cấp: " + ncc.TenNhaCungCap
+                        );
                     }
+                }
 
-                    frmNhaCungCap_Load(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                frmNhaCungCap_Load(sender, e);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -196,8 +281,18 @@ namespace QuanLyCuaHangSachMini.GUI
                         NhaCungCap ncc = context.NhaCungCap.Find(id);
                         if (ncc != null)
                         {
+                            string khoaChinh = ncc.ID.ToString();
+                            string ten = ncc.TenNhaCungCap;
+
                             context.NhaCungCap.Remove(ncc);
                             context.SaveChanges();
+
+                            NhatKyHelper.GhiLog(
+                                "Xóa",
+                                "NhaCungCap",
+                                khoaChinh,
+                                "Xóa nhà cung cấp: " + ten
+                            );
                         }
 
                         frmNhaCungCap_Load(sender, e);
@@ -235,8 +330,7 @@ namespace QuanLyCuaHangSachMini.GUI
             }
             else
             {
-                List<NhaCungCap> ncc = new List<NhaCungCap>();
-                ncc = context.NhaCungCap
+                List<NhaCungCap> ncc = context.NhaCungCap
                     .Where(r => r.TenNhaCungCap.Contains(tuKhoa))
                     .OrderBy(r => r.ID)
                     .ToList();
@@ -250,15 +344,35 @@ namespace QuanLyCuaHangSachMini.GUI
                 cboTenNhaCungCap.DataBindings.Clear();
                 cboTenNhaCungCap.DataBindings.Add("Text", bindingSource, "TenNhaCungCap", false, DataSourceUpdateMode.Never);
 
+                txtDienThoai.DataBindings.Clear();
+                txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+
+                txtEmail.DataBindings.Clear();
+                txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
+
+                txtDiaChi.DataBindings.Clear();
+                txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
+
                 dgvNhaCungCap.DataSource = bindingSource;
 
                 if (dgvNhaCungCap.Rows.Count > 0 && dgvNhaCungCap.CurrentRow != null)
                 {
                     id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value.ToString());
+
+                    NhatKyHelper.GhiLog(
+                        "Tìm kiếm",
+                        "NhaCungCap",
+                        null,
+                        "Tìm kiếm nhà cung cấp với từ khóa: " + tuKhoa
+                    );
                 }
                 else
                 {
                     txtMaNhaCungCap.Clear();
+                    txtDienThoai.Clear();
+                    txtEmail.Clear();
+                    txtDiaChi.Clear();
+
                     MessageBox.Show("Không tìm thấy nhà cung cấp phù hợp.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -330,6 +444,9 @@ namespace QuanLyCuaHangSachMini.GUI
                             foreach (DataRow r in table.Rows)
                             {
                                 string tenNhaCungCap = "";
+                                string dienThoai = "";
+                                string email = "";
+                                string diaChi = "";
 
                                 if (table.Columns.Contains("TenNhaCungCap"))
                                     tenNhaCungCap = r["TenNhaCungCap"]?.ToString()?.Trim() ?? "";
@@ -338,10 +455,33 @@ namespace QuanLyCuaHangSachMini.GUI
                                 else if (table.Columns.Contains("TenNhaCungUng"))
                                     tenNhaCungCap = r["TenNhaCungUng"]?.ToString()?.Trim() ?? "";
 
+                                if (table.Columns.Contains("DienThoai"))
+                                    dienThoai = r["DienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SoDienThoai"))
+                                    dienThoai = r["SoDienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SDT"))
+                                    dienThoai = r["SDT"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("Email"))
+                                    email = r["Email"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("DiaChi"))
+                                    diaChi = r["DiaChi"]?.ToString()?.Trim() ?? "";
+
                                 if (string.IsNullOrWhiteSpace(tenNhaCungCap))
                                     continue;
 
-                                bool tonTai = context.NhaCungCap.Any(x => x.TenNhaCungCap == tenNhaCungCap);
+                                if (!string.IsNullOrWhiteSpace(dienThoai))
+                                {
+                                    if (!dienThoai.All(char.IsDigit))
+                                        continue;
+                                    if (dienThoai.Length != 10)
+                                        continue;
+                                }
+
+                                bool tonTai = context.NhaCungCap.Any(x =>
+                                    x.TenNhaCungCap == tenNhaCungCap &&
+                                    (x.DienThoai ?? "") == dienThoai);
                                 if (tonTai)
                                     continue;
 
@@ -350,12 +490,22 @@ namespace QuanLyCuaHangSachMini.GUI
                                 NhaCungCap ncc = new NhaCungCap();
                                 ncc.MaNhaCungCap = "NCC" + soLonNhat.ToString("000");
                                 ncc.TenNhaCungCap = tenNhaCungCap;
+                                ncc.DienThoai = dienThoai;
+                                ncc.Email = email;
+                                ncc.DiaChi = diaChi;
 
                                 context.NhaCungCap.Add(ncc);
                                 demThanhCong++;
                             }
 
                             context.SaveChanges();
+
+                            NhatKyHelper.GhiLog(
+                                "Nhập Excel",
+                                "NhaCungCap",
+                                null,
+                                "Nhập Excel nhà cung cấp, thêm mới " + demThanhCong + " dòng."
+                            );
 
                             MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
                                 "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -389,23 +539,32 @@ namespace QuanLyCuaHangSachMini.GUI
                 try
                 {
                     DataTable table = new DataTable();
-                    table.Columns.AddRange(new DataColumn[2]
+                    table.Columns.AddRange(new DataColumn[5]
                     {
                         new DataColumn("MaNhaCungCap", typeof(string)),
-                        new DataColumn("TenNhaCungCap", typeof(string))
+                        new DataColumn("TenNhaCungCap", typeof(string)),
+                        new DataColumn("DienThoai", typeof(string)),
+                        new DataColumn("Email", typeof(string)),
+                        new DataColumn("DiaChi", typeof(string))
                     });
 
-                    List<NhaCungCap> ncc = new List<NhaCungCap>();
-                    ncc = context.NhaCungCap.OrderBy(r => r.ID).ToList();
+                    List<NhaCungCap> ncc = context.NhaCungCap.OrderBy(r => r.ID).ToList();
 
                     foreach (NhaCungCap item in ncc)
-                        table.Rows.Add(item.MaNhaCungCap, item.TenNhaCungCap);
+                        table.Rows.Add(item.MaNhaCungCap, item.TenNhaCungCap, item.DienThoai, item.Email, item.DiaChi);
 
                     using (XLWorkbook wb = new XLWorkbook())
                     {
                         var sheet = wb.Worksheets.Add(table, "NhaCungCap");
                         sheet.Columns().AdjustToContents();
                         wb.SaveAs(saveFileDialog.FileName);
+
+                        NhatKyHelper.GhiLog(
+                            "Xuất Excel",
+                            "NhaCungCap",
+                            null,
+                            "Xuất danh sách nhà cung cấp ra Excel, số dòng: " + ncc.Count
+                        );
 
                         MessageBox.Show("Đã xuất dữ liệu ra tập tin Excel thành công.",
                             "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -416,16 +575,6 @@ namespace QuanLyCuaHangSachMini.GUI
                     MessageBox.Show(ex.Message, "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
-            }
-        }
-
-        private void dgvNhaCungCap_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && dgvNhaCungCap.CurrentRow != null)
-            {
-                id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value.ToString());
-                txtMaNhaCungCap.Text = dgvNhaCungCap.CurrentRow.Cells["MaNhaCungCap"].Value.ToString();
-                cboTenNhaCungCap.Text = dgvNhaCungCap.CurrentRow.Cells["TenNhaCungCap"].Value.ToString();
             }
         }
     }

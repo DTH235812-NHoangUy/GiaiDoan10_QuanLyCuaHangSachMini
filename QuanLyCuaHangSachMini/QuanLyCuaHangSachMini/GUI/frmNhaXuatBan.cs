@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
+using QuanLyCuaHangSachMini.Helpers;
 using System.Data;
 
 namespace QuanLyCuaHangSachMini.GUI
@@ -14,6 +15,50 @@ namespace QuanLyCuaHangSachMini.GUI
         public frmNhaXuatBan()
         {
             InitializeComponent();
+            txtDienThoai.KeyPress += txtDienThoai_KeyPress;
+        }
+
+        private void txtDienThoai_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private bool KiemTraDuLieu()
+        {
+            if (string.IsNullOrWhiteSpace(cboTenNhaXuatBan.Text))
+            {
+                MessageBox.Show("Vui lòng nhập tên nhà xuất bản.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cboTenNhaXuatBan.Focus();
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(txtDienThoai.Text))
+            {
+                if (!txtDienThoai.Text.All(char.IsDigit))
+                {
+                    MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return false;
+                }
+
+                if (txtDienThoai.Text.Length != 10)
+                {
+                    MessageBox.Show("Điện thoại phải đủ 10 số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return false;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text) &&
+                !txtEmail.Text.Contains("@"))
+            {
+                MessageBox.Show("Email không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtEmail.Focus();
+                return false;
+            }
+
+            return true;
         }
 
         private void BatTatChucNang(bool giaTri)
@@ -30,15 +75,18 @@ namespace QuanLyCuaHangSachMini.GUI
             btnXuat.Enabled = !giaTri;
 
             cboTenNhaXuatBan.Enabled = true;
+            txtDienThoai.Enabled = giaTri;
+            txtEmail.Enabled = giaTri;
+            txtDiaChi.Enabled = giaTri;
         }
 
         private void frmNhaXuatBan_Load(object sender, EventArgs e)
         {
             BatTatChucNang(false);
+            txtDienThoai.MaxLength = 10;
             dgvNhaXuatBan.AutoGenerateColumns = false;
 
-            List<NhaXuatBan> nxb = new List<NhaXuatBan>();
-            nxb = context.NhaXuatBan.OrderBy(r => r.ID).ToList();
+            List<NhaXuatBan> nxb = context.NhaXuatBan.OrderBy(r => r.ID).ToList();
 
             BindingSource bindingSource = new BindingSource();
             bindingSource.DataSource = nxb;
@@ -49,12 +97,22 @@ namespace QuanLyCuaHangSachMini.GUI
             cboTenNhaXuatBan.DataBindings.Clear();
             cboTenNhaXuatBan.DataBindings.Add("Text", bindingSource, "TenNhaXuatBan", false, DataSourceUpdateMode.Never);
 
+            txtDienThoai.DataBindings.Clear();
+            txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+
+            txtEmail.DataBindings.Clear();
+            txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
+
+            txtDiaChi.DataBindings.Clear();
+            txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
+
             dgvNhaXuatBan.DataSource = bindingSource;
 
             cboTenNhaXuatBan.Items.Clear();
             List<string> dsTenNhaXuatBan = context.NhaXuatBan
                 .OrderBy(r => r.TenNhaXuatBan)
                 .Select(r => r.TenNhaXuatBan)
+                .Distinct()
                 .ToList();
 
             foreach (string item in dsTenNhaXuatBan)
@@ -78,6 +136,9 @@ namespace QuanLyCuaHangSachMini.GUI
                 id = 0;
                 txtMaNhaXuatBan.Clear();
                 cboTenNhaXuatBan.Text = "";
+                txtDienThoai.Clear();
+                txtEmail.Clear();
+                txtDiaChi.Clear();
                 btnSua.Enabled = false;
                 btnXoa.Enabled = false;
                 btnXuat.Enabled = false;
@@ -106,9 +167,17 @@ namespace QuanLyCuaHangSachMini.GUI
                     .Max();
             }
 
-            txtMaNhaXuatBan.Text = "NXB" + (soLonNhat + 1).ToString("000");
+            txtMaNhaXuatBan.DataBindings.Clear();
             cboTenNhaXuatBan.DataBindings.Clear();
+            txtDienThoai.DataBindings.Clear();
+            txtEmail.DataBindings.Clear();
+            txtDiaChi.DataBindings.Clear();
+
+            txtMaNhaXuatBan.Text = "NXB" + (soLonNhat + 1).ToString("000");
             cboTenNhaXuatBan.Text = "";
+            txtDienThoai.Text = "";
+            txtEmail.Text = "";
+            txtDiaChi.Text = "";
             cboTenNhaXuatBan.Focus();
         }
 
@@ -129,18 +198,44 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(cboTenNhaXuatBan.Text))
+            if (!KiemTraDuLieu())
+                return;
+
+            try
             {
-                MessageBox.Show("Vui lòng nhập tên nhà xuất bản.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cboTenNhaXuatBan.Focus();
-            }
-            else
-            {
-                try
+                if (xuLyThem)
                 {
-                    if (xuLyThem)
+                    bool tonTai = context.NhaXuatBan.Any(r => r.TenNhaXuatBan == cboTenNhaXuatBan.Text.Trim());
+                    if (tonTai)
                     {
-                        bool tonTai = context.NhaXuatBan.Any(r => r.TenNhaXuatBan == cboTenNhaXuatBan.Text.Trim());
+                        MessageBox.Show("Tên nhà xuất bản đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        cboTenNhaXuatBan.Focus();
+                        return;
+                    }
+
+                    NhaXuatBan nxb = new NhaXuatBan();
+                    nxb.MaNhaXuatBan = txtMaNhaXuatBan.Text.Trim();
+                    nxb.TenNhaXuatBan = cboTenNhaXuatBan.Text.Trim();
+                    nxb.DienThoai = txtDienThoai.Text.Trim();
+                    nxb.Email = txtEmail.Text.Trim();
+                    nxb.DiaChi = txtDiaChi.Text.Trim();
+
+                    context.NhaXuatBan.Add(nxb);
+                    context.SaveChanges();
+
+                    NhatKyHelper.GhiLog(
+                        "Thêm",
+                        "NhaXuatBan",
+                        nxb.ID.ToString(),
+                        "Thêm nhà xuất bản: " + nxb.TenNhaXuatBan
+                    );
+                }
+                else
+                {
+                    NhaXuatBan nxb = context.NhaXuatBan.Find(id);
+                    if (nxb != null)
+                    {
+                        bool tonTai = context.NhaXuatBan.Any(r => r.TenNhaXuatBan == cboTenNhaXuatBan.Text.Trim() && r.ID != id);
                         if (tonTai)
                         {
                             MessageBox.Show("Tên nhà xuất bản đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -148,38 +243,28 @@ namespace QuanLyCuaHangSachMini.GUI
                             return;
                         }
 
-                        NhaXuatBan nxb = new NhaXuatBan();
-                        nxb.MaNhaXuatBan = txtMaNhaXuatBan.Text.Trim();
                         nxb.TenNhaXuatBan = cboTenNhaXuatBan.Text.Trim();
+                        nxb.DienThoai = txtDienThoai.Text.Trim();
+                        nxb.Email = txtEmail.Text.Trim();
+                        nxb.DiaChi = txtDiaChi.Text.Trim();
 
-                        context.NhaXuatBan.Add(nxb);
+                        context.NhaXuatBan.Update(nxb);
                         context.SaveChanges();
-                    }
-                    else
-                    {
-                        NhaXuatBan nxb = context.NhaXuatBan.Find(id);
-                        if (nxb != null)
-                        {
-                            bool tonTai = context.NhaXuatBan.Any(r => r.TenNhaXuatBan == cboTenNhaXuatBan.Text.Trim() && r.ID != id);
-                            if (tonTai)
-                            {
-                                MessageBox.Show("Tên nhà xuất bản đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                cboTenNhaXuatBan.Focus();
-                                return;
-                            }
 
-                            nxb.TenNhaXuatBan = cboTenNhaXuatBan.Text.Trim();
-                            context.NhaXuatBan.Update(nxb);
-                            context.SaveChanges();
-                        }
+                        NhatKyHelper.GhiLog(
+                            "Sửa",
+                            "NhaXuatBan",
+                            nxb.ID.ToString(),
+                            "Sửa nhà xuất bản: " + nxb.TenNhaXuatBan
+                        );
                     }
+                }
 
-                    frmNhaXuatBan_Load(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                frmNhaXuatBan_Load(sender, e);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -196,8 +281,18 @@ namespace QuanLyCuaHangSachMini.GUI
                         NhaXuatBan nxb = context.NhaXuatBan.Find(id);
                         if (nxb != null)
                         {
+                            string khoaChinh = nxb.ID.ToString();
+                            string ten = nxb.TenNhaXuatBan;
+
                             context.NhaXuatBan.Remove(nxb);
                             context.SaveChanges();
+
+                            NhatKyHelper.GhiLog(
+                                "Xóa",
+                                "NhaXuatBan",
+                                khoaChinh,
+                                "Xóa nhà xuất bản: " + ten
+                            );
                         }
 
                         frmNhaXuatBan_Load(sender, e);
@@ -235,8 +330,7 @@ namespace QuanLyCuaHangSachMini.GUI
             }
             else
             {
-                List<NhaXuatBan> nxb = new List<NhaXuatBan>();
-                nxb = context.NhaXuatBan
+                List<NhaXuatBan> nxb = context.NhaXuatBan
                     .Where(r => r.TenNhaXuatBan.Contains(tuKhoa))
                     .OrderBy(r => r.ID)
                     .ToList();
@@ -250,15 +344,35 @@ namespace QuanLyCuaHangSachMini.GUI
                 cboTenNhaXuatBan.DataBindings.Clear();
                 cboTenNhaXuatBan.DataBindings.Add("Text", bindingSource, "TenNhaXuatBan", false, DataSourceUpdateMode.Never);
 
+                txtDienThoai.DataBindings.Clear();
+                txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+
+                txtEmail.DataBindings.Clear();
+                txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
+
+                txtDiaChi.DataBindings.Clear();
+                txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
+
                 dgvNhaXuatBan.DataSource = bindingSource;
 
                 if (dgvNhaXuatBan.Rows.Count > 0 && dgvNhaXuatBan.CurrentRow != null)
                 {
                     id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value.ToString());
+
+                    NhatKyHelper.GhiLog(
+                        "Tìm kiếm",
+                        "NhaXuatBan",
+                        null,
+                        "Tìm kiếm nhà xuất bản với từ khóa: " + tuKhoa
+                    );
                 }
                 else
                 {
                     txtMaNhaXuatBan.Clear();
+                    txtDienThoai.Clear();
+                    txtEmail.Clear();
+                    txtDiaChi.Clear();
+
                     MessageBox.Show("Không tìm thấy nhà xuất bản phù hợp.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -330,6 +444,9 @@ namespace QuanLyCuaHangSachMini.GUI
                             foreach (DataRow r in table.Rows)
                             {
                                 string tenNhaXuatBan = "";
+                                string dienThoai = "";
+                                string email = "";
+                                string diaChi = "";
 
                                 if (table.Columns.Contains("TenNhaXuatBan"))
                                     tenNhaXuatBan = r["TenNhaXuatBan"]?.ToString()?.Trim() ?? "";
@@ -338,10 +455,33 @@ namespace QuanLyCuaHangSachMini.GUI
                                 else if (table.Columns.Contains("TenNXB"))
                                     tenNhaXuatBan = r["TenNXB"]?.ToString()?.Trim() ?? "";
 
+                                if (table.Columns.Contains("DienThoai"))
+                                    dienThoai = r["DienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SoDienThoai"))
+                                    dienThoai = r["SoDienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SDT"))
+                                    dienThoai = r["SDT"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("Email"))
+                                    email = r["Email"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("DiaChi"))
+                                    diaChi = r["DiaChi"]?.ToString()?.Trim() ?? "";
+
                                 if (string.IsNullOrWhiteSpace(tenNhaXuatBan))
                                     continue;
 
-                                bool tonTai = context.NhaXuatBan.Any(x => x.TenNhaXuatBan == tenNhaXuatBan);
+                                if (!string.IsNullOrWhiteSpace(dienThoai))
+                                {
+                                    if (!dienThoai.All(char.IsDigit))
+                                        continue;
+                                    if (dienThoai.Length != 10)
+                                        continue;
+                                }
+
+                                bool tonTai = context.NhaXuatBan.Any(x =>
+                                    x.TenNhaXuatBan == tenNhaXuatBan &&
+                                    (x.DienThoai ?? "") == dienThoai);
                                 if (tonTai)
                                     continue;
 
@@ -350,12 +490,22 @@ namespace QuanLyCuaHangSachMini.GUI
                                 NhaXuatBan nxb = new NhaXuatBan();
                                 nxb.MaNhaXuatBan = "NXB" + soLonNhat.ToString("000");
                                 nxb.TenNhaXuatBan = tenNhaXuatBan;
+                                nxb.DienThoai = dienThoai;
+                                nxb.Email = email;
+                                nxb.DiaChi = diaChi;
 
                                 context.NhaXuatBan.Add(nxb);
                                 demThanhCong++;
                             }
 
                             context.SaveChanges();
+
+                            NhatKyHelper.GhiLog(
+                                "Nhập Excel",
+                                "NhaXuatBan",
+                                null,
+                                "Nhập Excel nhà xuất bản, thêm mới " + demThanhCong + " dòng."
+                            );
 
                             MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
                                 "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -389,23 +539,32 @@ namespace QuanLyCuaHangSachMini.GUI
                 try
                 {
                     DataTable table = new DataTable();
-                    table.Columns.AddRange(new DataColumn[2]
+                    table.Columns.AddRange(new DataColumn[5]
                     {
                         new DataColumn("MaNhaXuatBan", typeof(string)),
-                        new DataColumn("TenNhaXuatBan", typeof(string))
+                        new DataColumn("TenNhaXuatBan", typeof(string)),
+                        new DataColumn("DienThoai", typeof(string)),
+                        new DataColumn("Email", typeof(string)),
+                        new DataColumn("DiaChi", typeof(string))
                     });
 
-                    List<NhaXuatBan> nxb = new List<NhaXuatBan>();
-                    nxb = context.NhaXuatBan.OrderBy(r => r.ID).ToList();
+                    List<NhaXuatBan> nxb = context.NhaXuatBan.OrderBy(r => r.ID).ToList();
 
                     foreach (NhaXuatBan item in nxb)
-                        table.Rows.Add(item.MaNhaXuatBan, item.TenNhaXuatBan);
+                        table.Rows.Add(item.MaNhaXuatBan, item.TenNhaXuatBan, item.DienThoai, item.Email, item.DiaChi);
 
                     using (XLWorkbook wb = new XLWorkbook())
                     {
                         var sheet = wb.Worksheets.Add(table, "NhaXuatBan");
                         sheet.Columns().AdjustToContents();
                         wb.SaveAs(saveFileDialog.FileName);
+
+                        NhatKyHelper.GhiLog(
+                            "Xuất Excel",
+                            "NhaXuatBan",
+                            null,
+                            "Xuất danh sách nhà xuất bản ra Excel, số dòng: " + nxb.Count
+                        );
 
                         MessageBox.Show("Đã xuất dữ liệu ra tập tin Excel thành công.",
                             "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -416,16 +575,6 @@ namespace QuanLyCuaHangSachMini.GUI
                     MessageBox.Show(ex.Message, "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
-            }
-        }
-
-        private void dgvNhaXuatBan_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && dgvNhaXuatBan.CurrentRow != null)
-            {
-                id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value.ToString());
-                txtMaNhaXuatBan.Text = dgvNhaXuatBan.CurrentRow.Cells["MaNhaXuatBan"].Value.ToString();
-                cboTenNhaXuatBan.Text = dgvNhaXuatBan.CurrentRow.Cells["TenNhaXuatBan"].Value.ToString();
             }
         }
     }

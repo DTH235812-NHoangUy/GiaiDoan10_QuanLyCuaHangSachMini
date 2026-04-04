@@ -2,6 +2,7 @@
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
+using QuanLyCuaHangSachMini.Helpers;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
@@ -388,6 +389,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                 context.SaveChanges();
                 transaction.Commit();
+
+                NhatKyHelper.GhiLog(
+                    "Thêm",
+                    "PhieuNhap",
+                    pn.ID.ToString(),
+                    "Lập phiếu nhập: " + pn.MaPhieuNhap + " - Tổng tiền: " + dsChiTietTam.Sum(r => r.ThanhTien).ToString("N0")
+                );
 
                 MessageBox.Show("Lập phiếu nhập thành công.", "Thành công",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);

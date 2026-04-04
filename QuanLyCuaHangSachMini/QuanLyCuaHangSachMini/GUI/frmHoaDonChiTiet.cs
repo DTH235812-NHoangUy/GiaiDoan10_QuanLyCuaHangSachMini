@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
+using QuanLyCuaHangSachMini.Helpers;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
@@ -378,6 +379,9 @@ namespace QuanLyCuaHangSachMini.GUI
             try
             {
                 List<DanhSachHoaDonChiTiet> danhSachMoi = hoaDonChiTiet.ToList();
+                bool dangSua = id != 0;
+                string maHoaDonLog = "";
+                int hoaDonIDLog = 0;
 
                 if (id != 0)
                 {
@@ -470,6 +474,8 @@ namespace QuanLyCuaHangSachMini.GUI
                     }
 
                     context.SaveChanges();
+                    maHoaDonLog = hd.MaHoaDon;
+                    hoaDonIDLog = hd.ID;
                 }
                 else
                 {
@@ -528,9 +534,19 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     context.SaveChanges();
                     id = hd.ID;
+
+                    maHoaDonLog = hd.MaHoaDon;
+                    hoaDonIDLog = hd.ID;
                 }
 
                 transaction.Commit();
+
+                NhatKyHelper.GhiLog(
+                    dangSua ? "Sửa" : "Thêm",
+                    "HoaDon",
+                    hoaDonIDLog.ToString(),
+                    (dangSua ? "Cập nhật hóa đơn: " : "Lập hóa đơn: ") + maHoaDonLog
+                );
 
                 MessageBox.Show("Đã lưu thành công!", "Hoàn tất",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);

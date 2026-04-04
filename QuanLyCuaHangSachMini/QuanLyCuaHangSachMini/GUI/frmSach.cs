@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using QuanLyCuaHangSachMini.Data;
+using QuanLyCuaHangSachMini.Helpers;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
 using System.Data;
@@ -426,6 +427,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     context.Sach.Add(s);
                     context.SaveChanges();
+
+                    NhatKyHelper.GhiLog(
+                        "Thêm",
+                        "Sach",
+                        s.ID.ToString(),
+                        "Thêm sách: " + s.TenSach
+                    );
                 }
                 else
                 {
@@ -461,6 +469,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                         context.Sach.Update(s);
                         context.SaveChanges();
+
+                        NhatKyHelper.GhiLog(
+                            "Sửa",
+                            "Sach",
+                            s.ID.ToString(),
+                            "Sửa sách: " + s.TenSach
+                        );
                     }
                 }
 
@@ -495,8 +510,18 @@ namespace QuanLyCuaHangSachMini.GUI
                         Sach? s = context.Sach.Find(id);
                         if (s != null)
                         {
+                            string khoaChinh = s.ID.ToString();
+                            string tenSach = s.TenSach;
+
                             context.Sach.Remove(s);
                             context.SaveChanges();
+
+                            NhatKyHelper.GhiLog(
+                                "Xóa",
+                                "Sach",
+                                khoaChinh,
+                                "Xóa sách: " + tenSach
+                            );
                         }
 
                         TaiLaiToanBoDuLieu();
@@ -579,6 +604,13 @@ namespace QuanLyCuaHangSachMini.GUI
                 btnSua.Enabled = true;
                 btnXoa.Enabled = true;
                 btnXuat.Enabled = true;
+
+                NhatKyHelper.GhiLog(
+                    "Tìm kiếm",
+                    "Sach",
+                    null,
+                    "Tìm kiếm sách với từ khóa: " + cboTenSach.Text.Trim()
+                );
             }
             else
             {
@@ -750,6 +782,8 @@ namespace QuanLyCuaHangSachMini.GUI
                             .Max();
                     }
 
+                    int soLuongThemMoi = 0;
+
                     foreach (DataRow row in table.Rows)
                     {
                         string tenTheLoai = table.Columns.Contains("TenTheLoai") ? row["TenTheLoai"].ToString()!.Trim() : "";
@@ -817,9 +851,17 @@ namespace QuanLyCuaHangSachMini.GUI
                         s.TrangThai = soLuongTon > 0 ? "Còn hàng" : "Hết hàng";
 
                         context.Sach.Add(s);
+                        soLuongThemMoi++;
                     }
 
                     context.SaveChanges();
+
+                    NhatKyHelper.GhiLog(
+                        "Nhập Excel",
+                        "Sach",
+                        null,
+                        "Nhập Excel sách, thêm mới " + soLuongThemMoi + " dòng."
+                    );
 
                     TaiLaiToanBoDuLieu();
                     BatTatChucNang(false);
@@ -898,6 +940,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     worksheet.Columns().AdjustToContents();
                     workbook.SaveAs(saveFileDialog.FileName);
+
+                    NhatKyHelper.GhiLog(
+                        "Xuất Excel",
+                        "Sach",
+                        null,
+                        "Xuất danh sách sách ra Excel, số dòng: " + dsSach.Count
+                    );
 
                     MessageBox.Show("Xuất Excel thành công.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);

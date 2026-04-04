@@ -1,48 +1,38 @@
-﻿using QuanLyCuaHangSachMini.Data;
-using System;
+﻿using QuanLyCuaHangSachMini.Helpers;
 using System.Diagnostics;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
     public partial class frmMain : Form
     {
-        private readonly AppDbContext context = new AppDbContext();
-
-        private frmTheLoai theLoai = null;
-        private frmNhaXuatBan nhaXuatBan = null;
-        private frmNhaCungCap nhaCungCap = null;
-        private frmSach sach = null;
-        private frmKhachHang khachHang = null;
-        private frmNhanVien nhanVien = null;
-        private frmPhieuNhap phieuNhap = null;
-        private frmHoaDon hoaDon = null;
-        private frmDangNhap dangNhap = null;
-
-        private int nhanVienDangNhapID = 0;
-        private string tenDangNhapNhanVien = "";
-        private string hoVaTenNhanVien = "";
-        private string quyenHanNhanVien = "";
+        private frmTheLoai? theLoai = null;
+        private frmNhaXuatBan? nhaXuatBan = null;
+        private frmNhaCungCap? nhaCungCap = null;
+        private frmSach? sach = null;
+        private frmKhachHang? khachHang = null;
+        private frmNhanVien? nhanVien = null;
+        private frmPhieuNhap? phieuNhap = null;
+        private frmHoaDon? hoaDon = null;
+        private frmNhatKyHeThong? nhatKyHeThong = null;
 
         public int NhanVienDangNhapID
         {
-            get { return nhanVienDangNhapID; }
+            get { return SessionHelper.NhanVienID; }
         }
 
         public string TenDangNhapNhanVien
         {
-            get { return tenDangNhapNhanVien; }
+            get { return SessionHelper.TenDangNhap; }
         }
 
         public string HoVaTenNhanVien
         {
-            get { return hoVaTenNhanVien; }
+            get { return SessionHelper.HoVaTen; }
         }
 
         public string QuyenHanNhanVien
         {
-            get { return quyenHanNhanVien; }
+            get { return SessionHelper.QuyenHan; }
         }
 
         public frmMain()
@@ -52,84 +42,37 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            SessionHelper.DangXuat();
             ChuaDangNhap();
-            DangNhap();
+
+            bool dangNhapThanhCong = HienThiDangNhap(true);
+            if (!dangNhapThanhCong)
+                Close();
         }
 
-        private void DangNhap()
+        private bool HienThiDangNhap(bool batBuocDangNhap = false)
         {
-        LamLai:
-            if (dangNhap == null || dangNhap.IsDisposed)
-                dangNhap = new frmDangNhap();
-
-            dangNhap.txtTenDangNhap.Clear();
-            dangNhap.txtMatKhau.Clear();
-
-            if (dangNhap.ShowDialog() == DialogResult.OK)
+            using (frmDangNhap dangNhap = new frmDangNhap())
             {
-                string tenDangNhap = dangNhap.txtTenDangNhap.Text.Trim();
-                string matKhau = dangNhap.txtMatKhau.Text.Trim();
-
-                if (tenDangNhap == "")
+                if (dangNhap.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Tên đăng nhập không được bỏ trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    dangNhap.txtTenDangNhap.Focus();
-                    goto LamLai;
-                }
-                else if (matKhau == "")
-                {
-                    MessageBox.Show("Mật khẩu không được bỏ trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    dangNhap.txtMatKhau.Focus();
-                    goto LamLai;
-                }
-                else
-                {
-                    var taiKhoan = context.NhanVien.SingleOrDefault(r => r.TenDangNhap == tenDangNhap);
-
-                    if (taiKhoan == null)
-                    {
-                        MessageBox.Show("Tên đăng nhập không chính xác!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        dangNhap.txtTenDangNhap.Focus();
-                        goto LamLai;
-                    }
+                    if (SessionHelper.LaQuanTri)
+                        QuyenAdmin();
                     else
-                    {
-                        if (taiKhoan.MatKhau == matKhau)
-                        {
-                            if (taiKhoan.KichHoat == false)
-                            {
-                                MessageBox.Show("Tài khoản này đã bị khóa hoặc ngừng hoạt động!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                goto LamLai;
-                            }
+                        QuyenNhanVien();
 
-                            nhanVienDangNhapID = taiKhoan.ID;
-                            tenDangNhapNhanVien = taiKhoan.TenDangNhap;
-                            hoVaTenNhanVien = taiKhoan.HoVaTen;
-                            quyenHanNhanVien = taiKhoan.QuyenHan ? "admin" : "nhanvien";
-
-                            if (taiKhoan.QuyenHan == true)
-                                QuyenAdmin();
-                            else
-                                QuyenNhanVien();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Mật khẩu không chính xác!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            dangNhap.txtMatKhau.Focus();
-                            goto LamLai;
-                        }
-                    }
+                    return true;
                 }
             }
+
+            if (batBuocDangNhap)
+                return false;
+
+            return false;
         }
 
         public void ChuaDangNhap()
         {
-            nhanVienDangNhapID = 0;
-            tenDangNhapNhanVien = "";
-            hoVaTenNhanVien = "";
-            quyenHanNhanVien = "";
-
             mnuDangNhap.Enabled = true;
 
             mnuDangXuat.Enabled = false;
@@ -146,6 +89,7 @@ namespace QuanLyCuaHangSachMini.GUI
 
             mnuThongKeSach.Enabled = false;
             mnuThongKeDoanhThu.Enabled = false;
+            mnuNhatKyHeThong.Enabled = false;
 
             lblTrangThai.Text = "Chưa đăng nhập.";
         }
@@ -168,13 +112,17 @@ namespace QuanLyCuaHangSachMini.GUI
 
             mnuThongKeSach.Enabled = true;
             mnuThongKeDoanhThu.Enabled = true;
+            mnuNhatKyHeThong.Enabled = true;
 
-            lblTrangThai.Text = "Quản trị viên: " + hoVaTenNhanVien;
+            lblTrangThai.Text = "Quản trị viên: " + SessionHelper.HoVaTen + " | " + SessionHelper.TenDangNhap;
         }
 
         public void QuyenNhanVien()
         {
             mnuDangNhap.Enabled = false;
+
+            mnuDangXuat.Enabled = true;
+            mnuDoiMatKhau.Enabled = true;
 
             mnuLoaiSach.Enabled = false;
             mnuNhaXuatBan.Enabled = false;
@@ -183,29 +131,69 @@ namespace QuanLyCuaHangSachMini.GUI
             mnuNhanVien.Enabled = false;
             mnuPhieuNhap.Enabled = false;
 
-            mnuDangXuat.Enabled = true;
-            mnuDoiMatKhau.Enabled = true;
             mnuKhachHang.Enabled = true;
             mnuHoaDon.Enabled = true;
+
             mnuThongKeSach.Enabled = true;
             mnuThongKeDoanhThu.Enabled = true;
+            mnuNhatKyHeThong.Enabled = false;
 
-            lblTrangThai.Text = "Nhân viên: " + hoVaTenNhanVien;
+            lblTrangThai.Text = "Nhân viên: " + SessionHelper.HoVaTen + " | " + SessionHelper.TenDangNhap;
         }
 
-        private void mnuDangNhap_Click(object sender, EventArgs e)
-        {
-            DangNhap();
-        }
-
-        private void mnuDangXuat_Click(object sender, EventArgs e)
+        private void DongTatCaFormCon()
         {
             foreach (Form child in MdiChildren)
             {
                 child.Close();
             }
 
-            ChuaDangNhap();
+            theLoai = null;
+            nhaXuatBan = null;
+            nhaCungCap = null;
+            sach = null;
+            khachHang = null;
+            nhanVien = null;
+            phieuNhap = null;
+            hoaDon = null;
+            nhatKyHeThong = null;
+        }
+
+        private void mnuDangNhap_Click(object sender, EventArgs e)
+        {
+            if (SessionHelper.DaDangNhap)
+            {
+                MessageBox.Show("Hiện tại bạn đã đăng nhập rồi.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            HienThiDangNhap(false);
+        }
+
+        private void mnuDangXuat_Click(object sender, EventArgs e)
+        {
+            if (!SessionHelper.DaDangNhap)
+            {
+                MessageBox.Show("Hiện tại chưa có tài khoản nào đăng nhập.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (MessageBox.Show("Bạn có chắc muốn đăng xuất không?", "Đăng xuất",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                NhatKyHelper.GhiLog(
+                    "Đăng xuất",
+                    "Hệ thống",
+                    SessionHelper.NhanVienID.ToString(),
+                    "Đăng xuất khỏi hệ thống"
+                );
+
+                DongTatCaFormCon();
+                SessionHelper.DangXuat();
+                ChuaDangNhap();
+            }
         }
 
         private void mnuThoat_Click(object sender, EventArgs e)
@@ -301,7 +289,11 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             if (hoaDon == null || hoaDon.IsDisposed)
             {
-                hoaDon = new frmHoaDon(nhanVienDangNhapID, quyenHanNhanVien, hoVaTenNhanVien);
+                hoaDon = new frmHoaDon(
+                    SessionHelper.NhanVienID,
+                    SessionHelper.QuyenHan,
+                    SessionHelper.HoVaTen
+                );
                 hoaDon.MdiParent = this;
                 hoaDon.Show();
             }
@@ -309,29 +301,64 @@ namespace QuanLyCuaHangSachMini.GUI
                 hoaDon.Activate();
         }
 
+        private void mnuNhatKyHeThong_Click(object sender, EventArgs e)
+        {
+            if (!SessionHelper.LaQuanTri)
+            {
+                MessageBox.Show("Bạn không có quyền xem nhật ký hệ thống.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (nhatKyHeThong == null || nhatKyHeThong.IsDisposed)
+            {
+                nhatKyHeThong = new frmNhatKyHeThong();
+                nhatKyHeThong.MdiParent = this;
+                nhatKyHeThong.Show();
+            }
+            else
+                nhatKyHeThong.Activate();
+        }
+
         private void mnuDoiMatKhau_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng đổi mật khẩu sẽ làm tiếp sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Chức năng đổi mật khẩu sẽ làm tiếp sau.", "Thông báo",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void mnuThongKeSach_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng thống kê sách sẽ làm tiếp sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Chức năng thống kê sách sẽ làm tiếp sau.", "Thông báo",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void mnuThongKeDoanhThu_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng thống kê doanh thu sẽ làm tiếp sau.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Chức năng thống kê doanh thu sẽ làm tiếp sau.", "Thông báo",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void mnuHuongDanSuDung_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Đăng nhập tài khoản để sử dụng hệ thống.\nCác chức năng sẽ mở trong cửa sổ chính dạng MDI.", "Hướng dẫn sử dụng", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(
+                "1. Đăng nhập tài khoản để sử dụng hệ thống." +
+                "\n2. Admin quản lý toàn bộ danh mục, nhân viên, phiếu nhập, hóa đơn và nhật ký hệ thống." +
+                "\n3. Nhân viên chỉ thao tác các chức năng được phân quyền." +
+                "\n4. Các form sẽ mở trong cửa sổ chính dạng MDI.",
+                "Hướng dẫn sử dụng",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         private void mnuThongTinPhanMem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("PHẦN MỀM QUẢN LÝ CỬA HÀNG SÁCH MINI\nThiết kế theo form mẫu của thầy, chỉnh lại theo đồ án của bạn.", "Thông tin phần mềm", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(
+                "PHẦN MỀM QUẢN LÝ CỬA HÀNG SÁCH MINI" +
+                "\nThiết kế theo form mẫu WinForms dạng MDI." +
+                "\nĐã chỉnh lại theo đúng đồ án và phân quyền của bạn.",
+                "Thông tin phần mềm",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         private void lblLienKet_Click(object sender, EventArgs e)

@@ -16,6 +16,8 @@
         private void InitializeComponent()
         {
             groupBox1 = new GroupBox();
+            txtEmail = new TextBox();
+            lblEmail = new Label();
             btnXuat = new Button();
             btnNhap = new Button();
             btnThoat = new Button();
@@ -39,6 +41,7 @@
             MaKhachHang = new DataGridViewTextBoxColumn();
             HoVaTen = new DataGridViewTextBoxColumn();
             DienThoai = new DataGridViewTextBoxColumn();
+            Email = new DataGridViewTextBoxColumn();
             DiaChi = new DataGridViewTextBoxColumn();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -47,6 +50,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(txtEmail);
+            groupBox1.Controls.Add(lblEmail);
             groupBox1.Controls.Add(btnXuat);
             groupBox1.Controls.Add(btnNhap);
             groupBox1.Controls.Add(btnThoat);
@@ -66,10 +71,26 @@
             groupBox1.Controls.Add(lblMaKH);
             groupBox1.Location = new Point(12, 12);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(980, 165);
+            groupBox1.Size = new Size(980, 205);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "Thông tin khách hàng";
+            // 
+            // txtEmail
+            // 
+            txtEmail.Location = new Point(120, 154);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(290, 27);
+            txtEmail.TabIndex = 8;
+            // 
+            // lblEmail
+            // 
+            lblEmail.AutoSize = true;
+            lblEmail.Location = new Point(16, 157);
+            lblEmail.Name = "lblEmail";
+            lblEmail.Size = new Size(49, 20);
+            lblEmail.TabIndex = 17;
+            lblEmail.Text = "Email:";
             // 
             // btnXuat
             // 
@@ -171,6 +192,7 @@
             // txtDienThoai
             // 
             txtDienThoai.Location = new Point(120, 88);
+            txtDienThoai.MaxLength = 10;
             txtDienThoai.Name = "txtDienThoai";
             txtDienThoai.Size = new Size(290, 27);
             txtDienThoai.TabIndex = 6;
@@ -187,6 +209,7 @@
             // 
             txtMaKhachHang.Location = new Point(120, 22);
             txtMaKhachHang.Name = "txtMaKhachHang";
+            txtMaKhachHang.ReadOnly = true;
             txtMaKhachHang.Size = new Size(290, 27);
             txtMaKhachHang.TabIndex = 4;
             // 
@@ -195,7 +218,7 @@
             lblDiaChi.AutoSize = true;
             lblDiaChi.Location = new Point(16, 124);
             lblDiaChi.Name = "lblDiaChi";
-            lblDiaChi.Size = new Size(58, 20);
+            lblDiaChi.Size = new Size(55, 20);
             lblDiaChi.TabIndex = 3;
             lblDiaChi.Text = "Địa chỉ:";
             // 
@@ -204,7 +227,7 @@
             lblSDT.AutoSize = true;
             lblSDT.Location = new Point(16, 91);
             lblSDT.Name = "lblSDT";
-            lblSDT.Size = new Size(81, 20);
+            lblSDT.Size = new Size(79, 20);
             lblSDT.TabIndex = 2;
             lblSDT.Text = "Điện thoại:";
             // 
@@ -229,7 +252,7 @@
             // groupBox2
             // 
             groupBox2.Controls.Add(dgvKhachHang);
-            groupBox2.Location = new Point(12, 183);
+            groupBox2.Location = new Point(12, 223);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(980, 390);
             groupBox2.TabIndex = 1;
@@ -242,7 +265,7 @@
             dgvKhachHang.AllowUserToDeleteRows = false;
             dgvKhachHang.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvKhachHang.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvKhachHang.Columns.AddRange(new DataGridViewColumn[] { ID, MaKhachHang, HoVaTen, DienThoai, DiaChi });
+            dgvKhachHang.Columns.AddRange(new DataGridViewColumn[] { ID, MaKhachHang, HoVaTen, DienThoai, Email, DiaChi });
             dgvKhachHang.Dock = DockStyle.Fill;
             dgvKhachHang.Location = new Point(3, 23);
             dgvKhachHang.MultiSelect = false;
@@ -253,7 +276,6 @@
             dgvKhachHang.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvKhachHang.Size = new Size(974, 364);
             dgvKhachHang.TabIndex = 0;
-            dgvKhachHang.CellClick += dgvKhachHang_CellClick;
             // 
             // ID
             // 
@@ -288,6 +310,14 @@
             DienThoai.Name = "DienThoai";
             DienThoai.ReadOnly = true;
             // 
+            // Email
+            // 
+            Email.DataPropertyName = "Email";
+            Email.HeaderText = "Email";
+            Email.MinimumWidth = 6;
+            Email.Name = "Email";
+            Email.ReadOnly = true;
+            // 
             // DiaChi
             // 
             DiaChi.DataPropertyName = "DiaChi";
@@ -300,7 +330,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1004, 585);
+            ClientSize = new Size(1004, 625);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Name = "frmKhachHang";
@@ -329,10 +359,12 @@
         private Button btnTimKiem;
         private TextBox txtDiaChi;
         private TextBox txtDienThoai;
+        private TextBox txtEmail;
         private ComboBox cboHoVaTen;
         private TextBox txtMaKhachHang;
         private Label lblDiaChi;
         private Label lblSDT;
+        private Label lblEmail;
         private Label lblHoTen;
         private Label lblMaKH;
         private DataGridView dgvKhachHang;
@@ -340,6 +372,7 @@
         private DataGridViewTextBoxColumn MaKhachHang;
         private DataGridViewTextBoxColumn HoVaTen;
         private DataGridViewTextBoxColumn DienThoai;
+        private DataGridViewTextBoxColumn Email;
         private DataGridViewTextBoxColumn DiaChi;
     }
 }

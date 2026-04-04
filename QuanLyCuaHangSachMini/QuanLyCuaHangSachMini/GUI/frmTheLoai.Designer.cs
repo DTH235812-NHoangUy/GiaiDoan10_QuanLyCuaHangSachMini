@@ -17,6 +17,8 @@
         private void InitializeComponent()
         {
             grpThongTinTheLoai = new GroupBox();
+            txtMoTa = new TextBox();
+            lblMoTa = new Label();
             btnXuat = new Button();
             btnNhap = new Button();
             btnTimKiem = new Button();
@@ -35,6 +37,7 @@
             ID = new DataGridViewTextBoxColumn();
             MaTheLoai = new DataGridViewTextBoxColumn();
             TenTheLoai = new DataGridViewTextBoxColumn();
+            MoTa = new DataGridViewTextBoxColumn();
             grpThongTinTheLoai.SuspendLayout();
             grpDanhSachTheLoai.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvTheLoai).BeginInit();
@@ -42,6 +45,8 @@
             // 
             // grpThongTinTheLoai
             // 
+            grpThongTinTheLoai.Controls.Add(txtMoTa);
+            grpThongTinTheLoai.Controls.Add(lblMoTa);
             grpThongTinTheLoai.Controls.Add(btnXuat);
             grpThongTinTheLoai.Controls.Add(btnNhap);
             grpThongTinTheLoai.Controls.Add(btnTimKiem);
@@ -57,10 +62,26 @@
             grpThongTinTheLoai.Controls.Add(label1);
             grpThongTinTheLoai.Location = new Point(12, 12);
             grpThongTinTheLoai.Name = "grpThongTinTheLoai";
-            grpThongTinTheLoai.Size = new Size(860, 130);
+            grpThongTinTheLoai.Size = new Size(860, 170);
             grpThongTinTheLoai.TabIndex = 0;
             grpThongTinTheLoai.TabStop = false;
             grpThongTinTheLoai.Text = "Thông tin thể loại";
+            // 
+            // txtMoTa
+            // 
+            txtMoTa.Location = new Point(121, 99);
+            txtMoTa.Name = "txtMoTa";
+            txtMoTa.Size = new Size(256, 27);
+            txtMoTa.TabIndex = 4;
+            // 
+            // lblMoTa
+            // 
+            lblMoTa.AutoSize = true;
+            lblMoTa.Location = new Point(16, 102);
+            lblMoTa.Name = "lblMoTa";
+            lblMoTa.Size = new Size(50, 20);
+            lblMoTa.TabIndex = 13;
+            lblMoTa.Text = "Mô tả:";
             // 
             // btnXuat
             // 
@@ -189,9 +210,9 @@
             // grpDanhSachTheLoai
             // 
             grpDanhSachTheLoai.Controls.Add(dgvTheLoai);
-            grpDanhSachTheLoai.Location = new Point(12, 148);
+            grpDanhSachTheLoai.Location = new Point(12, 188);
             grpDanhSachTheLoai.Name = "grpDanhSachTheLoai";
-            grpDanhSachTheLoai.Size = new Size(860, 340);
+            grpDanhSachTheLoai.Size = new Size(860, 300);
             grpDanhSachTheLoai.TabIndex = 1;
             grpDanhSachTheLoai.TabStop = false;
             grpDanhSachTheLoai.Text = "Danh sách thể loại";
@@ -203,7 +224,7 @@
             dgvTheLoai.AllowUserToResizeRows = false;
             dgvTheLoai.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvTheLoai.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvTheLoai.Columns.AddRange(new DataGridViewColumn[] { ID, MaTheLoai, TenTheLoai });
+            dgvTheLoai.Columns.AddRange(new DataGridViewColumn[] { ID, MaTheLoai, TenTheLoai, MoTa });
             dgvTheLoai.Dock = DockStyle.Fill;
             dgvTheLoai.Location = new Point(3, 23);
             dgvTheLoai.MultiSelect = false;
@@ -212,9 +233,8 @@
             dgvTheLoai.RowHeadersVisible = false;
             dgvTheLoai.RowHeadersWidth = 51;
             dgvTheLoai.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvTheLoai.Size = new Size(854, 314);
+            dgvTheLoai.Size = new Size(854, 274);
             dgvTheLoai.TabIndex = 0;
-            dgvTheLoai.CellClick += dgvTheLoai_CellClick;
             // 
             // ID
             // 
@@ -241,6 +261,14 @@
             TenTheLoai.Name = "TenTheLoai";
             TenTheLoai.ReadOnly = true;
             // 
+            // MoTa
+            // 
+            MoTa.DataPropertyName = "MoTa";
+            MoTa.HeaderText = "Mô tả";
+            MoTa.MinimumWidth = 6;
+            MoTa.Name = "MoTa";
+            MoTa.ReadOnly = true;
+            // 
             // frmTheLoai
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -265,8 +293,10 @@
         private GroupBox grpDanhSachTheLoai;
         private Label label1;
         private Label label2;
+        private Label lblMoTa;
         private TextBox txtMaTheLoai;
         private ComboBox cboTenTheLoai;
+        private TextBox txtMoTa;
         private Button btnThem;
         private Button btnSua;
         private Button btnXoa;
@@ -280,5 +310,6 @@
         private DataGridViewTextBoxColumn ID;
         private DataGridViewTextBoxColumn MaTheLoai;
         private DataGridViewTextBoxColumn TenTheLoai;
+        private DataGridViewTextBoxColumn MoTa;
     }
 }

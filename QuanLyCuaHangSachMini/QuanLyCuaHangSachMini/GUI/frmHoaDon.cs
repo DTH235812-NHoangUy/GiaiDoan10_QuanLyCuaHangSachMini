@@ -77,7 +77,7 @@ namespace QuanLyCuaHangSachMini.GUI
                     TongTienHoaDon = r.HoaDon_ChiTiet.Sum(ct => (decimal?)ct.SoLuongBan * ct.DonGiaBan) ?? 0,
                     XemChiTiet = "Xem chi tiết"
                 })
-                .OrderByDescending(r => r.ID)
+                .OrderBy(r => r.ID)
                 .ToList();
 
             dataGridView.DataSource = null;
@@ -296,7 +296,7 @@ namespace QuanLyCuaHangSachMini.GUI
                     TongTienHoaDon = r.HoaDon_ChiTiet.Sum(ct => (decimal?)ct.SoLuongBan * ct.DonGiaBan) ?? 0,
                     XemChiTiet = "Xem chi tiết"
                 })
-                .OrderByDescending(r => r.ID)
+                .OrderBy(r => r.ID)
                 .ToList();
 
             dataGridView.DataSource = null;
@@ -305,59 +305,32 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnXuat_Click(object sender, EventArgs e)
         {
-            DanhSachHoaDon? hoaDonDangChon = LayHoaDonDangChon();
-            if (hoaDonDangChon == null)
+            IQueryable<HoaDon> query = context.HoaDon
+                .Include(r => r.NhanVien)
+                .Include(r => r.KhachHang)
+                .Include(r => r.HoaDon_ChiTiet)
+                .ThenInclude(r => r.Sach);
+
+            if (quyenHanNguoiDung == "nhanvien")
             {
-                MessageBox.Show("Vui lòng chọn hóa đơn cần xuất.", "Thông báo",
+                query = query.Where(r => r.NhanVienID == nhanVienDangNhapID);
+            }
+
+            List<HoaDon> dsHoaDon = query
+                .OrderBy(r => r.ID)
+                .ToList();
+
+            if (dsHoaDon.Count == 0)
+            {
+                MessageBox.Show("Không có hóa đơn để xuất.", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            if (quyenHanNguoiDung == "nhanvien" && hoaDonDangChon.NhanVienID != nhanVienDangNhapID)
-            {
-                MessageBox.Show("Bạn chỉ được xuất hóa đơn do chính bạn lập.",
-                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            int hoaDonID = hoaDonDangChon.ID;
-
-            HoaDon? hoaDon = context.HoaDon
-                .Include(r => r.NhanVien)
-                .Include(r => r.KhachHang)
-                .Include(r => r.HoaDon_ChiTiet)
-                .ThenInclude(r => r.Sach)
-                .FirstOrDefault(r => r.ID == hoaDonID);
-
-            if (hoaDon == null)
-            {
-                MessageBox.Show("Không tìm thấy hóa đơn cần xuất.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            List<DanhSachHoaDonChiTiet> chiTietHoaDon = context.HoaDon_ChiTiet
-                .Where(r => r.HoaDonID == hoaDonID)
-                .Select(r => new DanhSachHoaDonChiTiet
-                {
-                    ID = r.ID,
-                    HoaDonID = r.HoaDonID,
-                    SachID = r.SachID,
-                    MaSach = r.Sach.MaSach,
-                    TenSach = r.Sach.TenSach,
-                    SoLuongBan = r.SoLuongBan,
-                    DonGiaBan = r.DonGiaBan,
-                    ThanhTien = r.SoLuongBan * r.DonGiaBan
-                })
-                .OrderBy(r => r.ID)
-                .ToList();
-
-            decimal tongTien = chiTietHoaDon.Sum(r => r.ThanhTien);
-
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Title = "Xuất hóa đơn ra tập tin Excel";
+            saveFileDialog.Title = "Xuất toàn bộ hóa đơn ra tập tin Excel";
             saveFileDialog.Filter = "Tập tin Excel|*.xlsx";
-            saveFileDialog.FileName = $"{hoaDon.MaHoaDon}.xlsx";
+            saveFileDialog.FileName = $"DanhSachHoaDon_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -365,92 +338,125 @@ namespace QuanLyCuaHangSachMini.GUI
                 {
                     using XLWorkbook workbook = new XLWorkbook();
 
-                    IXLWorksheet wsHoaDon = workbook.Worksheets.Add("HoaDon");
+                    IXLWorksheet wsHoaDon = workbook.Worksheets.Add("DanhSachHoaDon");
 
-                    wsHoaDon.Cell("A1").Value = "THÔNG TIN HÓA ĐƠN";
-                    wsHoaDon.Range("A1:D1").Merge();
+                    wsHoaDon.Cell("A1").Value = "DANH SÁCH HÓA ĐƠN";
+                    wsHoaDon.Range("A1:G1").Merge();
                     wsHoaDon.Cell("A1").Style.Font.Bold = true;
                     wsHoaDon.Cell("A1").Style.Font.FontSize = 16;
                     wsHoaDon.Cell("A1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                    wsHoaDon.Cell("A3").Value = "ID";
-                    wsHoaDon.Cell("B3").Value = hoaDon.ID;
+                    wsHoaDon.Cell("A3").Value = "STT";
+                    wsHoaDon.Cell("B3").Value = "Mã hóa đơn";
+                    wsHoaDon.Cell("C3").Value = "Ngày lập";
+                    wsHoaDon.Cell("D3").Value = "Nhân viên";
+                    wsHoaDon.Cell("E3").Value = "Khách hàng";
+                    wsHoaDon.Cell("F3").Value = "Tổng tiền";
+                    wsHoaDon.Cell("G3").Value = "Ghi chú";
 
-                    wsHoaDon.Cell("A4").Value = "Mã hóa đơn";
-                    wsHoaDon.Cell("B4").Value = hoaDon.MaHoaDon;
+                    wsHoaDon.Range("A3:G3").Style.Font.Bold = true;
+                    wsHoaDon.Range("A3:G3").Style.Fill.BackgroundColor = XLColor.LightGray;
+                    wsHoaDon.Range("A3:G3").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                    wsHoaDon.Cell("A5").Value = "Ngày lập";
-                    wsHoaDon.Cell("B5").Value = hoaDon.NgayLap.ToString("dd/MM/yyyy HH:mm:ss");
+                    int dongHoaDon = 4;
+                    int sttHoaDon = 1;
+                    decimal tongTatCaHoaDon = 0;
 
-                    wsHoaDon.Cell("A6").Value = "Nhân viên";
-                    wsHoaDon.Cell("B6").Value = hoaDon.NhanVien != null ? hoaDon.NhanVien.HoVaTen : "";
+                    foreach (HoaDon hoaDon in dsHoaDon)
+                    {
+                        decimal tongTien = hoaDon.HoaDon_ChiTiet.Sum(ct => ct.SoLuongBan * ct.DonGiaBan);
+                        tongTatCaHoaDon += tongTien;
 
-                    wsHoaDon.Cell("A7").Value = "Khách hàng";
-                    wsHoaDon.Cell("B7").Value = hoaDon.KhachHang != null ? hoaDon.KhachHang.HoVaTen : "";
+                        wsHoaDon.Cell(dongHoaDon, 1).Value = sttHoaDon;
+                        wsHoaDon.Cell(dongHoaDon, 2).Value = hoaDon.MaHoaDon;
+                        wsHoaDon.Cell(dongHoaDon, 3).Value = hoaDon.NgayLap.ToString("dd/MM/yyyy HH:mm:ss");
+                        wsHoaDon.Cell(dongHoaDon, 4).Value = hoaDon.NhanVien != null ? hoaDon.NhanVien.HoVaTen : "";
+                        wsHoaDon.Cell(dongHoaDon, 5).Value = hoaDon.KhachHang != null ? hoaDon.KhachHang.HoVaTen : "";
+                        wsHoaDon.Cell(dongHoaDon, 6).Value = tongTien;
+                        wsHoaDon.Cell(dongHoaDon, 6).Style.NumberFormat.Format = "#,##0";
+                        wsHoaDon.Cell(dongHoaDon, 7).Value = hoaDon.GhiChuHoaDon ?? "";
 
-                    wsHoaDon.Cell("A8").Value = "Ghi chú";
-                    wsHoaDon.Cell("B8").Value = hoaDon.GhiChuHoaDon ?? "";
+                        dongHoaDon++;
+                        sttHoaDon++;
+                    }
 
-                    wsHoaDon.Cell("A9").Value = "Tổng tiền";
-                    wsHoaDon.Cell("B9").Value = tongTien;
-                    wsHoaDon.Cell("B9").Style.NumberFormat.Format = "#,##0";
-                    wsHoaDon.Cell("B9").Style.Font.Bold = true;
+                    wsHoaDon.Cell(dongHoaDon, 5).Value = "Tổng cộng";
+                    wsHoaDon.Cell(dongHoaDon, 5).Style.Font.Bold = true;
+                    wsHoaDon.Cell(dongHoaDon, 6).Value = tongTatCaHoaDon;
+                    wsHoaDon.Cell(dongHoaDon, 6).Style.NumberFormat.Format = "#,##0";
+                    wsHoaDon.Cell(dongHoaDon, 6).Style.Font.Bold = true;
 
-                    wsHoaDon.Range("A3:A9").Style.Font.Bold = true;
+                    wsHoaDon.Range(3, 1, dongHoaDon, 7).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    wsHoaDon.Range(3, 1, dongHoaDon, 7).Style.Border.InsideBorder = XLBorderStyleValues.Thin;
                     wsHoaDon.Columns().AdjustToContents();
 
-                    IXLWorksheet wsChiTiet = workbook.Worksheets.Add("ChiTietHoaDon");
+                    IXLWorksheet wsChiTiet = workbook.Worksheets.Add("ChiTietTatCaHoaDon");
 
-                    wsChiTiet.Cell("A1").Value = "CHI TIẾT HÓA ĐƠN";
-                    wsChiTiet.Range("A1:F1").Merge();
+                    wsChiTiet.Cell("A1").Value = "CHI TIẾT TẤT CẢ HÓA ĐƠN";
+                    wsChiTiet.Range("A1:J1").Merge();
                     wsChiTiet.Cell("A1").Style.Font.Bold = true;
                     wsChiTiet.Cell("A1").Style.Font.FontSize = 16;
                     wsChiTiet.Cell("A1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
                     wsChiTiet.Cell("A3").Value = "STT";
-                    wsChiTiet.Cell("B3").Value = "Mã sách";
-                    wsChiTiet.Cell("C3").Value = "Tên sách";
-                    wsChiTiet.Cell("D3").Value = "Số lượng bán";
-                    wsChiTiet.Cell("E3").Value = "Đơn giá bán";
-                    wsChiTiet.Cell("F3").Value = "Thành tiền";
+                    wsChiTiet.Cell("B3").Value = "Mã hóa đơn";
+                    wsChiTiet.Cell("C3").Value = "Ngày lập";
+                    wsChiTiet.Cell("D3").Value = "Nhân viên";
+                    wsChiTiet.Cell("E3").Value = "Khách hàng";
+                    wsChiTiet.Cell("F3").Value = "Mã sách";
+                    wsChiTiet.Cell("G3").Value = "Tên sách";
+                    wsChiTiet.Cell("H3").Value = "Số lượng bán";
+                    wsChiTiet.Cell("I3").Value = "Đơn giá bán";
+                    wsChiTiet.Cell("J3").Value = "Thành tiền";
 
-                    wsChiTiet.Range("A3:F3").Style.Font.Bold = true;
-                    wsChiTiet.Range("A3:F3").Style.Fill.BackgroundColor = XLColor.LightGray;
-                    wsChiTiet.Range("A3:F3").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    wsChiTiet.Range("A3:J3").Style.Font.Bold = true;
+                    wsChiTiet.Range("A3:J3").Style.Fill.BackgroundColor = XLColor.LightGray;
+                    wsChiTiet.Range("A3:J3").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-                    int dong = 4;
-                    int stt = 1;
+                    int dongChiTiet = 4;
+                    int sttChiTiet = 1;
 
-                    foreach (DanhSachHoaDonChiTiet item in chiTietHoaDon)
+                    foreach (HoaDon hoaDon in dsHoaDon)
                     {
-                        wsChiTiet.Cell(dong, 1).Value = stt;
-                        wsChiTiet.Cell(dong, 2).Value = item.MaSach;
-                        wsChiTiet.Cell(dong, 3).Value = item.TenSach;
-                        wsChiTiet.Cell(dong, 4).Value = item.SoLuongBan;
-                        wsChiTiet.Cell(dong, 5).Value = item.DonGiaBan;
-                        wsChiTiet.Cell(dong, 6).Value = item.ThanhTien;
+                        List<HoaDon_ChiTiet> dsChiTiet = hoaDon.HoaDon_ChiTiet
+                            .OrderBy(r => r.ID)
+                            .ToList();
 
-                        wsChiTiet.Cell(dong, 4).Style.NumberFormat.Format = "#,##0";
-                        wsChiTiet.Cell(dong, 5).Style.NumberFormat.Format = "#,##0";
-                        wsChiTiet.Cell(dong, 6).Style.NumberFormat.Format = "#,##0";
+                        foreach (HoaDon_ChiTiet item in dsChiTiet)
+                        {
+                            decimal thanhTien = item.SoLuongBan * item.DonGiaBan;
 
-                        dong++;
-                        stt++;
+                            wsChiTiet.Cell(dongChiTiet, 1).Value = sttChiTiet;
+                            wsChiTiet.Cell(dongChiTiet, 2).Value = hoaDon.MaHoaDon;
+                            wsChiTiet.Cell(dongChiTiet, 3).Value = hoaDon.NgayLap.ToString("dd/MM/yyyy HH:mm:ss");
+                            wsChiTiet.Cell(dongChiTiet, 4).Value = hoaDon.NhanVien != null ? hoaDon.NhanVien.HoVaTen : "";
+                            wsChiTiet.Cell(dongChiTiet, 5).Value = hoaDon.KhachHang != null ? hoaDon.KhachHang.HoVaTen : "";
+                            wsChiTiet.Cell(dongChiTiet, 6).Value = item.Sach != null ? item.Sach.MaSach : "";
+                            wsChiTiet.Cell(dongChiTiet, 7).Value = item.Sach != null ? item.Sach.TenSach : "";
+                            wsChiTiet.Cell(dongChiTiet, 8).Value = item.SoLuongBan;
+                            wsChiTiet.Cell(dongChiTiet, 9).Value = item.DonGiaBan;
+                            wsChiTiet.Cell(dongChiTiet, 10).Value = thanhTien;
+
+                            wsChiTiet.Cell(dongChiTiet, 8).Style.NumberFormat.Format = "#,##0";
+                            wsChiTiet.Cell(dongChiTiet, 9).Style.NumberFormat.Format = "#,##0";
+                            wsChiTiet.Cell(dongChiTiet, 10).Style.NumberFormat.Format = "#,##0";
+
+                            dongChiTiet++;
+                            sttChiTiet++;
+                        }
                     }
 
-                    wsChiTiet.Cell(dong, 5).Value = "Tổng tiền";
-                    wsChiTiet.Cell(dong, 5).Style.Font.Bold = true;
-                    wsChiTiet.Cell(dong, 6).Value = tongTien;
-                    wsChiTiet.Cell(dong, 6).Style.NumberFormat.Format = "#,##0";
-                    wsChiTiet.Cell(dong, 6).Style.Font.Bold = true;
+                    if (dongChiTiet > 4)
+                    {
+                        wsChiTiet.Range(3, 1, dongChiTiet - 1, 10).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                        wsChiTiet.Range(3, 1, dongChiTiet - 1, 10).Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                    }
 
-                    wsChiTiet.Range(3, 1, dong, 6).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    wsChiTiet.Range(3, 1, dong, 6).Style.Border.InsideBorder = XLBorderStyleValues.Thin;
                     wsChiTiet.Columns().AdjustToContents();
 
                     workbook.SaveAs(saveFileDialog.FileName);
 
-                    MessageBox.Show("Xuất hóa đơn thành công.", "Hoàn tất",
+                    MessageBox.Show("Xuất toàn bộ hóa đơn thành công.", "Hoàn tất",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)

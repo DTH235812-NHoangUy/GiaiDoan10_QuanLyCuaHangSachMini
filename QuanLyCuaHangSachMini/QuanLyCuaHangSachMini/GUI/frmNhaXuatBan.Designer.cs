@@ -16,6 +16,12 @@
         private void InitializeComponent()
         {
             grpThongTinNXB = new GroupBox();
+            txtDiaChi = new TextBox();
+            lblDiaChi = new Label();
+            txtEmail = new TextBox();
+            lblEmail = new Label();
+            txtDienThoai = new TextBox();
+            lblDienThoai = new Label();
             btnXuat = new Button();
             btnNhap = new Button();
             btnThoat = new Button();
@@ -34,6 +40,9 @@
             ID = new DataGridViewTextBoxColumn();
             MaNhaXuatBan = new DataGridViewTextBoxColumn();
             TenNhaXuatBan = new DataGridViewTextBoxColumn();
+            DienThoai = new DataGridViewTextBoxColumn();
+            Email = new DataGridViewTextBoxColumn();
+            DiaChi = new DataGridViewTextBoxColumn();
             grpThongTinNXB.SuspendLayout();
             grpDanhSachNXB.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvNhaXuatBan).BeginInit();
@@ -41,6 +50,12 @@
             // 
             // grpThongTinNXB
             // 
+            grpThongTinNXB.Controls.Add(txtDiaChi);
+            grpThongTinNXB.Controls.Add(lblDiaChi);
+            grpThongTinNXB.Controls.Add(txtEmail);
+            grpThongTinNXB.Controls.Add(lblEmail);
+            grpThongTinNXB.Controls.Add(txtDienThoai);
+            grpThongTinNXB.Controls.Add(lblDienThoai);
             grpThongTinNXB.Controls.Add(btnXuat);
             grpThongTinNXB.Controls.Add(btnNhap);
             grpThongTinNXB.Controls.Add(btnThoat);
@@ -56,14 +71,63 @@
             grpThongTinNXB.Controls.Add(lblMaXB);
             grpThongTinNXB.Location = new Point(12, 12);
             grpThongTinNXB.Name = "grpThongTinNXB";
-            grpThongTinNXB.Size = new Size(900, 135);
+            grpThongTinNXB.Size = new Size(980, 185);
             grpThongTinNXB.TabIndex = 0;
             grpThongTinNXB.TabStop = false;
             grpThongTinNXB.Text = "Thông tin nhà xuất bản";
             // 
+            // txtDiaChi
+            // 
+            txtDiaChi.Location = new Point(151, 138);
+            txtDiaChi.Name = "txtDiaChi";
+            txtDiaChi.Size = new Size(282, 27);
+            txtDiaChi.TabIndex = 6;
+            // 
+            // lblDiaChi
+            // 
+            lblDiaChi.AutoSize = true;
+            lblDiaChi.Location = new Point(18, 141);
+            lblDiaChi.Name = "lblDiaChi";
+            lblDiaChi.Size = new Size(58, 20);
+            lblDiaChi.TabIndex = 18;
+            lblDiaChi.Text = "Địa chỉ:";
+            // 
+            // txtEmail
+            // 
+            txtEmail.Location = new Point(494, 89);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(115, 27);
+            txtEmail.TabIndex = 7;
+            // 
+            // lblEmail
+            // 
+            lblEmail.AutoSize = true;
+            lblEmail.Location = new Point(439, 91);
+            lblEmail.Name = "lblEmail";
+            lblEmail.Size = new Size(49, 20);
+            lblEmail.TabIndex = 16;
+            lblEmail.Text = "Email:";
+            // 
+            // txtDienThoai
+            // 
+            txtDienThoai.Location = new Point(433, 36);
+            txtDienThoai.MaxLength = 10;
+            txtDienThoai.Name = "txtDienThoai";
+            txtDienThoai.Size = new Size(109, 27);
+            txtDienThoai.TabIndex = 5;
+            // 
+            // lblDienThoai
+            // 
+            lblDienThoai.AutoSize = true;
+            lblDienThoai.Location = new Point(352, 39);
+            lblDienThoai.Name = "lblDienThoai";
+            lblDienThoai.Size = new Size(81, 20);
+            lblDienThoai.TabIndex = 14;
+            lblDienThoai.Text = "Điện thoại:";
+            // 
             // btnXuat
             // 
-            btnXuat.Location = new Point(777, 63);
+            btnXuat.Location = new Point(857, 86);
             btnXuat.Name = "btnXuat";
             btnXuat.Size = new Size(100, 30);
             btnXuat.TabIndex = 12;
@@ -73,7 +137,7 @@
             // 
             // btnNhap
             // 
-            btnNhap.Location = new Point(777, 26);
+            btnNhap.Location = new Point(857, 34);
             btnNhap.Name = "btnNhap";
             btnNhap.Size = new Size(100, 30);
             btnNhap.TabIndex = 11;
@@ -83,7 +147,7 @@
             // 
             // btnThoat
             // 
-            btnThoat.Location = new Point(660, 99);
+            btnThoat.Location = new Point(751, 131);
             btnThoat.Name = "btnThoat";
             btnThoat.Size = new Size(100, 30);
             btnThoat.TabIndex = 10;
@@ -93,7 +157,7 @@
             // 
             // btnHuyBo
             // 
-            btnHuyBo.Location = new Point(660, 26);
+            btnHuyBo.Location = new Point(751, 81);
             btnHuyBo.Name = "btnHuyBo";
             btnHuyBo.Size = new Size(100, 30);
             btnHuyBo.TabIndex = 9;
@@ -103,7 +167,7 @@
             // 
             // btnSua
             // 
-            btnSua.Location = new Point(660, 63);
+            btnSua.Location = new Point(645, 131);
             btnSua.Name = "btnSua";
             btnSua.Size = new Size(100, 30);
             btnSua.TabIndex = 8;
@@ -113,7 +177,7 @@
             // 
             // btnLuu
             // 
-            btnLuu.Location = new Point(554, 63);
+            btnLuu.Location = new Point(645, 81);
             btnLuu.Name = "btnLuu";
             btnLuu.Size = new Size(100, 30);
             btnLuu.TabIndex = 7;
@@ -123,7 +187,7 @@
             // 
             // btnXoa
             // 
-            btnXoa.Location = new Point(554, 99);
+            btnXoa.Location = new Point(751, 34);
             btnXoa.Name = "btnXoa";
             btnXoa.Size = new Size(100, 30);
             btnXoa.TabIndex = 6;
@@ -133,7 +197,7 @@
             // 
             // btnThem
             // 
-            btnThem.Location = new Point(554, 27);
+            btnThem.Location = new Point(645, 33);
             btnThem.Name = "btnThem";
             btnThem.Size = new Size(100, 30);
             btnThem.TabIndex = 5;
@@ -163,6 +227,7 @@
             // 
             txtMaNhaXuatBan.Location = new Point(151, 34);
             txtMaNhaXuatBan.Name = "txtMaNhaXuatBan";
+            txtMaNhaXuatBan.ReadOnly = true;
             txtMaNhaXuatBan.Size = new Size(160, 27);
             txtMaNhaXuatBan.TabIndex = 2;
             // 
@@ -187,9 +252,9 @@
             // grpDanhSachNXB
             // 
             grpDanhSachNXB.Controls.Add(dgvNhaXuatBan);
-            grpDanhSachNXB.Location = new Point(12, 153);
+            grpDanhSachNXB.Location = new Point(12, 203);
             grpDanhSachNXB.Name = "grpDanhSachNXB";
-            grpDanhSachNXB.Size = new Size(900, 380);
+            grpDanhSachNXB.Size = new Size(980, 380);
             grpDanhSachNXB.TabIndex = 1;
             grpDanhSachNXB.TabStop = false;
             grpDanhSachNXB.Text = "Danh sách nhà xuất bản";
@@ -200,7 +265,7 @@
             dgvNhaXuatBan.AllowUserToDeleteRows = false;
             dgvNhaXuatBan.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvNhaXuatBan.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvNhaXuatBan.Columns.AddRange(new DataGridViewColumn[] { ID, MaNhaXuatBan, TenNhaXuatBan });
+            dgvNhaXuatBan.Columns.AddRange(new DataGridViewColumn[] { ID, MaNhaXuatBan, TenNhaXuatBan, DienThoai, Email, DiaChi });
             dgvNhaXuatBan.Dock = DockStyle.Fill;
             dgvNhaXuatBan.Location = new Point(3, 23);
             dgvNhaXuatBan.MultiSelect = false;
@@ -209,9 +274,8 @@
             dgvNhaXuatBan.RowHeadersVisible = false;
             dgvNhaXuatBan.RowHeadersWidth = 51;
             dgvNhaXuatBan.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvNhaXuatBan.Size = new Size(894, 354);
+            dgvNhaXuatBan.Size = new Size(974, 354);
             dgvNhaXuatBan.TabIndex = 0;
-            dgvNhaXuatBan.CellClick += dgvNhaXuatBan_CellClick;
             // 
             // ID
             // 
@@ -238,11 +302,35 @@
             TenNhaXuatBan.Name = "TenNhaXuatBan";
             TenNhaXuatBan.ReadOnly = true;
             // 
+            // DienThoai
+            // 
+            DienThoai.DataPropertyName = "DienThoai";
+            DienThoai.HeaderText = "Điện thoại";
+            DienThoai.MinimumWidth = 6;
+            DienThoai.Name = "DienThoai";
+            DienThoai.ReadOnly = true;
+            // 
+            // Email
+            // 
+            Email.DataPropertyName = "Email";
+            Email.HeaderText = "Email";
+            Email.MinimumWidth = 6;
+            Email.Name = "Email";
+            Email.ReadOnly = true;
+            // 
+            // DiaChi
+            // 
+            DiaChi.DataPropertyName = "DiaChi";
+            DiaChi.HeaderText = "Địa chỉ";
+            DiaChi.MinimumWidth = 6;
+            DiaChi.Name = "DiaChi";
+            DiaChi.ReadOnly = true;
+            // 
             // frmNhaXuatBan
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(924, 545);
+            ClientSize = new Size(1004, 595);
             Controls.Add(grpDanhSachNXB);
             Controls.Add(grpThongTinNXB);
             Name = "frmNhaXuatBan";
@@ -271,11 +359,20 @@
         private Button btnTimKiem;
         private ComboBox cboTenNhaXuatBan;
         private TextBox txtMaNhaXuatBan;
+        private TextBox txtDienThoai;
+        private TextBox txtEmail;
+        private TextBox txtDiaChi;
         private Label lblTenNXB;
         private Label lblMaXB;
+        private Label lblDienThoai;
+        private Label lblEmail;
+        private Label lblDiaChi;
         private DataGridView dgvNhaXuatBan;
         private DataGridViewTextBoxColumn ID;
         private DataGridViewTextBoxColumn MaNhaXuatBan;
         private DataGridViewTextBoxColumn TenNhaXuatBan;
+        private DataGridViewTextBoxColumn DienThoai;
+        private DataGridViewTextBoxColumn Email;
+        private DataGridViewTextBoxColumn DiaChi;
     }
 }

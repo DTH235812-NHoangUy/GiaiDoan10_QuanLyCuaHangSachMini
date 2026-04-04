@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
+using QuanLyCuaHangSachMini.Helpers;
 using System.Data;
 
 namespace QuanLyCuaHangSachMini.GUI
@@ -272,6 +273,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     context.NhanVien.Add(nv);
                     context.SaveChanges();
+
+                    NhatKyHelper.GhiLog(
+                        "Thêm",
+                        "NhanVien",
+                        nv.ID.ToString(),
+                        "Thêm nhân viên: " + nv.HoVaTen
+                    );
                 }
                 else
                 {
@@ -298,6 +306,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                         context.NhanVien.Update(nv);
                         context.SaveChanges();
+
+                        NhatKyHelper.GhiLog(
+                            "Sửa",
+                            "NhanVien",
+                            nv.ID.ToString(),
+                            "Sửa nhân viên: " + nv.HoVaTen
+                        );
                     }
                 }
 
@@ -330,8 +345,18 @@ namespace QuanLyCuaHangSachMini.GUI
                         NhanVien nv = context.NhanVien.Find(id);
                         if (nv != null)
                         {
+                            string khoaChinh = nv.ID.ToString();
+                            string hoTen = nv.HoVaTen;
+
                             context.NhanVien.Remove(nv);
                             context.SaveChanges();
+
+                            NhatKyHelper.GhiLog(
+                                "Xóa",
+                                "NhanVien",
+                                khoaChinh,
+                                "Xóa nhân viên: " + hoTen
+                            );
                         }
 
                         frmNhanVien_Load(sender, e);
@@ -426,6 +451,13 @@ namespace QuanLyCuaHangSachMini.GUI
                 if (dgvNhanVien.Rows.Count > 0 && dgvNhanVien.CurrentRow != null)
                 {
                     id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value.ToString());
+
+                    NhatKyHelper.GhiLog(
+                        "Tìm kiếm",
+                        "NhanVien",
+                        null,
+                        "Tìm kiếm nhân viên với từ khóa: " + tuKhoa
+                    );
                 }
                 else
                 {
@@ -544,6 +576,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                             context.SaveChanges();
 
+                            NhatKyHelper.GhiLog(
+                                "Nhập Excel",
+                                "NhanVien",
+                                null,
+                                "Nhập Excel nhân viên, thêm mới " + demThanhCong + " dòng."
+                            );
+
                             MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
                                 "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -615,6 +654,13 @@ namespace QuanLyCuaHangSachMini.GUI
                         var sheet = wb.Worksheets.Add(table, "NhanVien");
                         sheet.Columns().AdjustToContents();
                         wb.SaveAs(saveFileDialog.FileName);
+
+                        NhatKyHelper.GhiLog(
+                            "Xuất Excel",
+                            "NhanVien",
+                            null,
+                            "Xuất danh sách nhân viên ra Excel, số dòng: " + nv.Count
+                        );
 
                         MessageBox.Show("Đã xuất dữ liệu ra tập tin Excel thành công.",
                             "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);

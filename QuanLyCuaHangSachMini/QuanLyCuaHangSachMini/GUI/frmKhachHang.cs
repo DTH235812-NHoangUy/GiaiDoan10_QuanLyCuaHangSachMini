@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
+using QuanLyCuaHangSachMini.Helpers;
 using System.Data;
 
 namespace QuanLyCuaHangSachMini.GUI
@@ -23,6 +24,46 @@ namespace QuanLyCuaHangSachMini.GUI
                 e.Handled = true;
         }
 
+        private bool KiemTraDuLieu()
+        {
+            if (string.IsNullOrWhiteSpace(cboHoVaTen.Text))
+            {
+                MessageBox.Show("Vui lòng nhập họ và tên khách hàng.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cboHoVaTen.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtDienThoai.Text))
+            {
+                MessageBox.Show("Vui lòng nhập điện thoại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtDienThoai.Focus();
+                return false;
+            }
+
+            if (!txtDienThoai.Text.All(char.IsDigit))
+            {
+                MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtDienThoai.Focus();
+                return false;
+            }
+
+            if (txtDienThoai.Text.Length != 10)
+            {
+                MessageBox.Show("Điện thoại phải đúng 10 số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtDienThoai.Focus();
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text) && !txtEmail.Text.Contains("@"))
+            {
+                MessageBox.Show("Email không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtEmail.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
         private void BatTatChucNang(bool giaTri)
         {
             txtMaKhachHang.Enabled = false;
@@ -38,6 +79,7 @@ namespace QuanLyCuaHangSachMini.GUI
 
             cboHoVaTen.Enabled = true;
             txtDienThoai.Enabled = giaTri;
+            txtEmail.Enabled = giaTri;
             txtDiaChi.Enabled = giaTri;
         }
 
@@ -47,8 +89,7 @@ namespace QuanLyCuaHangSachMini.GUI
             txtDienThoai.MaxLength = 10;
             dgvKhachHang.AutoGenerateColumns = false;
 
-            List<KhachHang> kh = new List<KhachHang>();
-            kh = context.KhachHang.OrderBy(r => r.ID).ToList();
+            List<KhachHang> kh = context.KhachHang.OrderBy(r => r.ID).ToList();
 
             BindingSource bindingSource = new BindingSource();
             bindingSource.DataSource = kh;
@@ -61,6 +102,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
             txtDienThoai.DataBindings.Clear();
             txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+
+            txtEmail.DataBindings.Clear();
+            txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
 
             txtDiaChi.DataBindings.Clear();
             txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
@@ -96,6 +140,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 txtMaKhachHang.Clear();
                 cboHoVaTen.Text = "";
                 txtDienThoai.Clear();
+                txtEmail.Clear();
                 txtDiaChi.Clear();
                 btnSua.Enabled = false;
                 btnXoa.Enabled = false;
@@ -128,11 +173,13 @@ namespace QuanLyCuaHangSachMini.GUI
             txtMaKhachHang.DataBindings.Clear();
             cboHoVaTen.DataBindings.Clear();
             txtDienThoai.DataBindings.Clear();
+            txtEmail.DataBindings.Clear();
             txtDiaChi.DataBindings.Clear();
 
             txtMaKhachHang.Text = "KH" + (soLonNhat + 1).ToString("000");
             cboHoVaTen.Text = "";
             txtDienThoai.Text = "";
+            txtEmail.Text = "";
             txtDiaChi.Text = "";
             cboHoVaTen.Focus();
         }
@@ -154,33 +201,8 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(cboHoVaTen.Text))
-            {
-                MessageBox.Show("Vui lòng nhập họ và tên khách hàng.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cboHoVaTen.Focus();
+            if (!KiemTraDuLieu())
                 return;
-            }
-
-            if (string.IsNullOrWhiteSpace(txtDienThoai.Text))
-            {
-                MessageBox.Show("Vui lòng nhập điện thoại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtDienThoai.Focus();
-                return;
-            }
-
-            if (!txtDienThoai.Text.All(char.IsDigit))
-            {
-                MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtDienThoai.Focus();
-                return;
-            }
-
-            if (txtDienThoai.Text.Length != 10)
-            {
-                MessageBox.Show("Điện thoại phải đúng 10 số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtDienThoai.Focus();
-                return;
-            }
 
             try
             {
@@ -201,10 +223,18 @@ namespace QuanLyCuaHangSachMini.GUI
                     kh.MaKhachHang = txtMaKhachHang.Text.Trim();
                     kh.HoVaTen = cboHoVaTen.Text.Trim();
                     kh.DienThoai = txtDienThoai.Text.Trim();
+                    kh.Email = txtEmail.Text.Trim();
                     kh.DiaChi = txtDiaChi.Text.Trim();
 
                     context.KhachHang.Add(kh);
                     context.SaveChanges();
+
+                    NhatKyHelper.GhiLog(
+                        "Thêm",
+                        "KhachHang",
+                        kh.ID.ToString(),
+                        "Thêm khách hàng: " + kh.HoVaTen
+                    );
                 }
                 else
                 {
@@ -225,10 +255,18 @@ namespace QuanLyCuaHangSachMini.GUI
 
                         kh.HoVaTen = cboHoVaTen.Text.Trim();
                         kh.DienThoai = txtDienThoai.Text.Trim();
+                        kh.Email = txtEmail.Text.Trim();
                         kh.DiaChi = txtDiaChi.Text.Trim();
 
                         context.KhachHang.Update(kh);
                         context.SaveChanges();
+
+                        NhatKyHelper.GhiLog(
+                            "Sửa",
+                            "KhachHang",
+                            kh.ID.ToString(),
+                            "Sửa khách hàng: " + kh.HoVaTen
+                        );
                     }
                 }
 
@@ -261,8 +299,18 @@ namespace QuanLyCuaHangSachMini.GUI
                         KhachHang kh = context.KhachHang.Find(id);
                         if (kh != null)
                         {
+                            string khoaChinh = kh.ID.ToString();
+                            string hoTen = kh.HoVaTen;
+
                             context.KhachHang.Remove(kh);
                             context.SaveChanges();
+
+                            NhatKyHelper.GhiLog(
+                                "Xóa",
+                                "KhachHang",
+                                khoaChinh,
+                                "Xóa khách hàng: " + hoTen
+                            );
                         }
 
                         frmKhachHang_Load(sender, e);
@@ -308,8 +356,7 @@ namespace QuanLyCuaHangSachMini.GUI
             }
             else
             {
-                List<KhachHang> kh = new List<KhachHang>();
-                kh = context.KhachHang
+                List<KhachHang> kh = context.KhachHang
                     .Where(r => r.HoVaTen.Contains(tuKhoa))
                     .OrderBy(r => r.ID)
                     .ToList();
@@ -326,6 +373,9 @@ namespace QuanLyCuaHangSachMini.GUI
                 txtDienThoai.DataBindings.Clear();
                 txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
 
+                txtEmail.DataBindings.Clear();
+                txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
+
                 txtDiaChi.DataBindings.Clear();
                 txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
 
@@ -334,11 +384,19 @@ namespace QuanLyCuaHangSachMini.GUI
                 if (dgvKhachHang.Rows.Count > 0 && dgvKhachHang.CurrentRow != null)
                 {
                     id = Convert.ToInt32(dgvKhachHang.CurrentRow.Cells["ID"].Value.ToString());
+
+                    NhatKyHelper.GhiLog(
+                        "Tìm kiếm",
+                        "KhachHang",
+                        null,
+                        "Tìm kiếm khách hàng với từ khóa: " + tuKhoa
+                    );
                 }
                 else
                 {
                     txtMaKhachHang.Clear();
                     txtDienThoai.Clear();
+                    txtEmail.Clear();
                     txtDiaChi.Clear();
                     MessageBox.Show("Không tìm thấy khách hàng phù hợp.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -412,29 +470,46 @@ namespace QuanLyCuaHangSachMini.GUI
                             {
                                 string hoVaTen = "";
                                 string dienThoai = "";
+                                string email = "";
                                 string diaChi = "";
 
                                 if (table.Columns.Contains("HoVaTen"))
                                     hoVaTen = r["HoVaTen"]?.ToString()?.Trim() ?? "";
                                 else if (table.Columns.Contains("TenKhachHang"))
                                     hoVaTen = r["TenKhachHang"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("TenKH"))
+                                    hoVaTen = r["TenKH"]?.ToString()?.Trim() ?? "";
 
                                 if (table.Columns.Contains("DienThoai"))
                                     dienThoai = r["DienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SoDienThoai"))
+                                    dienThoai = r["SoDienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SDT"))
+                                    dienThoai = r["SDT"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("Email"))
+                                    email = r["Email"]?.ToString()?.Trim() ?? "";
 
                                 if (table.Columns.Contains("DiaChi"))
                                     diaChi = r["DiaChi"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("DiaChiKhachHang"))
+                                    diaChi = r["DiaChiKhachHang"]?.ToString()?.Trim() ?? "";
 
-                                if (string.IsNullOrWhiteSpace(hoVaTen) || string.IsNullOrWhiteSpace(dienThoai))
+                                if (string.IsNullOrWhiteSpace(hoVaTen))
                                     continue;
 
-                                if (!dienThoai.All(char.IsDigit) || dienThoai.Length != 10)
+                                if (string.IsNullOrWhiteSpace(dienThoai))
+                                    continue;
+
+                                if (!dienThoai.All(char.IsDigit))
+                                    continue;
+
+                                if (dienThoai.Length != 10)
                                     continue;
 
                                 bool tonTai = context.KhachHang.Any(x =>
                                     x.HoVaTen == hoVaTen &&
                                     (x.DienThoai ?? "") == dienThoai);
-
                                 if (tonTai)
                                     continue;
 
@@ -444,6 +519,7 @@ namespace QuanLyCuaHangSachMini.GUI
                                 kh.MaKhachHang = "KH" + soLonNhat.ToString("000");
                                 kh.HoVaTen = hoVaTen;
                                 kh.DienThoai = dienThoai;
+                                kh.Email = email;
                                 kh.DiaChi = diaChi;
 
                                 context.KhachHang.Add(kh);
@@ -452,29 +528,28 @@ namespace QuanLyCuaHangSachMini.GUI
 
                             context.SaveChanges();
 
-                            MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
-                                "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            NhatKyHelper.GhiLog(
+                                "Nhập Excel",
+                                "KhachHang",
+                                null,
+                                "Nhập Excel khách hàng, thêm mới " + demThanhCong + " dòng."
+                            );
 
                             frmKhachHang_Load(sender, e);
+
+                            MessageBox.Show("Nhập Excel thành công.", "Thông báo",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
                         {
-                            MessageBox.Show("Tập tin Excel rỗng.", "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            MessageBox.Show("Không có dữ liệu để nhập.", "Thông báo",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    string loi = ex.Message;
-
-                    if (ex.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.Message;
-
-                    if (ex.InnerException != null && ex.InnerException.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.InnerException.Message;
-
-                    MessageBox.Show(loi, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -483,62 +558,54 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Xuất dữ liệu ra tập tin Excel";
-            saveFileDialog.Filter = "Tập tin Excel|*.xls;*.xlsx";
-            saveFileDialog.FileName = "KhachHang_" + DateTime.Now.ToString("dd_MM_yyyy") + ".xlsx";
+            saveFileDialog.Filter = "Tập tin Excel|*.xlsx";
+            saveFileDialog.FileName = "DanhSachKhachHang.xlsx";
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    DataTable table = new DataTable();
-                    table.Columns.AddRange(new DataColumn[4]
-                    {
-                        new DataColumn("MaKhachHang", typeof(string)),
-                        new DataColumn("HoVaTen", typeof(string)),
-                        new DataColumn("DienThoai", typeof(string)),
-                        new DataColumn("DiaChi", typeof(string))
-                    });
+                    List<KhachHang> kh = context.KhachHang
+                        .OrderBy(r => r.ID)
+                        .ToList();
 
-                    List<KhachHang> kh = new List<KhachHang>();
-                    kh = context.KhachHang.OrderBy(r => r.ID).ToList();
+                    using XLWorkbook workbook = new XLWorkbook();
+                    IXLWorksheet worksheet = workbook.Worksheets.Add("KhachHang");
 
+                    worksheet.Cell(1, 1).Value = "MaKhachHang";
+                    worksheet.Cell(1, 2).Value = "HoVaTen";
+                    worksheet.Cell(1, 3).Value = "DienThoai";
+                    worksheet.Cell(1, 4).Value = "Email";
+                    worksheet.Cell(1, 5).Value = "DiaChi";
+
+                    int dong = 2;
                     foreach (KhachHang item in kh)
-                        table.Rows.Add(item.MaKhachHang, item.HoVaTen, item.DienThoai, item.DiaChi);
-
-                    using (XLWorkbook wb = new XLWorkbook())
                     {
-                        var sheet = wb.Worksheets.Add(table, "KhachHang");
-                        sheet.Columns().AdjustToContents();
-                        wb.SaveAs(saveFileDialog.FileName);
-
-                        MessageBox.Show("Đã xuất dữ liệu ra tập tin Excel thành công.",
-                            "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        worksheet.Cell(dong, 1).Value = item.MaKhachHang;
+                        worksheet.Cell(dong, 2).Value = item.HoVaTen;
+                        worksheet.Cell(dong, 3).Value = item.DienThoai;
+                        worksheet.Cell(dong, 4).Value = item.Email;
+                        worksheet.Cell(dong, 5).Value = item.DiaChi;
+                        dong++;
                     }
+
+                    worksheet.Columns().AdjustToContents();
+                    workbook.SaveAs(saveFileDialog.FileName);
+
+                    NhatKyHelper.GhiLog(
+                        "Xuất Excel",
+                        "KhachHang",
+                        null,
+                        "Xuất danh sách khách hàng ra Excel, số dòng: " + kh.Count
+                    );
+
+                    MessageBox.Show("Xuất Excel thành công.", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    string loi = ex.Message;
-
-                    if (ex.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.Message;
-
-                    if (ex.InnerException != null && ex.InnerException.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.InnerException.Message;
-
-                    MessageBox.Show(loi, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-            }
-        }
-
-        private void dgvKhachHang_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && dgvKhachHang.CurrentRow != null)
-            {
-                id = Convert.ToInt32(dgvKhachHang.CurrentRow.Cells["ID"].Value.ToString());
-                txtMaKhachHang.Text = dgvKhachHang.CurrentRow.Cells["MaKhachHang"].Value.ToString();
-                cboHoVaTen.Text = dgvKhachHang.CurrentRow.Cells["HoVaTen"].Value.ToString();
-                txtDienThoai.Text = dgvKhachHang.CurrentRow.Cells["DienThoai"].Value?.ToString() ?? "";
-                txtDiaChi.Text = dgvKhachHang.CurrentRow.Cells["DiaChi"].Value?.ToString() ?? "";
             }
         }
     }
