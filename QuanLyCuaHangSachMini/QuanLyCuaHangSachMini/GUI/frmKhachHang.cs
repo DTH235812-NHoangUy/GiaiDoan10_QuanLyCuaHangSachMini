@@ -8,14 +8,78 @@ namespace QuanLyCuaHangSachMini.GUI
 {
     public partial class frmKhachHang : Form
     {
-        AppDbContext context = new AppDbContext();
-        bool xuLyThem = false;
-        int id = 0;
+        private readonly AppDbContext context = new AppDbContext();
+        private bool xuLyThem = false;
+        private int id = 0;
 
-        public frmKhachHang()
+        private readonly string quyenHanNguoiDung = "";
+
+        public frmKhachHang(string quyenHan = "")
         {
             InitializeComponent();
+            quyenHanNguoiDung = quyenHan ?? "";
             txtDienThoai.KeyPress += txtDienThoai_KeyPress;
+        }
+
+        private bool LaAdmin()
+        {
+            return quyenHanNguoiDung == "admin";
+        }
+
+        private void ApDungQuyen()
+        {
+            btnThem.Visible = true;
+            btnSua.Visible = true;
+            btnXoa.Visible = true;
+            btnLuu.Visible = true;
+            btnHuyBo.Visible = true;
+            btnNhap.Visible = true;
+            btnTimKiem.Visible = true;
+            btnXuat.Visible = true;
+            btnThoat.Visible = true;
+
+            if (LaAdmin())
+            {
+                btnThem.Enabled = false;
+                btnSua.Enabled = false;
+                btnXoa.Enabled = false;
+                btnLuu.Enabled = false;
+                btnHuyBo.Enabled = false;
+                btnNhap.Enabled = false;
+
+                btnTimKiem.Enabled = true;
+                btnXuat.Enabled = true;
+                btnThoat.Enabled = true;
+
+                txtMaKhachHang.Enabled = false;
+                txtDienThoai.Enabled = false;
+                txtEmail.Enabled = false;
+                txtDiaChi.Enabled = false;
+                cboHoVaTen.Enabled = true;
+            }
+            else
+            {
+                btnThem.Enabled = true;
+                btnSua.Enabled = true;
+                btnXoa.Enabled = true;
+                btnLuu.Enabled = true;
+                btnHuyBo.Enabled = true;
+                btnNhap.Enabled = true;
+                btnTimKiem.Enabled = true;
+                btnXuat.Enabled = true;
+                btnThoat.Enabled = true;
+            }
+        }
+
+        private bool KhongChoPhepAdminChinhSua()
+        {
+            if (LaAdmin())
+            {
+                MessageBox.Show("Quản trị viên chỉ được xem, tìm kiếm và xuất Excel khách hàng.",
+                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return true;
+            }
+            return false;
         }
 
         private void txtDienThoai_KeyPress(object sender, KeyPressEventArgs e)
@@ -28,35 +92,40 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             if (string.IsNullOrWhiteSpace(cboHoVaTen.Text))
             {
-                MessageBox.Show("Vui lòng nhập họ và tên khách hàng.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Vui lòng nhập họ và tên khách hàng.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 cboHoVaTen.Focus();
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(txtDienThoai.Text))
             {
-                MessageBox.Show("Vui lòng nhập điện thoại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Vui lòng nhập điện thoại.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtDienThoai.Focus();
                 return false;
             }
 
             if (!txtDienThoai.Text.All(char.IsDigit))
             {
-                MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtDienThoai.Focus();
                 return false;
             }
 
             if (txtDienThoai.Text.Length != 10)
             {
-                MessageBox.Show("Điện thoại phải đúng 10 số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Điện thoại phải đúng 10 số.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtDienThoai.Focus();
                 return false;
             }
 
             if (!string.IsNullOrWhiteSpace(txtEmail.Text) && !txtEmail.Text.Contains("@"))
             {
-                MessageBox.Show("Email không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Email không hợp lệ.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtEmail.Focus();
                 return false;
             }
@@ -81,6 +150,8 @@ namespace QuanLyCuaHangSachMini.GUI
             txtDienThoai.Enabled = giaTri;
             txtEmail.Enabled = giaTri;
             txtDiaChi.Enabled = giaTri;
+
+            ApDungQuyen();
         }
 
         private void frmKhachHang_Load(object sender, EventArgs e)
@@ -89,7 +160,9 @@ namespace QuanLyCuaHangSachMini.GUI
             txtDienThoai.MaxLength = 10;
             dgvKhachHang.AutoGenerateColumns = false;
 
-            List<KhachHang> kh = context.KhachHang.OrderBy(r => r.ID).ToList();
+            List<KhachHang> kh = context.KhachHang
+                .OrderBy(r => r.ID)
+                .ToList();
 
             BindingSource bindingSource = new BindingSource();
             bindingSource.DataSource = kh;
@@ -130,8 +203,13 @@ namespace QuanLyCuaHangSachMini.GUI
             if (dgvKhachHang.Rows.Count > 0 && dgvKhachHang.CurrentRow != null)
             {
                 id = Convert.ToInt32(dgvKhachHang.CurrentRow.Cells["ID"].Value.ToString());
-                btnSua.Enabled = true;
-                btnXoa.Enabled = true;
+
+                if (!LaAdmin())
+                {
+                    btnSua.Enabled = true;
+                    btnXoa.Enabled = true;
+                }
+
                 btnXuat.Enabled = true;
             }
             else
@@ -142,14 +220,20 @@ namespace QuanLyCuaHangSachMini.GUI
                 txtDienThoai.Clear();
                 txtEmail.Clear();
                 txtDiaChi.Clear();
+
                 btnSua.Enabled = false;
                 btnXoa.Enabled = false;
                 btnXuat.Enabled = false;
             }
+
+            ApDungQuyen();
         }
 
         private void btnThem_Click(object sender, EventArgs e)
         {
+            if (KhongChoPhepAdminChinhSua())
+                return;
+
             xuLyThem = true;
             BatTatChucNang(true);
 
@@ -186,6 +270,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnSua_Click(object sender, EventArgs e)
         {
+            if (KhongChoPhepAdminChinhSua())
+                return;
+
             if (dgvKhachHang.CurrentRow != null)
             {
                 xuLyThem = false;
@@ -195,12 +282,16 @@ namespace QuanLyCuaHangSachMini.GUI
             }
             else
             {
-                MessageBox.Show("Vui lòng chọn khách hàng cần sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Vui lòng chọn khách hàng cần sửa.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
+            if (KhongChoPhepAdminChinhSua())
+                return;
+
             if (!KiemTraDuLieu())
                 return;
 
@@ -214,7 +305,8 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     if (tonTai)
                     {
-                        MessageBox.Show("Khách hàng đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Khách hàng đã tồn tại.", "Lỗi",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                         cboHoVaTen.Focus();
                         return;
                     }
@@ -248,7 +340,8 @@ namespace QuanLyCuaHangSachMini.GUI
 
                         if (tonTai)
                         {
-                            MessageBox.Show("Khách hàng đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("Khách hàng đã tồn tại.", "Lỗi",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
                             cboHoVaTen.Focus();
                             return;
                         }
@@ -288,6 +381,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
+            if (KhongChoPhepAdminChinhSua())
+                return;
+
             if (dgvKhachHang.CurrentRow != null)
             {
                 if (MessageBox.Show("Xác nhận xóa khách hàng " + cboHoVaTen.Text + "?", "Xóa",
@@ -332,12 +428,16 @@ namespace QuanLyCuaHangSachMini.GUI
             }
             else
             {
-                MessageBox.Show("Vui lòng chọn khách hàng cần xóa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Vui lòng chọn khách hàng cần xóa.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void btnHuyBo_Click(object sender, EventArgs e)
         {
+            if (KhongChoPhepAdminChinhSua())
+                return;
+
             frmKhachHang_Load(sender, e);
         }
 
@@ -398,14 +498,20 @@ namespace QuanLyCuaHangSachMini.GUI
                     txtDienThoai.Clear();
                     txtEmail.Clear();
                     txtDiaChi.Clear();
+
                     MessageBox.Show("Không tìm thấy khách hàng phù hợp.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+
+            ApDungQuyen();
         }
 
         private void btnNhap_Click(object sender, EventArgs e)
         {
+            if (KhongChoPhepAdminChinhSua())
+                return;
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Title = "Nhập dữ liệu từ tập tin Excel";
             openFileDialog.Filter = "Tập tin Excel|*.xls;*.xlsx";

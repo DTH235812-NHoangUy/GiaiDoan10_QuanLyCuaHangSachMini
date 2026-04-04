@@ -17,6 +17,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDangNhap));
             picKhoa = new PictureBox();
             lblTieuDe = new Label();
             lblTenDangNhap = new Label();
@@ -30,10 +31,11 @@
             // 
             // picKhoa
             // 
-            picKhoa.Location = new Point(40, 83);
+            picKhoa.Image = Properties.Resources.logo_jpg;
+            picKhoa.Location = new Point(12, 75);
             picKhoa.Margin = new Padding(3, 4, 3, 4);
             picKhoa.Name = "picKhoa";
-            picKhoa.Size = new Size(126, 147);
+            picKhoa.Size = new Size(183, 117);
             picKhoa.SizeMode = PictureBoxSizeMode.StretchImage;
             picKhoa.TabIndex = 0;
             picKhoa.TabStop = false;
@@ -128,6 +130,7 @@
             Controls.Add(lblTieuDe);
             Controls.Add(picKhoa);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 4, 3, 4);
             MaximizeBox = false;
             MinimizeBox = false;

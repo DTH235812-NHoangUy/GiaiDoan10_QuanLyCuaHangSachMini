@@ -13,6 +13,8 @@ namespace QuanLyCuaHangSachMini.GUI
         private frmNhanVien? nhanVien = null;
         private frmPhieuNhap? phieuNhap = null;
         private frmHoaDon? hoaDon = null;
+        private frmThongKeSach? thongKeSach = null;
+        private frmThongKeDoanhThu? thongKeDoanhThu = null;
         private frmNhatKyHeThong? nhatKyHeThong = null;
 
         public int NhanVienDangNhapID
@@ -134,8 +136,8 @@ namespace QuanLyCuaHangSachMini.GUI
             mnuKhachHang.Enabled = true;
             mnuHoaDon.Enabled = true;
 
-            mnuThongKeSach.Enabled = true;
-            mnuThongKeDoanhThu.Enabled = true;
+            mnuThongKeSach.Enabled = false;
+            mnuThongKeDoanhThu.Enabled = false;
             mnuNhatKyHeThong.Enabled = false;
 
             lblTrangThai.Text = "Nhân viên: " + SessionHelper.HoVaTen + " | " + SessionHelper.TenDangNhap;
@@ -156,6 +158,8 @@ namespace QuanLyCuaHangSachMini.GUI
             nhanVien = null;
             phieuNhap = null;
             hoaDon = null;
+            thongKeSach = null;
+            thongKeDoanhThu = null;
             nhatKyHeThong = null;
         }
 
@@ -253,7 +257,7 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             if (khachHang == null || khachHang.IsDisposed)
             {
-                khachHang = new frmKhachHang();
+                khachHang = new frmKhachHang(SessionHelper.QuyenHan);
                 khachHang.MdiParent = this;
                 khachHang.Show();
             }
@@ -301,6 +305,37 @@ namespace QuanLyCuaHangSachMini.GUI
                 hoaDon.Activate();
         }
 
+        private void mnuThongKeSach_Click(object sender, EventArgs e)
+        {
+            if (!SessionHelper.LaQuanTri)
+            {
+                MessageBox.Show("Bạn không có quyền xem thống kê sách.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (thongKeSach == null || thongKeSach.IsDisposed)
+            {
+                thongKeSach = new frmThongKeSach();
+                thongKeSach.MdiParent = this;
+                thongKeSach.Show();
+            }
+            else
+                thongKeSach.Activate();
+        }
+
+        private void mnuThongKeDoanhThu_Click(object sender, EventArgs e)
+        {
+            if (thongKeDoanhThu == null || thongKeDoanhThu.IsDisposed)
+            {
+                thongKeDoanhThu = new frmThongKeDoanhThu();
+                thongKeDoanhThu.MdiParent = this;
+                thongKeDoanhThu.Show();
+            }
+            else
+                thongKeDoanhThu.Activate();
+        }
+
         private void mnuNhatKyHeThong_Click(object sender, EventArgs e)
         {
             if (!SessionHelper.LaQuanTri)
@@ -323,18 +358,6 @@ namespace QuanLyCuaHangSachMini.GUI
         private void mnuDoiMatKhau_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Chức năng đổi mật khẩu sẽ làm tiếp sau.", "Thông báo",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void mnuThongKeSach_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Chức năng thống kê sách sẽ làm tiếp sau.", "Thông báo",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void mnuThongKeDoanhThu_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Chức năng thống kê doanh thu sẽ làm tiếp sau.", "Thông báo",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 

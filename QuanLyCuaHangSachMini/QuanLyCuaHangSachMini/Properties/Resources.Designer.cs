@@ -59,5 +59,15 @@ namespace QuanLyCuaHangSachMini.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap logo_jpg {
+            get {
+                object obj = ResourceManager.GetObject("logo.jpg", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

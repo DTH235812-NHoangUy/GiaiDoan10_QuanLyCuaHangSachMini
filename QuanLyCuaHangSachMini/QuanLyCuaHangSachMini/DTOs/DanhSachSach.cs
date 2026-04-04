@@ -15,7 +15,6 @@ namespace QuanLyCuaHangSachMini.DTOs
         public string TenSach { get; set; } = string.Empty;
         public string TacGia { get; set; } = string.Empty;
         public int NamXuatBan { get; set; }
-        public string? ISBN { get; set; }
         public decimal GiaNhap { get; set; }
         public decimal GiaBan { get; set; }
         public int SoLuongTon { get; set; }
