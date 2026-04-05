@@ -8,14 +8,22 @@ namespace QuanLyCuaHangSachMini.GUI
 {
     public partial class frmNhaCungCap : Form
     {
-        AppDbContext context = new AppDbContext();
-        bool xuLyThem = false;
-        int id = 0;
+        private readonly AppDbContext context = new AppDbContext();
+        private readonly BindingSource bindingSource = new BindingSource();
+        private bool xuLyThem = false;
+        private int id = 0;
 
         public frmNhaCungCap()
         {
             InitializeComponent();
             txtDienThoai.KeyPress += txtDienThoai_KeyPress;
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            bindingSource.Dispose();
+            context.Dispose();
+            base.OnFormClosed(e);
         }
 
         private void txtDienThoai_KeyPress(object sender, KeyPressEventArgs e)
@@ -75,6 +83,9 @@ namespace QuanLyCuaHangSachMini.GUI
             btnXuat.Enabled = !giaTri;
 
             cboTenNhaCungCap.Enabled = true;
+            cboTenNhaCungCap.DropDownStyle = ComboBoxStyle.DropDown;
+            cboTenNhaCungCap.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboTenNhaCungCap.AutoCompleteSource = AutoCompleteSource.ListItems;
             txtDienThoai.Enabled = giaTri;
             txtEmail.Enabled = giaTri;
             txtDiaChi.Enabled = giaTri;
@@ -85,64 +96,92 @@ namespace QuanLyCuaHangSachMini.GUI
             BatTatChucNang(false);
             txtDienThoai.MaxLength = 10;
             dgvNhaCungCap.AutoGenerateColumns = false;
+            LoadData();
+        }
 
-            List<NhaCungCap> ncc = context.NhaCungCap.OrderBy(r => r.ID).ToList();
-
-            BindingSource bindingSource = new BindingSource();
-            bindingSource.DataSource = ncc;
-
-            txtMaNhaCungCap.DataBindings.Clear();
-            txtMaNhaCungCap.DataBindings.Add("Text", bindingSource, "MaNhaCungCap", false, DataSourceUpdateMode.Never);
-
-            cboTenNhaCungCap.DataBindings.Clear();
-            cboTenNhaCungCap.DataBindings.Add("Text", bindingSource, "TenNhaCungCap", false, DataSourceUpdateMode.Never);
-
-            txtDienThoai.DataBindings.Clear();
-            txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
-
-            txtEmail.DataBindings.Clear();
-            txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
-
-            txtDiaChi.DataBindings.Clear();
-            txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
-
-            dgvNhaCungCap.DataSource = bindingSource;
-
-            cboTenNhaCungCap.Items.Clear();
-            List<string> dsTenNhaCungCap = context.NhaCungCap
-                .OrderBy(r => r.TenNhaCungCap)
-                .Select(r => r.TenNhaCungCap)
-                .Distinct()
-                .ToList();
-
-            foreach (string item in dsTenNhaCungCap)
-                cboTenNhaCungCap.Items.Add(item);
-
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(dsTenNhaCungCap.ToArray());
-            cboTenNhaCungCap.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            cboTenNhaCungCap.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            cboTenNhaCungCap.AutoCompleteCustomSource = auto;
-
-            if (dgvNhaCungCap.Rows.Count > 0 && dgvNhaCungCap.CurrentRow != null)
+        private void LoadData()
+        {
+            try
             {
-                id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value.ToString());
-                btnSua.Enabled = true;
-                btnXoa.Enabled = true;
-                btnXuat.Enabled = true;
+                List<NhaCungCap> ncc = context.NhaCungCap.OrderBy(r => r.ID).ToList();
+                bindingSource.DataSource = ncc;
+
+                txtMaNhaCungCap.DataBindings.Clear();
+                txtMaNhaCungCap.DataBindings.Add("Text", bindingSource, "MaNhaCungCap", false, DataSourceUpdateMode.Never);
+
+                cboTenNhaCungCap.DataBindings.Clear();
+                cboTenNhaCungCap.DataBindings.Add("Text", bindingSource, "TenNhaCungCap", false, DataSourceUpdateMode.Never);
+
+                txtDienThoai.DataBindings.Clear();
+                txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+
+                txtEmail.DataBindings.Clear();
+                txtEmail.DataBindings.Add("Text", bindingSource, "Email", false, DataSourceUpdateMode.Never);
+
+                txtDiaChi.DataBindings.Clear();
+                txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
+
+                dgvNhaCungCap.DataSource = bindingSource;
+
+                List<string> dsTenNhaCungCap = context.NhaCungCap
+                    .OrderBy(r => r.TenNhaCungCap)
+                    .Select(r => r.TenNhaCungCap)
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Distinct()
+                    .ToList();
+
+                cboTenNhaCungCap.BeginUpdate();
+                cboTenNhaCungCap.Items.Clear();
+                cboTenNhaCungCap.Items.AddRange(dsTenNhaCungCap.ToArray());
+                cboTenNhaCungCap.EndUpdate();
+
+                cboTenNhaCungCap.DropDownStyle = ComboBoxStyle.DropDown;
+                cboTenNhaCungCap.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                cboTenNhaCungCap.AutoCompleteSource = AutoCompleteSource.ListItems;
+
+                if (dgvNhaCungCap.Rows.Count > 0 && dgvNhaCungCap.CurrentRow != null)
+                {
+                    id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
+                    btnSua.Enabled = true;
+                    btnXoa.Enabled = true;
+                    btnXuat.Enabled = true;
+                }
+                else
+                {
+                    id = 0;
+                    txtMaNhaCungCap.Clear();
+                    cboTenNhaCungCap.SelectedIndex = -1;
+                    cboTenNhaCungCap.Text = string.Empty;
+                    txtDienThoai.Clear();
+                    txtEmail.Clear();
+                    txtDiaChi.Clear();
+                    btnSua.Enabled = false;
+                    btnXoa.Enabled = false;
+                    btnXuat.Enabled = false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                id = 0;
-                txtMaNhaCungCap.Clear();
-                cboTenNhaCungCap.Text = "";
-                txtDienThoai.Clear();
-                txtEmail.Clear();
-                txtDiaChi.Clear();
-                btnSua.Enabled = false;
-                btnXoa.Enabled = false;
-                btnXuat.Enabled = false;
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private string TaoMaNhaCungCapMoi()
+        {
+            int soLonNhat = context.NhaCungCap
+                .AsEnumerable()
+                .Select(r =>
+                {
+                    if (string.IsNullOrWhiteSpace(r.MaNhaCungCap))
+                        return 0;
+
+                    string so = new string(r.MaNhaCungCap.Where(char.IsDigit).ToArray());
+                    return int.TryParse(so, out int kq) ? kq : 0;
+                })
+                .DefaultIfEmpty(0)
+                .Max();
+
+            return $"NCC{soLonNhat + 1:000}";
         }
 
         private void btnThem_Click(object sender, EventArgs e)
@@ -150,34 +189,19 @@ namespace QuanLyCuaHangSachMini.GUI
             xuLyThem = true;
             BatTatChucNang(true);
 
-            int soLonNhat = 0;
-            if (context.NhaCungCap.Any())
-            {
-                soLonNhat = context.NhaCungCap
-                    .AsEnumerable()
-                    .Select(r =>
-                    {
-                        if (string.IsNullOrWhiteSpace(r.MaNhaCungCap))
-                            return 0;
-
-                        string so = new string(r.MaNhaCungCap.Where(char.IsDigit).ToArray());
-                        return int.TryParse(so, out int kq) ? kq : 0;
-                    })
-                    .DefaultIfEmpty(0)
-                    .Max();
-            }
-
             txtMaNhaCungCap.DataBindings.Clear();
             cboTenNhaCungCap.DataBindings.Clear();
             txtDienThoai.DataBindings.Clear();
             txtEmail.DataBindings.Clear();
             txtDiaChi.DataBindings.Clear();
 
-            txtMaNhaCungCap.Text = "NCC" + (soLonNhat + 1).ToString("000");
-            cboTenNhaCungCap.Text = "";
-            txtDienThoai.Text = "";
-            txtEmail.Text = "";
-            txtDiaChi.Text = "";
+            txtMaNhaCungCap.Text = TaoMaNhaCungCapMoi();
+            cboTenNhaCungCap.SelectedIndex = -1;
+            cboTenNhaCungCap.DroppedDown = false;
+            cboTenNhaCungCap.Text = string.Empty;
+            txtDienThoai.Text = string.Empty;
+            txtEmail.Text = string.Empty;
+            txtDiaChi.Text = string.Empty;
             cboTenNhaCungCap.Focus();
         }
 
@@ -187,7 +211,7 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 xuLyThem = false;
                 BatTatChucNang(true);
-                id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value.ToString());
+                id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
                 cboTenNhaCungCap.Focus();
             }
             else
@@ -213,8 +237,15 @@ namespace QuanLyCuaHangSachMini.GUI
                         return;
                     }
 
+                    string maNhaCungCap = txtMaNhaCungCap.Text.Trim();
+                    if (string.IsNullOrWhiteSpace(maNhaCungCap))
+                    {
+                        maNhaCungCap = TaoMaNhaCungCapMoi();
+                        txtMaNhaCungCap.Text = maNhaCungCap;
+                    }
+
                     NhaCungCap ncc = new NhaCungCap();
-                    ncc.MaNhaCungCap = txtMaNhaCungCap.Text.Trim();
+                    ncc.MaNhaCungCap = maNhaCungCap;
                     ncc.TenNhaCungCap = cboTenNhaCungCap.Text.Trim();
                     ncc.DienThoai = txtDienThoai.Text.Trim();
                     ncc.Email = txtEmail.Text.Trim();
@@ -258,9 +289,17 @@ namespace QuanLyCuaHangSachMini.GUI
                             "Sửa nhà cung cấp: " + ncc.TenNhaCungCap
                         );
                     }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy nhà cung cấp cần sửa.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                 }
 
-                frmNhaCungCap_Load(sender, e);
+                xuLyThem = false;
+                id = 0;
+                LoadData();
+                BatTatChucNang(false);
             }
             catch (Exception ex)
             {
@@ -277,7 +316,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 {
                     try
                     {
-                        id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value.ToString());
+                        id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
                         NhaCungCap ncc = context.NhaCungCap.Find(id);
                         if (ncc != null)
                         {
@@ -295,7 +334,10 @@ namespace QuanLyCuaHangSachMini.GUI
                             );
                         }
 
-                        frmNhaCungCap_Load(sender, e);
+                        xuLyThem = false;
+                        id = 0;
+                        LoadData();
+                        BatTatChucNang(false);
                     }
                     catch (Exception ex)
                     {
@@ -312,7 +354,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnHuyBo_Click(object sender, EventArgs e)
         {
-            frmNhaCungCap_Load(sender, e);
+            xuLyThem = false;
+            id = 0;
+            LoadData();
+            BatTatChucNang(false);
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
@@ -326,7 +371,8 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (string.IsNullOrWhiteSpace(tuKhoa))
             {
-                frmNhaCungCap_Load(sender, e);
+                LoadData();
+                BatTatChucNang(false);
             }
             else
             {
@@ -335,7 +381,6 @@ namespace QuanLyCuaHangSachMini.GUI
                     .OrderBy(r => r.ID)
                     .ToList();
 
-                BindingSource bindingSource = new BindingSource();
                 bindingSource.DataSource = ncc;
 
                 txtMaNhaCungCap.DataBindings.Clear();
@@ -357,7 +402,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
                 if (dgvNhaCungCap.Rows.Count > 0 && dgvNhaCungCap.CurrentRow != null)
                 {
-                    id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value.ToString());
+                    id = Convert.ToInt32(dgvNhaCungCap.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
+                    btnSua.Enabled = true;
+                    btnXoa.Enabled = true;
+                    btnXuat.Enabled = true;
 
                     NhatKyHelper.GhiLog(
                         "Tìm kiếm",
@@ -368,10 +416,16 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
                 else
                 {
+                    id = 0;
                     txtMaNhaCungCap.Clear();
+                    cboTenNhaCungCap.SelectedIndex = -1;
+                    cboTenNhaCungCap.Text = string.Empty;
                     txtDienThoai.Clear();
                     txtEmail.Clear();
                     txtDiaChi.Clear();
+                    btnSua.Enabled = false;
+                    btnXoa.Enabled = false;
+                    btnXuat.Enabled = false;
 
                     MessageBox.Show("Không tìm thấy nhà cung cấp phù hợp.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -510,7 +564,8 @@ namespace QuanLyCuaHangSachMini.GUI
                             MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
                                 "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                            frmNhaCungCap_Load(sender, e);
+                            LoadData();
+                            BatTatChucNang(false);
                         }
                         else
                         {

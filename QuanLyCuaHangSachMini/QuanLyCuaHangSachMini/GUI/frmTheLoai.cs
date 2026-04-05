@@ -3,90 +3,116 @@ using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.Helpers;
 using System.Data;
+using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
     public partial class frmTheLoai : Form
     {
-        AppDbContext context = new AppDbContext();
-        bool xuLyThem = false;
-        int id = 0;
+        private readonly AppDbContext context = new AppDbContext();
+        private readonly BindingSource bindingSource = new BindingSource();
+        private bool xuLyThem = false;
+        private int idSelected = 0; // Lưu ID đang chọn để sửa/xóa
 
         public frmTheLoai()
         {
             InitializeComponent();
         }
 
-        private void BatTatChucNang(bool giaTri)
+        // Giải phóng bộ nhớ khi đóng form
+        protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            txtMaTheLoai.Enabled = false;
-            btnLuu.Enabled = giaTri;
-            btnHuyBo.Enabled = giaTri;
-
-            btnThem.Enabled = !giaTri;
-            btnSua.Enabled = !giaTri;
-            btnXoa.Enabled = !giaTri;
-            btnTimKiem.Enabled = !giaTri;
-            btnNhap.Enabled = !giaTri;
-            btnXuat.Enabled = !giaTri;
-
-            cboTenTheLoai.Enabled = true;
-            txtMoTa.Enabled = giaTri;
+            bindingSource.Dispose();
+            context.Dispose();
+            base.OnFormClosed(e);
         }
 
         private void frmTheLoai_Load(object sender, EventArgs e)
         {
-            BatTatChucNang(false);
             dgvTheLoai.AutoGenerateColumns = false;
 
-            List<TheLoai> tl = context.TheLoai.OrderBy(r => r.ID).ToList();
-
-            BindingSource bindingSource = new BindingSource();
-            bindingSource.DataSource = tl;
-
-            txtMaTheLoai.DataBindings.Clear();
-            txtMaTheLoai.DataBindings.Add("Text", bindingSource, "MaTheLoai", false, DataSourceUpdateMode.Never);
-
-            cboTenTheLoai.DataBindings.Clear();
-            cboTenTheLoai.DataBindings.Add("Text", bindingSource, "TenTheLoai", false, DataSourceUpdateMode.Never);
-
-            txtMoTa.DataBindings.Clear();
-            txtMoTa.DataBindings.Add("Text", bindingSource, "MoTa", false, DataSourceUpdateMode.Never);
-
-            dgvTheLoai.DataSource = bindingSource;
-
-            cboTenTheLoai.Items.Clear();
-            List<string> dsTenTheLoai = context.TheLoai
-                .OrderBy(r => r.TenTheLoai)
-                .Select(r => r.TenTheLoai)
-                .ToList();
-
-            foreach (string item in dsTenTheLoai)
-                cboTenTheLoai.Items.Add(item);
-
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(dsTenTheLoai.ToArray());
+            // CẤU HÌNH COMBOBOX: Cho phép gõ chữ mới và tự động gợi ý
+            cboTenTheLoai.DropDownStyle = ComboBoxStyle.DropDown;
             cboTenTheLoai.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            cboTenTheLoai.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            cboTenTheLoai.AutoCompleteCustomSource = auto;
+            cboTenTheLoai.AutoCompleteSource = AutoCompleteSource.ListItems;
 
-            if (dgvTheLoai.Rows.Count > 0 && dgvTheLoai.CurrentRow != null)
+            LoadData();
+            BatTatChucNang(false);
+        }
+
+        private void BatTatChucNang(bool đangThaoTac)
+        {
+            // Các ô nhập liệu
+            txtMaTheLoai.Enabled = false; // Mã không cho sửa thủ công
+            cboTenTheLoai.Enabled = đangThaoTac;
+            txtMoTa.Enabled = đangThaoTac;
+            cboTenTheLoai.DropDownStyle = ComboBoxStyle.DropDown;
+            cboTenTheLoai.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboTenTheLoai.AutoCompleteSource = AutoCompleteSource.ListItems;
+
+            // Các nút điều khiển
+            btnLuu.Enabled = đangThaoTac;
+            btnHuyBo.Enabled = đangThaoTac;
+
+            btnThem.Enabled = !đangThaoTac;
+            btnSua.Enabled = !đangThaoTac;
+            btnXoa.Enabled = !đangThaoTac;
+            btnTimKiem.Enabled = !đangThaoTac;
+            btnNhap.Enabled = !đangThaoTac;
+            btnXuat.Enabled = !đangThaoTac;
+
+            dgvTheLoai.Enabled = !đangThaoTac;
+        }
+
+        private void LoadData()
+        {
+            try
             {
-                id = Convert.ToInt32(dgvTheLoai.CurrentRow.Cells["ID"].Value.ToString());
-                btnSua.Enabled = true;
-                btnXoa.Enabled = true;
-                btnXuat.Enabled = true;
+                // Lấy dữ liệu từ Database
+                var list = context.TheLoai.OrderBy(t => t.MaTheLoai).ToList();
+                bindingSource.DataSource = list;
+                dgvTheLoai.DataSource = bindingSource;
+
+                // Xóa binding cũ và thiết lập binding mới cho các control
+                txtMaTheLoai.DataBindings.Clear();
+                txtMaTheLoai.DataBindings.Add("Text", bindingSource, "MaTheLoai", true, DataSourceUpdateMode.Never);
+
+                cboTenTheLoai.DataBindings.Clear();
+                cboTenTheLoai.DataBindings.Add("Text", bindingSource, "TenTheLoai", true, DataSourceUpdateMode.Never);
+
+                txtMoTa.DataBindings.Clear();
+                txtMoTa.DataBindings.Add("Text", bindingSource, "MoTa", true, DataSourceUpdateMode.Never);
+
+                cboTenTheLoai.BeginUpdate();
+                cboTenTheLoai.Items.Clear();
+                cboTenTheLoai.Items.AddRange(list.Select(x => x.TenTheLoai).Distinct().ToArray());
+                cboTenTheLoai.EndUpdate();
             }
-            else
+            catch (Exception ex)
             {
-                id = 0;
-                txtMaTheLoai.Clear();
-                cboTenTheLoai.Text = "";
-                txtMoTa.Clear();
-                btnSua.Enabled = false;
-                btnXoa.Enabled = false;
-                btnXuat.Enabled = false;
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private string TaoMaTheLoaiMoi()
+        {
+            int soLonNhat = context.TheLoai
+                .AsEnumerable()
+                .Select(r =>
+                {
+                    if (string.IsNullOrWhiteSpace(r.MaTheLoai))
+                        return 0;
+
+                    string so = new string(r.MaTheLoai.Where(char.IsDigit).ToArray());
+                    return int.TryParse(so, out int kq) ? kq : 0;
+                })
+                .DefaultIfEmpty(0)
+                .Max();
+
+            return $"TL{soLonNhat + 1:000}";
         }
 
         private void btnThem_Click(object sender, EventArgs e)
@@ -94,54 +120,33 @@ namespace QuanLyCuaHangSachMini.GUI
             xuLyThem = true;
             BatTatChucNang(true);
 
-            int soLonNhat = 0;
-            if (context.TheLoai.Any())
-            {
-                soLonNhat = context.TheLoai
-                    .AsEnumerable()
-                    .Select(r =>
-                    {
-                        if (string.IsNullOrWhiteSpace(r.MaTheLoai))
-                            return 0;
-
-                        string so = new string(r.MaTheLoai.Where(char.IsDigit).ToArray());
-                        return int.TryParse(so, out int kq) ? kq : 0;
-                    })
-                    .DefaultIfEmpty(0)
-                    .Max();
-            }
-
-            txtMaTheLoai.DataBindings.Clear();
-            cboTenTheLoai.DataBindings.Clear();
-            txtMoTa.DataBindings.Clear();
-
-            txtMaTheLoai.Text = "TL" + (soLonNhat + 1).ToString("000");
+            // Xóa trắng các ô nhập
+            txtMaTheLoai.Text = TaoMaTheLoaiMoi();
+            cboTenTheLoai.SelectedIndex = -1;
+            cboTenTheLoai.DroppedDown = false;
             cboTenTheLoai.Text = "";
             txtMoTa.Text = "";
+
             cboTenTheLoai.Focus();
         }
 
         private void btnSua_Click(object sender, EventArgs e)
         {
-            if (dgvTheLoai.CurrentRow != null)
-            {
-                xuLyThem = false;
-                BatTatChucNang(true);
-                id = Convert.ToInt32(dgvTheLoai.CurrentRow.Cells["ID"].Value.ToString());
-                cboTenTheLoai.Focus();
-            }
-            else
-            {
-                MessageBox.Show("Vui lòng chọn thể loại cần sửa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            if (bindingSource.Current == null) return;
+
+            var item = (TheLoai)bindingSource.Current;
+            idSelected = item.ID;
+
+            xuLyThem = false;
+            BatTatChucNang(true);
+            cboTenTheLoai.Focus();
         }
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(cboTenTheLoai.Text))
             {
-                MessageBox.Show("Vui lòng nhập tên thể loại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cboTenTheLoai.Focus();
+                MessageBox.Show("Vui lòng nhập tên thể loại!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -149,336 +154,147 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 if (xuLyThem)
                 {
-                    bool tonTai = context.TheLoai.Any(r => r.TenTheLoai == cboTenTheLoai.Text.Trim());
-                    if (tonTai)
+                    // Thêm mới
+                    string maTheLoai = txtMaTheLoai.Text.Trim();
+                    if (string.IsNullOrWhiteSpace(maTheLoai))
                     {
-                        MessageBox.Show("Tên thể loại đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        cboTenTheLoai.Focus();
-                        return;
+                        maTheLoai = TaoMaTheLoaiMoi();
+                        txtMaTheLoai.Text = maTheLoai;
                     }
 
-                    TheLoai tl = new TheLoai();
-                    tl.MaTheLoai = txtMaTheLoai.Text.Trim();
-                    tl.TenTheLoai = cboTenTheLoai.Text.Trim();
-                    tl.MoTa = txtMoTa.Text.Trim();
+                    TheLoai moi = new TheLoai
+                    {
+                        MaTheLoai = maTheLoai,
+                        TenTheLoai = cboTenTheLoai.Text.Trim(),
+                        MoTa = txtMoTa.Text.Trim()
+                    };
+                    context.TheLoai.Add(moi);
 
-                    context.TheLoai.Add(tl);
-                    context.SaveChanges();
-
-                    NhatKyHelper.GhiLog(
-                        "Thêm",
-                        "TheLoai",
-                        tl.ID.ToString(),
-                        "Thêm thể loại: " + tl.TenTheLoai
-                    );
+                    NhatKyHelper.GhiLog("Thêm", "TheLoai", moi.MaTheLoai, $"Thêm mới thể loại: {moi.TenTheLoai}");
                 }
                 else
                 {
-                    TheLoai tl = context.TheLoai.Find(id);
-                    if (tl != null)
+                    // Cập nhật
+                    var item = context.TheLoai.Find(idSelected);
+                    if (item != null)
                     {
-                        bool tonTai = context.TheLoai.Any(r => r.TenTheLoai == cboTenTheLoai.Text.Trim() && r.ID != id);
-                        if (tonTai)
-                        {
-                            MessageBox.Show("Tên thể loại đã tồn tại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            cboTenTheLoai.Focus();
-                            return;
-                        }
+                        item.TenTheLoai = cboTenTheLoai.Text.Trim();
+                        item.MoTa = txtMoTa.Text.Trim();
 
-                        tl.TenTheLoai = cboTenTheLoai.Text.Trim();
-                        tl.MoTa = txtMoTa.Text.Trim();
-
-                        context.TheLoai.Update(tl);
-                        context.SaveChanges();
-
-                        NhatKyHelper.GhiLog(
-                            "Sửa",
-                            "TheLoai",
-                            tl.ID.ToString(),
-                            "Sửa thể loại: " + tl.TenTheLoai
-                        );
+                        NhatKyHelper.GhiLog("Sửa", "TheLoai", item.MaTheLoai, $"Sửa thể loại thành: {item.TenTheLoai}");
                     }
                 }
 
-                frmTheLoai_Load(sender, e);
+                context.SaveChanges();
+                MessageBox.Show("Lưu thành công!");
+                BatTatChucNang(false);
+                LoadData();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi khi lưu: " + ex.Message);
             }
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
-            if (dgvTheLoai.CurrentRow != null)
+            if (bindingSource.Current == null) return;
+            var item = (TheLoai)bindingSource.Current;
+
+            var confirm = MessageBox.Show($"Xác nhận xóa thể loại: {item.TenTheLoai}?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (confirm == DialogResult.Yes)
             {
-                if (MessageBox.Show("Xác nhận xóa thể loại " + cboTenTheLoai.Text + "?", "Xóa",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                try
                 {
-                    try
-                    {
-                        id = Convert.ToInt32(dgvTheLoai.CurrentRow.Cells["ID"].Value.ToString());
-                        TheLoai tl = context.TheLoai.Find(id);
-                        if (tl != null)
-                        {
-                            string khoaChinh = tl.ID.ToString();
-                            string ten = tl.TenTheLoai;
-
-                            context.TheLoai.Remove(tl);
-                            context.SaveChanges();
-
-                            NhatKyHelper.GhiLog(
-                                "Xóa",
-                                "TheLoai",
-                                khoaChinh,
-                                "Xóa thể loại: " + ten
-                            );
-                        }
-
-                        frmTheLoai_Load(sender, e);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Không thể xóa thể loại này.\n" + ex.Message, "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    context.TheLoai.Remove(item);
+                    context.SaveChanges();
+                    NhatKyHelper.GhiLog("Xóa", "TheLoai", item.MaTheLoai, $"Xóa thể loại: {item.TenTheLoai}");
+                    LoadData();
                 }
-            }
-            else
-            {
-                MessageBox.Show("Vui lòng chọn thể loại cần xóa.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                catch
+                {
+                    MessageBox.Show("Không thể xóa thể loại này vì đang có sách thuộc thể loại này!");
+                }
             }
         }
 
         private void btnHuyBo_Click(object sender, EventArgs e)
         {
-            frmTheLoai_Load(sender, e);
+            xuLyThem = false;
+            idSelected = 0;
+            BatTatChucNang(false);
+            bindingSource.ResetBindings(false); // Trả lại dữ liệu ban đầu
+            LoadData();
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
         {
-            Close();
+            this.Close();
         }
 
         private void btnTimKiem_Click(object sender, EventArgs e)
         {
-            string tuKhoa = cboTenTheLoai.Text.Trim();
+            string search = cboTenTheLoai.Text.ToLower().Trim();
+            var result = context.TheLoai
+                .Where(x => x.TenTheLoai.ToLower().Contains(search) || x.MaTheLoai.ToLower().Contains(search))
+                .ToList();
+            bindingSource.DataSource = result;
+        }
 
-            if (string.IsNullOrWhiteSpace(tuKhoa))
+        private void btnXuat_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog sfd = new SaveFileDialog { Filter = "Excel Workbook|*.xlsx" })
             {
-                frmTheLoai_Load(sender, e);
-            }
-            else
-            {
-                List<TheLoai> tl = context.TheLoai
-                    .Where(r => r.TenTheLoai.Contains(tuKhoa))
-                    .OrderBy(r => r.ID)
-                    .ToList();
-
-                BindingSource bindingSource = new BindingSource();
-                bindingSource.DataSource = tl;
-
-                txtMaTheLoai.DataBindings.Clear();
-                txtMaTheLoai.DataBindings.Add("Text", bindingSource, "MaTheLoai", false, DataSourceUpdateMode.Never);
-
-                cboTenTheLoai.DataBindings.Clear();
-                cboTenTheLoai.DataBindings.Add("Text", bindingSource, "TenTheLoai", false, DataSourceUpdateMode.Never);
-
-                txtMoTa.DataBindings.Clear();
-                txtMoTa.DataBindings.Add("Text", bindingSource, "MoTa", false, DataSourceUpdateMode.Never);
-
-                dgvTheLoai.DataSource = bindingSource;
-
-                if (dgvTheLoai.Rows.Count > 0 && dgvTheLoai.CurrentRow != null)
+                if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    id = Convert.ToInt32(dgvTheLoai.CurrentRow.Cells["ID"].Value.ToString());
-
-                    NhatKyHelper.GhiLog(
-                        "Tìm kiếm",
-                        "TheLoai",
-                        null,
-                        "Tìm kiếm thể loại với từ khóa: " + tuKhoa
-                    );
-                }
-                else
-                {
-                    txtMaTheLoai.Clear();
-                    txtMoTa.Clear();
-                    MessageBox.Show("Không tìm thấy thể loại phù hợp.", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    try
+                    {
+                        using (XLWorkbook wb = new XLWorkbook())
+                        {
+                            var data = context.TheLoai.Select(x => new { x.MaTheLoai, x.TenTheLoai, x.MoTa }).ToList();
+                            var ws = wb.Worksheets.Add("TheLoai");
+                            ws.Cell(1, 1).InsertTable(data);
+                            ws.Columns().AdjustToContents();
+                            wb.SaveAs(sfd.FileName);
+                        }
+                        NhatKyHelper.GhiLog("Xuất Excel", "TheLoai", null, "Xuất danh sách thể loại");
+                        MessageBox.Show("Xuất file thành công!");
+                    }
+                    catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
                 }
             }
         }
 
         private void btnNhap_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Nhập dữ liệu từ tập tin Excel";
-            openFileDialog.Filter = "Tập tin Excel|*.xls;*.xlsx";
-            openFileDialog.Multiselect = false;
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog ofd = new OpenFileDialog { Filter = "Excel Workbook|*.xlsx" })
             {
-                try
+                if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    DataTable table = new DataTable();
-
-                    using (XLWorkbook workbook = new XLWorkbook(openFileDialog.FileName))
+                    try
                     {
-                        IXLWorksheet worksheet = workbook.Worksheet(1);
-                        bool firstRow = true;
-                        string readRange = "1:1";
-
-                        foreach (IXLRow row in worksheet.RowsUsed())
+                        using (XLWorkbook wb = new XLWorkbook(ofd.FileName))
                         {
-                            if (firstRow)
+                            var rows = wb.Worksheet(1).RangeUsed().RowsUsed().Skip(1);
+                            foreach (var row in rows)
                             {
-                                readRange = string.Format("{0}:{1}", 1, row.LastCellUsed().Address.ColumnNumber);
-                                foreach (IXLCell cell in row.Cells(readRange))
-                                    table.Columns.Add(cell.Value.ToString());
-
-                                firstRow = false;
-                            }
-                            else
-                            {
-                                table.Rows.Add();
-                                int cellIndex = 0;
-                                foreach (IXLCell cell in row.Cells(readRange))
+                                string ma = row.Cell(1).Value.ToString();
+                                if (!context.TheLoai.Any(x => x.MaTheLoai == ma))
                                 {
-                                    table.Rows[table.Rows.Count - 1][cellIndex] = cell.Value.ToString();
-                                    cellIndex++;
+                                    context.TheLoai.Add(new TheLoai
+                                    {
+                                        MaTheLoai = ma,
+                                        TenTheLoai = row.Cell(2).Value.ToString(),
+                                        MoTa = row.Cell(3).Value.ToString()
+                                    });
                                 }
                             }
-                        }
-
-                        if (table.Rows.Count > 0)
-                        {
-                            int soLonNhat = 0;
-                            if (context.TheLoai.Any())
-                            {
-                                soLonNhat = context.TheLoai
-                                    .AsEnumerable()
-                                    .Select(r =>
-                                    {
-                                        if (string.IsNullOrWhiteSpace(r.MaTheLoai))
-                                            return 0;
-
-                                        string so = new string(r.MaTheLoai.Where(char.IsDigit).ToArray());
-                                        return int.TryParse(so, out int kq) ? kq : 0;
-                                    })
-                                    .DefaultIfEmpty(0)
-                                    .Max();
-                            }
-
-                            int demThanhCong = 0;
-
-                            foreach (DataRow r in table.Rows)
-                            {
-                                string tenTheLoai = "";
-                                string moTa = "";
-
-                                if (table.Columns.Contains("TenTheLoai"))
-                                    tenTheLoai = r["TenTheLoai"]?.ToString()?.Trim() ?? "";
-                                else if (table.Columns.Contains("TenLoai"))
-                                    tenTheLoai = r["TenLoai"]?.ToString()?.Trim() ?? "";
-
-                                if (table.Columns.Contains("MoTa"))
-                                    moTa = r["MoTa"]?.ToString()?.Trim() ?? "";
-                                else if (table.Columns.Contains("MoTaTheLoai"))
-                                    moTa = r["MoTaTheLoai"]?.ToString()?.Trim() ?? "";
-
-                                if (string.IsNullOrWhiteSpace(tenTheLoai))
-                                    continue;
-
-                                bool tonTai = context.TheLoai.Any(x => x.TenTheLoai == tenTheLoai);
-                                if (tonTai)
-                                    continue;
-
-                                soLonNhat++;
-
-                                TheLoai tl = new TheLoai();
-                                tl.MaTheLoai = "TL" + soLonNhat.ToString("000");
-                                tl.TenTheLoai = tenTheLoai;
-                                tl.MoTa = moTa;
-
-                                context.TheLoai.Add(tl);
-                                demThanhCong++;
-                            }
-
                             context.SaveChanges();
-
-                            NhatKyHelper.GhiLog(
-                                "Nhập Excel",
-                                "TheLoai",
-                                null,
-                                "Nhập Excel thể loại, thêm mới " + demThanhCong + " dòng."
-                            );
-
-                            MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
-                                "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            frmTheLoai_Load(sender, e);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Tập tin Excel rỗng.", "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            LoadData();
+                            MessageBox.Show("Nhập dữ liệu thành công!");
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-            }
-        }
-
-        private void btnXuat_Click(object sender, EventArgs e)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Title = "Xuất dữ liệu ra tập tin Excel";
-            saveFileDialog.Filter = "Tập tin Excel|*.xls;*.xlsx";
-            saveFileDialog.FileName = "TheLoai_" + DateTime.Now.ToString("dd_MM_yyyy") + ".xlsx";
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    DataTable table = new DataTable();
-                    table.Columns.AddRange(new DataColumn[3]
-                    {
-                        new DataColumn("MaTheLoai", typeof(string)),
-                        new DataColumn("TenTheLoai", typeof(string)),
-                        new DataColumn("MoTa", typeof(string))
-                    });
-
-                    List<TheLoai> tl = context.TheLoai.OrderBy(r => r.ID).ToList();
-
-                    foreach (TheLoai item in tl)
-                        table.Rows.Add(item.MaTheLoai, item.TenTheLoai, item.MoTa);
-
-                    using (XLWorkbook wb = new XLWorkbook())
-                    {
-                        var sheet = wb.Worksheets.Add(table, "TheLoai");
-                        sheet.Columns().AdjustToContents();
-                        wb.SaveAs(saveFileDialog.FileName);
-
-                        NhatKyHelper.GhiLog(
-                            "Xuất Excel",
-                            "TheLoai",
-                            null,
-                            "Xuất danh sách thể loại ra Excel, số dòng: " + tl.Count
-                        );
-
-                        MessageBox.Show("Đã xuất dữ liệu ra tập tin Excel thành công.",
-                            "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    catch (Exception ex) { MessageBox.Show("Lỗi nhập file: " + ex.Message); }
                 }
             }
         }

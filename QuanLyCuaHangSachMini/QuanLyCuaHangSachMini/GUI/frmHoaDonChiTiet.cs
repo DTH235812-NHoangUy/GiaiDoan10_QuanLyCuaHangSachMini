@@ -71,9 +71,7 @@ namespace QuanLyCuaHangSachMini.GUI
             btnLuuHoaDon.Enabled = giaTri;
 
             if (quyenHanNguoiDung == "nhanvien")
-            {
                 cboNhanVien.Enabled = false;
-            }
 
             if (chiXem)
             {
@@ -132,7 +130,9 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
 
                 cboKhachHang.SelectedIndex = -1;
-                cboSach.SelectedIndex = 0;
+                if (cboSach.Items.Count > 0)
+                    cboSach.SelectedIndex = 0;
+
                 txtGhiChuHoaDon.Clear();
                 numSoLuongBan.Value = 1;
                 numDonGiaBan.Value = 1;
@@ -206,7 +206,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
                 dataGridView.ClearSelection();
                 dataGridView.Rows[rowIndex].Selected = true;
-                dataGridView.CurrentCell = dataGridView.Rows[rowIndex].Cells["SachID"];
+
+                if (dataGridView.Columns["TenSach"] != null && dataGridView.Columns["TenSach"].Visible)
+                    dataGridView.CurrentCell = dataGridView.Rows[rowIndex].Cells["TenSach"];
+
                 HienThiThongTinSachBan();
             }
             else
@@ -221,6 +224,12 @@ namespace QuanLyCuaHangSachMini.GUI
         private void HienThiThongTinSachBan()
         {
             if (dataGridView.CurrentRow == null || dataGridView.Rows.Count == 0)
+            {
+                XoaTrangThongTinSachBan();
+                return;
+            }
+
+            if (dataGridView.CurrentRow.Cells["SachID"].Value == null)
             {
                 XoaTrangThongTinSachBan();
                 return;
@@ -277,49 +286,52 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 MessageBox.Show("Vui lòng chọn sách.", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
-            else if (numSoLuongBan.Value <= 0)
+
+            if (numSoLuongBan.Value <= 0)
             {
                 MessageBox.Show("Số lượng bán phải lớn hơn 0.", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
-            else if (numDonGiaBan.Value <= 0)
+
+            if (numDonGiaBan.Value <= 0)
             {
                 MessageBox.Show("Đơn giá bán phải lớn hơn 0.", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            int maSach = Convert.ToInt32(cboSach.SelectedValue.ToString());
+            DanhSachHoaDonChiTiet? chiTiet = hoaDonChiTiet.FirstOrDefault(x => x.SachID == maSach);
+
+            if (chiTiet != null)
+            {
+                chiTiet.SoLuongBan = Convert.ToInt32(numSoLuongBan.Value);
+                chiTiet.DonGiaBan = numDonGiaBan.Value;
+                chiTiet.ThanhTien = numSoLuongBan.Value * numDonGiaBan.Value;
             }
             else
             {
-                int maSach = Convert.ToInt32(cboSach.SelectedValue.ToString());
-                DanhSachHoaDonChiTiet? chiTiet = hoaDonChiTiet.FirstOrDefault(x => x.SachID == maSach);
+                Sach? sach = context.Sach.Find(maSach);
 
-                if (chiTiet != null)
+                DanhSachHoaDonChiTiet ct = new DanhSachHoaDonChiTiet
                 {
-                    chiTiet.SoLuongBan = Convert.ToInt32(numSoLuongBan.Value);
-                    chiTiet.DonGiaBan = numDonGiaBan.Value;
-                    chiTiet.ThanhTien = numSoLuongBan.Value * numDonGiaBan.Value;
-                }
-                else
-                {
-                    Sach? sach = context.Sach.Find(maSach);
+                    ID = 0,
+                    HoaDonID = id,
+                    SachID = maSach,
+                    MaSach = sach != null ? sach.MaSach : string.Empty,
+                    TenSach = cboSach.Text,
+                    SoLuongBan = Convert.ToInt32(numSoLuongBan.Value),
+                    DonGiaBan = numDonGiaBan.Value,
+                    ThanhTien = numSoLuongBan.Value * numDonGiaBan.Value
+                };
 
-                    DanhSachHoaDonChiTiet ct = new DanhSachHoaDonChiTiet
-                    {
-                        ID = 0,
-                        HoaDonID = id,
-                        SachID = maSach,
-                        MaSach = sach != null ? sach.MaSach : string.Empty,
-                        TenSach = cboSach.Text,
-                        SoLuongBan = Convert.ToInt32(numSoLuongBan.Value),
-                        DonGiaBan = numDonGiaBan.Value,
-                        ThanhTien = numSoLuongBan.Value * numDonGiaBan.Value
-                    };
-
-                    hoaDonChiTiet.Add(ct);
-                }
-
-                TaiLaiLuoiChiTiet(maSach);
+                hoaDonChiTiet.Add(ct);
             }
+
+            TaiLaiLuoiChiTiet(maSach);
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
@@ -334,13 +346,14 @@ namespace QuanLyCuaHangSachMini.GUI
                 return;
             }
 
+            if (dataGridView.CurrentRow.Cells["SachID"].Value == null)
+                return;
+
             int maSach = Convert.ToInt32(dataGridView.CurrentRow.Cells["SachID"].Value.ToString());
             DanhSachHoaDonChiTiet? chiTiet = hoaDonChiTiet.FirstOrDefault(x => x.SachID == maSach);
 
             if (chiTiet != null)
-            {
                 hoaDonChiTiet.Remove(chiTiet);
-            }
 
             TaiLaiLuoiChiTiet();
         }
@@ -455,11 +468,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     foreach (DanhSachHoaDonChiTiet item in danhSachMoi)
                     {
-                        HoaDon_ChiTiet ct = new HoaDon_ChiTiet();
-                        ct.HoaDonID = id;
-                        ct.SachID = item.SachID;
-                        ct.SoLuongBan = item.SoLuongBan;
-                        ct.DonGiaBan = item.DonGiaBan;
+                        HoaDon_ChiTiet ct = new HoaDon_ChiTiet
+                        {
+                            HoaDonID = id,
+                            SachID = item.SachID,
+                            SoLuongBan = item.SoLuongBan,
+                            DonGiaBan = item.DonGiaBan
+                        };
                         context.HoaDon_ChiTiet.Add(ct);
 
                         Sach? sach = context.Sach.Find(item.SachID);
@@ -502,23 +517,27 @@ namespace QuanLyCuaHangSachMini.GUI
                         }
                     }
 
-                    HoaDon hd = new HoaDon();
-                    hd.MaHoaDon = PhatSinhMaHoaDon();
-                    hd.NhanVienID = nhanVienDangNhapID;
-                    hd.KhachHangID = Convert.ToInt32(cboKhachHang.SelectedValue.ToString());
-                    hd.NgayLap = DateTime.Now;
-                    hd.GhiChuHoaDon = txtGhiChuHoaDon.Text;
+                    HoaDon hd = new HoaDon
+                    {
+                        MaHoaDon = PhatSinhMaHoaDon(),
+                        NhanVienID = nhanVienDangNhapID,
+                        KhachHangID = Convert.ToInt32(cboKhachHang.SelectedValue.ToString()),
+                        NgayLap = DateTime.Now,
+                        GhiChuHoaDon = txtGhiChuHoaDon.Text
+                    };
 
                     context.HoaDon.Add(hd);
                     context.SaveChanges();
 
                     foreach (DanhSachHoaDonChiTiet item in danhSachMoi)
                     {
-                        HoaDon_ChiTiet ct = new HoaDon_ChiTiet();
-                        ct.HoaDonID = hd.ID;
-                        ct.SachID = item.SachID;
-                        ct.SoLuongBan = item.SoLuongBan;
-                        ct.DonGiaBan = item.DonGiaBan;
+                        HoaDon_ChiTiet ct = new HoaDon_ChiTiet
+                        {
+                            HoaDonID = hd.ID,
+                            SachID = item.SachID,
+                            SoLuongBan = item.SoLuongBan,
+                            DonGiaBan = item.DonGiaBan
+                        };
                         context.HoaDon_ChiTiet.Add(ct);
 
                         Sach? sach = context.Sach.Find(item.SachID);
@@ -591,15 +610,14 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void cboSach_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            if (cboSach.SelectedValue == null) return;
+            if (cboSach.SelectedValue == null)
+                return;
 
             int maSach = Convert.ToInt32(cboSach.SelectedValue.ToString());
             Sach? sach = context.Sach.Find(maSach);
 
             if (sach != null)
-            {
                 numDonGiaBan.Value = sach.GiaBan;
-            }
         }
 
         private void btnInHoaDon_Click(object sender, EventArgs e)

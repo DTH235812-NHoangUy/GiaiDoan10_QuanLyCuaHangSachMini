@@ -8,9 +8,10 @@ namespace QuanLyCuaHangSachMini.GUI
 {
     public partial class frmNhanVien : Form
     {
-        AppDbContext context = new AppDbContext();
-        bool xuLyThem = false;
-        int id = 0;
+        private readonly AppDbContext context = new AppDbContext();
+        private readonly BindingSource bindingSource = new BindingSource();
+        private bool xuLyThem = false;
+        private int id = 0;
 
         public frmNhanVien()
         {
@@ -18,10 +19,67 @@ namespace QuanLyCuaHangSachMini.GUI
             txtDienThoai.KeyPress += txtDienThoai_KeyPress;
         }
 
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            bindingSource.Dispose();
+            context.Dispose();
+            base.OnFormClosed(e);
+        }
+
         private void txtDienThoai_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
+        }
+
+        private bool KiemTraDuLieu()
+        {
+            if (string.IsNullOrWhiteSpace(cboHoVaTen.Text))
+            {
+                MessageBox.Show("Vui lòng nhập họ và tên nhân viên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cboHoVaTen.Focus();
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(txtDienThoai.Text))
+            {
+                if (!txtDienThoai.Text.All(char.IsDigit))
+                {
+                    MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return false;
+                }
+
+                if (txtDienThoai.Text.Length != 10)
+                {
+                    MessageBox.Show("Điện thoại phải đủ 10 số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return false;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(txtTenDangNhap.Text))
+            {
+                MessageBox.Show("Vui lòng nhập tên đăng nhập.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtTenDangNhap.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtMatKhau.Text))
+            {
+                MessageBox.Show("Vui lòng nhập mật khẩu.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtMatKhau.Focus();
+                return false;
+            }
+
+            if (cboQuyenHan.SelectedIndex < 0)
+            {
+                MessageBox.Show("Vui lòng chọn quyền hạn.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cboQuyenHan.Focus();
+                return false;
+            }
+
+            return true;
         }
 
         private void BatTatChucNang(bool giaTri)
@@ -38,8 +96,11 @@ namespace QuanLyCuaHangSachMini.GUI
             btnXuat.Enabled = !giaTri;
 
             cboHoVaTen.Enabled = true;
+            cboHoVaTen.DropDownStyle = ComboBoxStyle.DropDown;
+            cboHoVaTen.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboHoVaTen.AutoCompleteSource = AutoCompleteSource.ListItems;
+
             txtDienThoai.Enabled = giaTri;
-            txtDiaChi.Enabled = giaTri;
             txtTenDangNhap.Enabled = giaTri;
             txtMatKhau.Enabled = giaTri;
             cboQuyenHan.Enabled = giaTri;
@@ -53,90 +114,105 @@ namespace QuanLyCuaHangSachMini.GUI
             dgvNhanVien.AutoGenerateColumns = false;
 
             cboQuyenHan.Items.Clear();
-            cboQuyenHan.Items.Add("Nhân viên");
-            cboQuyenHan.Items.Add("Quản trị viên");
+            cboQuyenHan.Items.Add("Quản trị viên (Admin)");
+            cboQuyenHan.Items.Add("Nhân viên bán hàng");
 
-            List<NhanVien> nv = new List<NhanVien>();
-            nv = context.NhanVien.OrderBy(r => r.ID).ToList();
+            LoadData();
+        }
 
-            BindingSource bindingSource = new BindingSource();
-            bindingSource.DataSource = nv;
-
-            txtMaNhanVien.DataBindings.Clear();
-            txtMaNhanVien.DataBindings.Add("Text", bindingSource, "MaNhanVien", false, DataSourceUpdateMode.Never);
-
-            cboHoVaTen.DataBindings.Clear();
-            cboHoVaTen.DataBindings.Add("Text", bindingSource, "HoVaTen", false, DataSourceUpdateMode.Never);
-
-            txtDienThoai.DataBindings.Clear();
-            txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
-
-            txtDiaChi.DataBindings.Clear();
-            txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
-
-            txtTenDangNhap.DataBindings.Clear();
-            txtTenDangNhap.DataBindings.Add("Text", bindingSource, "TenDangNhap", false, DataSourceUpdateMode.Never);
-
-            txtMatKhau.DataBindings.Clear();
-            txtMatKhau.DataBindings.Add("Text", bindingSource, "MatKhau", false, DataSourceUpdateMode.Never);
-
-            cboQuyenHan.DataBindings.Clear();
-            cboQuyenHan.DataBindings.Add("SelectedIndex", bindingSource, "QuyenHan", false, DataSourceUpdateMode.Never);
-
-            chkKichHoat.DataBindings.Clear();
-            chkKichHoat.DataBindings.Add("Checked", bindingSource, "KichHoat", true, DataSourceUpdateMode.Never);
-
-            dgvNhanVien.DataSource = bindingSource;
-
-            for (int i = 0; i < dgvNhanVien.Rows.Count; i++)
+        private void LoadData()
+        {
+            try
             {
-                bool quyenHan = false;
-                bool.TryParse(dgvNhanVien.Rows[i].Cells["QuyenHan"].Value?.ToString(), out quyenHan);
-                dgvNhanVien.Rows[i].Cells["TenQuyenHan"].Value = quyenHan ? "Quản trị viên" : "Nhân viên";
+                List<NhanVien> nhanVien = context.NhanVien.OrderBy(r => r.ID).ToList();
+                bindingSource.DataSource = nhanVien;
 
-                bool kichHoat = false;
-                bool.TryParse(dgvNhanVien.Rows[i].Cells["KichHoat"].Value?.ToString(), out kichHoat);
-                dgvNhanVien.Rows[i].Cells["TrangThai"].Value = kichHoat ? "Đang hoạt động" : "Ngừng hoạt động";
+                txtMaNhanVien.DataBindings.Clear();
+                txtMaNhanVien.DataBindings.Add("Text", bindingSource, "MaNhanVien", false, DataSourceUpdateMode.Never);
+
+                cboHoVaTen.DataBindings.Clear();
+                cboHoVaTen.DataBindings.Add("Text", bindingSource, "HoVaTen", false, DataSourceUpdateMode.Never);
+
+                txtDienThoai.DataBindings.Clear();
+                txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+
+                txtTenDangNhap.DataBindings.Clear();
+                txtTenDangNhap.DataBindings.Add("Text", bindingSource, "TenDangNhap", false, DataSourceUpdateMode.Never);
+
+                txtMatKhau.DataBindings.Clear();
+                txtMatKhau.DataBindings.Add("Text", bindingSource, "MatKhau", false, DataSourceUpdateMode.Never);
+
+                chkKichHoat.DataBindings.Clear();
+                chkKichHoat.DataBindings.Add("Checked", bindingSource, "KichHoat", false, DataSourceUpdateMode.Never);
+
+                dgvNhanVien.DataSource = bindingSource;
+
+                List<string> dsHoVaTen = context.NhanVien
+                    .OrderBy(r => r.HoVaTen)
+                    .Select(r => r.HoVaTen)
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Distinct()
+                    .ToList();
+
+                cboHoVaTen.BeginUpdate();
+                cboHoVaTen.Items.Clear();
+                cboHoVaTen.Items.AddRange(dsHoVaTen.ToArray());
+                cboHoVaTen.EndUpdate();
+
+                cboHoVaTen.DropDownStyle = ComboBoxStyle.DropDown;
+                cboHoVaTen.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                cboHoVaTen.AutoCompleteSource = AutoCompleteSource.ListItems;
+
+                if (bindingSource.Current is NhanVien nvHienTai)
+                    cboQuyenHan.SelectedIndex = nvHienTai.QuyenHan ? 0 : 1;
+                else
+                    cboQuyenHan.SelectedIndex = -1;
+
+                if (dgvNhanVien.Rows.Count > 0 && dgvNhanVien.CurrentRow != null)
+                {
+                    id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
+                    btnSua.Enabled = true;
+                    btnXoa.Enabled = true;
+                    btnXuat.Enabled = true;
+                }
+                else
+                {
+                    id = 0;
+                    txtMaNhanVien.Clear();
+                    cboHoVaTen.SelectedIndex = -1;
+                    cboHoVaTen.Text = string.Empty;
+                    txtDienThoai.Clear();
+                    txtTenDangNhap.Clear();
+                    txtMatKhau.Clear();
+                    cboQuyenHan.SelectedIndex = -1;
+                    chkKichHoat.Checked = false;
+                    btnSua.Enabled = false;
+                    btnXoa.Enabled = false;
+                    btnXuat.Enabled = false;
+                }
             }
-
-            cboHoVaTen.Items.Clear();
-            List<string> dsHoVaTen = context.NhanVien
-                .OrderBy(r => r.HoVaTen)
-                .Select(r => r.HoVaTen)
-                .Distinct()
-                .ToList();
-
-            foreach (string item in dsHoVaTen)
-                cboHoVaTen.Items.Add(item);
-
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(dsHoVaTen.ToArray());
-            cboHoVaTen.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            cboHoVaTen.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            cboHoVaTen.AutoCompleteCustomSource = auto;
-
-            if (dgvNhanVien.Rows.Count > 0 && dgvNhanVien.CurrentRow != null)
+            catch (Exception ex)
             {
-                id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value.ToString());
-                btnSua.Enabled = true;
-                btnXoa.Enabled = true;
-                btnXuat.Enabled = true;
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else
-            {
-                id = 0;
-                txtMaNhanVien.Clear();
-                cboHoVaTen.Text = "";
-                txtDienThoai.Clear();
-                txtDiaChi.Clear();
-                txtTenDangNhap.Clear();
-                txtMatKhau.Clear();
-                cboQuyenHan.SelectedIndex = -1;
-                chkKichHoat.Checked = true;
-                btnSua.Enabled = false;
-                btnXoa.Enabled = false;
-                btnXuat.Enabled = false;
-            }
+        }
+
+        private string TaoMaNhanVienMoi()
+        {
+            int soLonNhat = context.NhanVien
+                .AsEnumerable()
+                .Select(r =>
+                {
+                    if (string.IsNullOrWhiteSpace(r.MaNhanVien))
+                        return 0;
+
+                    string so = new string(r.MaNhanVien.Where(char.IsDigit).ToArray());
+                    return int.TryParse(so, out int kq) ? kq : 0;
+                })
+                .DefaultIfEmpty(0)
+                .Max();
+
+            return $"NV{soLonNhat + 1:000}";
         }
 
         private void btnThem_Click(object sender, EventArgs e)
@@ -144,39 +220,21 @@ namespace QuanLyCuaHangSachMini.GUI
             xuLyThem = true;
             BatTatChucNang(true);
 
-            int soLonNhat = 0;
-            if (context.NhanVien.Any())
-            {
-                soLonNhat = context.NhanVien
-                    .AsEnumerable()
-                    .Select(r =>
-                    {
-                        if (string.IsNullOrWhiteSpace(r.MaNhanVien))
-                            return 0;
-
-                        string so = new string(r.MaNhanVien.Where(char.IsDigit).ToArray());
-                        return int.TryParse(so, out int kq) ? kq : 0;
-                    })
-                    .DefaultIfEmpty(0)
-                    .Max();
-            }
-
             txtMaNhanVien.DataBindings.Clear();
             cboHoVaTen.DataBindings.Clear();
             txtDienThoai.DataBindings.Clear();
-            txtDiaChi.DataBindings.Clear();
             txtTenDangNhap.DataBindings.Clear();
             txtMatKhau.DataBindings.Clear();
-            cboQuyenHan.DataBindings.Clear();
             chkKichHoat.DataBindings.Clear();
 
-            txtMaNhanVien.Text = "NV" + (soLonNhat + 1).ToString("000");
-            cboHoVaTen.Text = "";
-            txtDienThoai.Text = "";
-            txtDiaChi.Text = "";
-            txtTenDangNhap.Text = "";
-            txtMatKhau.Text = "";
-            cboQuyenHan.SelectedIndex = 0;
+            txtMaNhanVien.Text = TaoMaNhanVienMoi();
+            cboHoVaTen.SelectedIndex = -1;
+            cboHoVaTen.DroppedDown = false;
+            cboHoVaTen.Text = string.Empty;
+            txtDienThoai.Text = string.Empty;
+            txtTenDangNhap.Text = string.Empty;
+            txtMatKhau.Text = string.Empty;
+            cboQuyenHan.SelectedIndex = 1;
             chkKichHoat.Checked = true;
             cboHoVaTen.Focus();
         }
@@ -187,7 +245,12 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 xuLyThem = false;
                 BatTatChucNang(true);
-                id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value.ToString());
+                id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
+
+                NhanVien nv = context.NhanVien.Find(id);
+                if (nv != null)
+                    cboQuyenHan.SelectedIndex = nv.QuyenHan ? 0 : 1;
+
                 cboHoVaTen.Focus();
             }
             else
@@ -198,58 +261,12 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(cboHoVaTen.Text))
-            {
-                MessageBox.Show("Vui lòng nhập họ và tên nhân viên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cboHoVaTen.Focus();
+            if (!KiemTraDuLieu())
                 return;
-            }
-
-            if (string.IsNullOrWhiteSpace(txtDienThoai.Text))
-            {
-                MessageBox.Show("Vui lòng nhập điện thoại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtDienThoai.Focus();
-                return;
-            }
-
-            if (!txtDienThoai.Text.All(char.IsDigit))
-            {
-                MessageBox.Show("Điện thoại chỉ được nhập số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtDienThoai.Focus();
-                return;
-            }
-
-            if (txtDienThoai.Text.Length != 10)
-            {
-                MessageBox.Show("Điện thoại phải đúng 10 số.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtDienThoai.Focus();
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(txtTenDangNhap.Text))
-            {
-                MessageBox.Show("Vui lòng nhập tên đăng nhập.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtTenDangNhap.Focus();
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(cboQuyenHan.Text))
-            {
-                MessageBox.Show("Vui lòng chọn quyền hạn cho nhân viên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cboQuyenHan.Focus();
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(txtMatKhau.Text) && xuLyThem)
-            {
-                MessageBox.Show("Vui lòng nhập mật khẩu.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtMatKhau.Focus();
-                return;
-            }
 
             try
             {
-                bool quyenHan = cboQuyenHan.SelectedIndex == 1;
+                bool laQuanTriVien = cboQuyenHan.SelectedIndex == 0;
 
                 if (xuLyThem)
                 {
@@ -261,14 +278,20 @@ namespace QuanLyCuaHangSachMini.GUI
                         return;
                     }
 
+                    string maNhanVien = txtMaNhanVien.Text.Trim();
+                    if (string.IsNullOrWhiteSpace(maNhanVien))
+                    {
+                        maNhanVien = TaoMaNhanVienMoi();
+                        txtMaNhanVien.Text = maNhanVien;
+                    }
+
                     NhanVien nv = new NhanVien();
-                    nv.MaNhanVien = txtMaNhanVien.Text.Trim();
+                    nv.MaNhanVien = maNhanVien;
                     nv.HoVaTen = cboHoVaTen.Text.Trim();
                     nv.DienThoai = txtDienThoai.Text.Trim();
-                    nv.DiaChi = txtDiaChi.Text.Trim();
                     nv.TenDangNhap = txtTenDangNhap.Text.Trim();
                     nv.MatKhau = txtMatKhau.Text.Trim();
-                    nv.QuyenHan = quyenHan;
+                    nv.QuyenHan = laQuanTriVien;
                     nv.KichHoat = chkKichHoat.Checked;
 
                     context.NhanVien.Add(nv);
@@ -296,13 +319,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
                         nv.HoVaTen = cboHoVaTen.Text.Trim();
                         nv.DienThoai = txtDienThoai.Text.Trim();
-                        nv.DiaChi = txtDiaChi.Text.Trim();
                         nv.TenDangNhap = txtTenDangNhap.Text.Trim();
-                        nv.QuyenHan = quyenHan;
+                        nv.MatKhau = txtMatKhau.Text.Trim();
+                        nv.QuyenHan = laQuanTriVien;
                         nv.KichHoat = chkKichHoat.Checked;
-
-                        if (!string.IsNullOrWhiteSpace(txtMatKhau.Text))
-                            nv.MatKhau = txtMatKhau.Text.Trim();
 
                         context.NhanVien.Update(nv);
                         context.SaveChanges();
@@ -314,21 +334,21 @@ namespace QuanLyCuaHangSachMini.GUI
                             "Sửa nhân viên: " + nv.HoVaTen
                         );
                     }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy nhân viên cần sửa.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                 }
 
-                frmNhanVien_Load(sender, e);
+                xuLyThem = false;
+                id = 0;
+                LoadData();
+                BatTatChucNang(false);
             }
             catch (Exception ex)
             {
-                string loi = ex.Message;
-
-                if (ex.InnerException != null)
-                    loi += "\n\n" + ex.InnerException.Message;
-
-                if (ex.InnerException != null && ex.InnerException.InnerException != null)
-                    loi += "\n\n" + ex.InnerException.InnerException.Message;
-
-                MessageBox.Show(loi, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -341,12 +361,12 @@ namespace QuanLyCuaHangSachMini.GUI
                 {
                     try
                     {
-                        id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value.ToString());
+                        id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
                         NhanVien nv = context.NhanVien.Find(id);
                         if (nv != null)
                         {
                             string khoaChinh = nv.ID.ToString();
-                            string hoTen = nv.HoVaTen;
+                            string ten = nv.HoVaTen;
 
                             context.NhanVien.Remove(nv);
                             context.SaveChanges();
@@ -355,23 +375,18 @@ namespace QuanLyCuaHangSachMini.GUI
                                 "Xóa",
                                 "NhanVien",
                                 khoaChinh,
-                                "Xóa nhân viên: " + hoTen
+                                "Xóa nhân viên: " + ten
                             );
                         }
 
-                        frmNhanVien_Load(sender, e);
+                        xuLyThem = false;
+                        id = 0;
+                        LoadData();
+                        BatTatChucNang(false);
                     }
                     catch (Exception ex)
                     {
-                        string loi = ex.Message;
-
-                        if (ex.InnerException != null)
-                            loi += "\n\n" + ex.InnerException.Message;
-
-                        if (ex.InnerException != null && ex.InnerException.InnerException != null)
-                            loi += "\n\n" + ex.InnerException.InnerException.Message;
-
-                        MessageBox.Show("Không thể xóa nhân viên này.\n" + loi, "Lỗi",
+                        MessageBox.Show("Không thể xóa nhân viên này.\n" + ex.Message, "Lỗi",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -384,7 +399,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnHuyBo_Click(object sender, EventArgs e)
         {
-            frmNhanVien_Load(sender, e);
+            xuLyThem = false;
+            id = 0;
+            LoadData();
+            BatTatChucNang(false);
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
@@ -398,18 +416,17 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (string.IsNullOrWhiteSpace(tuKhoa))
             {
-                frmNhanVien_Load(sender, e);
+                LoadData();
+                BatTatChucNang(false);
             }
             else
             {
-                List<NhanVien> nv = new List<NhanVien>();
-                nv = context.NhanVien
-                    .Where(r => r.HoVaTen.Contains(tuKhoa))
+                List<NhanVien> nhanVien = context.NhanVien
+                    .Where(r => r.HoVaTen.Contains(tuKhoa) || r.MaNhanVien.Contains(tuKhoa))
                     .OrderBy(r => r.ID)
                     .ToList();
 
-                BindingSource bindingSource = new BindingSource();
-                bindingSource.DataSource = nv;
+                bindingSource.DataSource = nhanVien;
 
                 txtMaNhanVien.DataBindings.Clear();
                 txtMaNhanVien.DataBindings.Add("Text", bindingSource, "MaNhanVien", false, DataSourceUpdateMode.Never);
@@ -420,37 +437,28 @@ namespace QuanLyCuaHangSachMini.GUI
                 txtDienThoai.DataBindings.Clear();
                 txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
 
-                txtDiaChi.DataBindings.Clear();
-                txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
-
                 txtTenDangNhap.DataBindings.Clear();
                 txtTenDangNhap.DataBindings.Add("Text", bindingSource, "TenDangNhap", false, DataSourceUpdateMode.Never);
 
                 txtMatKhau.DataBindings.Clear();
                 txtMatKhau.DataBindings.Add("Text", bindingSource, "MatKhau", false, DataSourceUpdateMode.Never);
 
-                cboQuyenHan.DataBindings.Clear();
-                cboQuyenHan.DataBindings.Add("SelectedIndex", bindingSource, "QuyenHan", false, DataSourceUpdateMode.Never);
-
                 chkKichHoat.DataBindings.Clear();
-                chkKichHoat.DataBindings.Add("Checked", bindingSource, "KichHoat", true, DataSourceUpdateMode.Never);
+                chkKichHoat.DataBindings.Add("Checked", bindingSource, "KichHoat", false, DataSourceUpdateMode.Never);
 
                 dgvNhanVien.DataSource = bindingSource;
 
-                for (int i = 0; i < dgvNhanVien.Rows.Count; i++)
-                {
-                    bool quyen = false;
-                    bool.TryParse(dgvNhanVien.Rows[i].Cells["QuyenHan"].Value?.ToString(), out quyen);
-                    dgvNhanVien.Rows[i].Cells["TenQuyenHan"].Value = quyen ? "Quản trị viên" : "Nhân viên";
-
-                    bool kichHoat = false;
-                    bool.TryParse(dgvNhanVien.Rows[i].Cells["KichHoat"].Value?.ToString(), out kichHoat);
-                    dgvNhanVien.Rows[i].Cells["TrangThai"].Value = kichHoat ? "Đang hoạt động" : "Ngừng hoạt động";
-                }
+                if (bindingSource.Current is NhanVien nvHienTai)
+                    cboQuyenHan.SelectedIndex = nvHienTai.QuyenHan ? 0 : 1;
+                else
+                    cboQuyenHan.SelectedIndex = -1;
 
                 if (dgvNhanVien.Rows.Count > 0 && dgvNhanVien.CurrentRow != null)
                 {
-                    id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value.ToString());
+                    id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
+                    btnSua.Enabled = true;
+                    btnXoa.Enabled = true;
+                    btnXuat.Enabled = true;
 
                     NhatKyHelper.GhiLog(
                         "Tìm kiếm",
@@ -461,12 +469,19 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
                 else
                 {
+                    id = 0;
                     txtMaNhanVien.Clear();
+                    cboHoVaTen.SelectedIndex = -1;
+                    cboHoVaTen.Text = string.Empty;
                     txtDienThoai.Clear();
-                    txtDiaChi.Clear();
                     txtTenDangNhap.Clear();
                     txtMatKhau.Clear();
                     cboQuyenHan.SelectedIndex = -1;
+                    chkKichHoat.Checked = false;
+                    btnSua.Enabled = false;
+                    btnXoa.Enabled = false;
+                    btnXuat.Enabled = false;
+
                     MessageBox.Show("Không tìm thấy nhân viên phù hợp.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -537,26 +552,66 @@ namespace QuanLyCuaHangSachMini.GUI
 
                             foreach (DataRow r in table.Rows)
                             {
-                                string hoVaTen = table.Columns.Contains("HoVaTen") ? r["HoVaTen"]?.ToString()?.Trim() ?? "" : "";
-                                string dienThoai = table.Columns.Contains("DienThoai") ? r["DienThoai"]?.ToString()?.Trim() ?? "" : "";
-                                string diaChi = table.Columns.Contains("DiaChi") ? r["DiaChi"]?.ToString()?.Trim() ?? "" : "";
-                                string tenDangNhap = table.Columns.Contains("TenDangNhap") ? r["TenDangNhap"]?.ToString()?.Trim() ?? "" : "";
-                                string matKhau = table.Columns.Contains("MatKhau") ? r["MatKhau"]?.ToString()?.Trim() ?? "" : "";
-                                string quyenHan = table.Columns.Contains("QuyenHan") ? r["QuyenHan"]?.ToString()?.Trim() ?? "" : "";
-                                string kichHoat = table.Columns.Contains("KichHoat") ? r["KichHoat"]?.ToString()?.Trim() ?? "" : "";
+                                string hoVaTen = "";
+                                string dienThoai = "";
+                                string tenDangNhap = "";
+                                string matKhau = "";
+                                string quyenHan = "";
+                                string kichHoat = "";
 
-                                if (string.IsNullOrWhiteSpace(hoVaTen) ||
-                                    string.IsNullOrWhiteSpace(dienThoai) ||
-                                    string.IsNullOrWhiteSpace(tenDangNhap) ||
-                                    string.IsNullOrWhiteSpace(matKhau))
+                                if (table.Columns.Contains("HoVaTen"))
+                                    hoVaTen = r["HoVaTen"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("TenNhanVien"))
+                                    hoVaTen = r["TenNhanVien"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("DienThoai"))
+                                    dienThoai = r["DienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SoDienThoai"))
+                                    dienThoai = r["SoDienThoai"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("SDT"))
+                                    dienThoai = r["SDT"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("TenDangNhap"))
+                                    tenDangNhap = r["TenDangNhap"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("Username"))
+                                    tenDangNhap = r["Username"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("MatKhau"))
+                                    matKhau = r["MatKhau"]?.ToString()?.Trim() ?? "";
+                                else if (table.Columns.Contains("Password"))
+                                    matKhau = r["Password"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("QuyenHan"))
+                                    quyenHan = r["QuyenHan"]?.ToString()?.Trim() ?? "";
+
+                                if (table.Columns.Contains("KichHoat"))
+                                    kichHoat = r["KichHoat"]?.ToString()?.Trim() ?? "";
+
+                                if (string.IsNullOrWhiteSpace(hoVaTen) || string.IsNullOrWhiteSpace(tenDangNhap))
                                     continue;
 
-                                if (!dienThoai.All(char.IsDigit) || dienThoai.Length != 10)
+                                if (!string.IsNullOrWhiteSpace(dienThoai))
+                                {
+                                    if (!dienThoai.All(char.IsDigit))
+                                        continue;
+                                    if (dienThoai.Length != 10)
+                                        continue;
+                                }
+
+                                bool tonTai = context.NhanVien.Any(x => x.TenDangNhap == tenDangNhap);
+                                if (tonTai)
                                     continue;
 
-                                bool tonTaiTenDangNhap = context.NhanVien.Any(x => x.TenDangNhap == tenDangNhap);
-                                if (tonTaiTenDangNhap)
-                                    continue;
+                                bool laQuanTriVien =
+                                    quyenHan.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+                                    quyenHan.Contains("Quản trị", StringComparison.OrdinalIgnoreCase) ||
+                                    quyenHan.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                                    quyenHan.Equals("1");
+
+                                bool dangKichHoat =
+                                    kichHoat.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                                    kichHoat.Equals("1") ||
+                                    kichHoat.Contains("Đang hoạt động", StringComparison.OrdinalIgnoreCase);
 
                                 soLonNhat++;
 
@@ -564,11 +619,10 @@ namespace QuanLyCuaHangSachMini.GUI
                                 nv.MaNhanVien = "NV" + soLonNhat.ToString("000");
                                 nv.HoVaTen = hoVaTen;
                                 nv.DienThoai = dienThoai;
-                                nv.DiaChi = diaChi;
                                 nv.TenDangNhap = tenDangNhap;
                                 nv.MatKhau = matKhau;
-                                nv.QuyenHan = quyenHan == "Quản trị viên" || quyenHan == "True" || quyenHan == "1";
-                                nv.KichHoat = kichHoat == "" || kichHoat == "Đang hoạt động" || kichHoat == "True" || kichHoat == "1";
+                                nv.QuyenHan = laQuanTriVien;
+                                nv.KichHoat = dangKichHoat;
 
                                 context.NhanVien.Add(nv);
                                 demThanhCong++;
@@ -586,7 +640,8 @@ namespace QuanLyCuaHangSachMini.GUI
                             MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
                                 "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                            frmNhanVien_Load(sender, e);
+                            LoadData();
+                            BatTatChucNang(false);
                         }
                         else
                         {
@@ -597,15 +652,8 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
                 catch (Exception ex)
                 {
-                    string loi = ex.Message;
-
-                    if (ex.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.Message;
-
-                    if (ex.InnerException != null && ex.InnerException.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.InnerException.Message;
-
-                    MessageBox.Show(loi, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(ex.Message, "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
         }
@@ -627,25 +675,24 @@ namespace QuanLyCuaHangSachMini.GUI
                         new DataColumn("MaNhanVien", typeof(string)),
                         new DataColumn("HoVaTen", typeof(string)),
                         new DataColumn("DienThoai", typeof(string)),
-                        new DataColumn("DiaChi", typeof(string)),
                         new DataColumn("TenDangNhap", typeof(string)),
+                        new DataColumn("MatKhau", typeof(string)),
                         new DataColumn("QuyenHan", typeof(string)),
                         new DataColumn("KichHoat", typeof(string))
                     });
 
-                    List<NhanVien> nv = new List<NhanVien>();
-                    nv = context.NhanVien.OrderBy(r => r.ID).ToList();
+                    List<NhanVien> nhanVien = context.NhanVien.OrderBy(r => r.ID).ToList();
 
-                    foreach (NhanVien item in nv)
+                    foreach (NhanVien item in nhanVien)
                     {
                         table.Rows.Add(
                             item.MaNhanVien,
                             item.HoVaTen,
                             item.DienThoai,
-                            item.DiaChi,
                             item.TenDangNhap,
-                            item.QuyenHan ? "Quản trị viên" : "Nhân viên",
-                            item.KichHoat ? "Đang hoạt động" : "Ngừng hoạt động"
+                            item.MatKhau,
+                            item.QuyenHan ? "Admin" : "Nhân viên",
+                            item.KichHoat ? "Đang hoạt động" : "Đã khóa"
                         );
                     }
 
@@ -659,7 +706,7 @@ namespace QuanLyCuaHangSachMini.GUI
                             "Xuất Excel",
                             "NhanVien",
                             null,
-                            "Xuất danh sách nhân viên ra Excel, số dòng: " + nv.Count
+                            "Xuất danh sách nhân viên ra Excel, số dòng: " + nhanVien.Count
                         );
 
                         MessageBox.Show("Đã xuất dữ liệu ra tập tin Excel thành công.",
@@ -668,38 +715,9 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
                 catch (Exception ex)
                 {
-                    string loi = ex.Message;
-
-                    if (ex.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.Message;
-
-                    if (ex.InnerException != null && ex.InnerException.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.InnerException.Message;
-
-                    MessageBox.Show(loi, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(ex.Message, "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
-            }
-        }
-
-        private void dgvNhanVien_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && dgvNhanVien.CurrentRow != null)
-            {
-                id = Convert.ToInt32(dgvNhanVien.CurrentRow.Cells["ID"].Value.ToString());
-                txtMaNhanVien.Text = dgvNhanVien.CurrentRow.Cells["MaNhanVien"].Value.ToString();
-                cboHoVaTen.Text = dgvNhanVien.CurrentRow.Cells["HoVaTen"].Value.ToString();
-                txtDienThoai.Text = dgvNhanVien.CurrentRow.Cells["DienThoai"].Value?.ToString() ?? "";
-                txtDiaChi.Text = dgvNhanVien.CurrentRow.Cells["DiaChi"].Value?.ToString() ?? "";
-                txtTenDangNhap.Text = dgvNhanVien.CurrentRow.Cells["TenDangNhap"].Value.ToString();
-                txtMatKhau.Text = dgvNhanVien.CurrentRow.Cells["MatKhau"].Value.ToString();
-
-                bool quyenHan = false;
-                bool.TryParse(dgvNhanVien.CurrentRow.Cells["QuyenHan"].Value?.ToString(), out quyenHan);
-                cboQuyenHan.SelectedIndex = quyenHan ? 1 : 0;
-
-                bool kichHoat = false;
-                bool.TryParse(dgvNhanVien.CurrentRow.Cells["KichHoat"].Value?.ToString(), out kichHoat);
-                chkKichHoat.Checked = kichHoat;
             }
         }
     }

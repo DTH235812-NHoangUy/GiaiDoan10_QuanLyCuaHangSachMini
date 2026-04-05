@@ -12,23 +12,32 @@ namespace QuanLyCuaHangSachMini.GUI
         private List<DanhSachPhieuNhapChiTiet> dsChiTietTam = new List<DanhSachPhieuNhapChiTiet>();
         private int idPhieuNhap = 0;
         private bool chiXem = false;
+        private readonly int nhanVienDangNhapID = 0;
+        private readonly string quyenHanNguoiDung = "";
 
         public frmPhieuNhapChiTiet()
         {
             InitializeComponent();
         }
 
-        public frmPhieuNhapChiTiet(int phieuNhapID, bool chiXemChiTiet)
+        public frmPhieuNhapChiTiet(int phieuNhapID, bool chiXemChiTiet, int nhanVienID = 0, string quyenHan = "")
         {
             InitializeComponent();
             idPhieuNhap = phieuNhapID;
             chiXem = chiXemChiTiet;
+            nhanVienDangNhapID = nhanVienID;
+            quyenHanNguoiDung = quyenHan ?? "";
+        }
+
+        private bool LaAdmin()
+        {
+            return quyenHanNguoiDung.Equals("admin", StringComparison.OrdinalIgnoreCase);
         }
 
         private void BatTatChucNang(bool giaTri)
         {
             cboNhaCungCap.Enabled = giaTri;
-            cboNhanVien.Enabled = giaTri;
+            cboNhanVien.Enabled = false;
             dtpNgayNhap.Enabled = giaTri;
             txtGhiChu.Enabled = giaTri;
 
@@ -39,6 +48,20 @@ namespace QuanLyCuaHangSachMini.GUI
             btnThemSach.Enabled = giaTri;
             btnXoaSach.Enabled = giaTri;
             btnLuuPhieuNhap.Enabled = giaTri;
+
+            if (chiXem)
+            {
+                cboNhaCungCap.Enabled = false;
+                cboNhanVien.Enabled = false;
+                dtpNgayNhap.Enabled = false;
+                txtGhiChu.Enabled = false;
+                cboTenSach.Enabled = false;
+                numSoLuongNhap.Enabled = false;
+                numDonGiaNhap.Enabled = false;
+                btnThemSach.Enabled = false;
+                btnXoaSach.Enabled = false;
+                btnLuuPhieuNhap.Enabled = false;
+            }
         }
 
         private void frmPhieuNhapChiTiet_Load(object sender, EventArgs e)
@@ -57,16 +80,19 @@ namespace QuanLyCuaHangSachMini.GUI
             numDonGiaNhap.Maximum = 1000000000;
             numDonGiaNhap.ThousandsSeparator = true;
 
-            cboNhaCungCap.DataSource = context.NhaCungCap.OrderBy(r => r.TenNhaCungCap).ToList();
+            cboNhaCungCap.DataSource = context.NhaCungCap
+                .OrderBy(r => r.TenNhaCungCap)
+                .ToList();
             cboNhaCungCap.ValueMember = "ID";
             cboNhaCungCap.DisplayMember = "TenNhaCungCap";
 
             cboNhanVien.DataSource = context.NhanVien
-                .Where(r => r.KichHoat)
+                .Where(r => r.ID == nhanVienDangNhapID && r.KichHoat)
                 .OrderBy(r => r.HoVaTen)
                 .ToList();
             cboNhanVien.ValueMember = "ID";
             cboNhanVien.DisplayMember = "HoVaTen";
+            cboNhanVien.Enabled = false;
 
             cboTenSach.DataSource = context.Sach
                 .OrderBy(r => r.TenSach)
@@ -76,6 +102,22 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (idPhieuNhap == 0)
             {
+                if (!LaAdmin())
+                {
+                    MessageBox.Show("Chỉ quản trị viên mới được lập phiếu nhập.",
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Close();
+                    return;
+                }
+
+                if (nhanVienDangNhapID <= 0)
+                {
+                    MessageBox.Show("Không xác định được admin đang đăng nhập.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Close();
+                    return;
+                }
+
                 BatTatChucNang(true);
 
                 int soLonNhat = 0;
@@ -101,6 +143,12 @@ namespace QuanLyCuaHangSachMini.GUI
                 dsChiTietTam.Clear();
                 TaiLaiLuoiChiTiet();
 
+                cboNhanVien.SelectedValue = nhanVienDangNhapID;
+                cboNhanVien.Enabled = false;
+
+                if (cboNhaCungCap.Items.Count > 0)
+                    cboNhaCungCap.SelectedIndex = 0;
+
                 if (cboTenSach.Items.Count > 0)
                 {
                     cboTenSach.SelectedIndex = 0;
@@ -121,7 +169,15 @@ namespace QuanLyCuaHangSachMini.GUI
                 {
                     txtMaPhieuNhap.Text = pn.MaPhieuNhap;
                     cboNhaCungCap.SelectedValue = pn.NhaCungCapID;
+
+                    cboNhanVien.DataSource = context.NhanVien
+                        .Where(r => r.ID == pn.NhanVienID)
+                        .ToList();
+                    cboNhanVien.ValueMember = "ID";
+                    cboNhanVien.DisplayMember = "HoVaTen";
                     cboNhanVien.SelectedValue = pn.NhanVienID;
+                    cboNhanVien.Enabled = false;
+
                     dtpNgayNhap.Value = pn.NgayNhap;
                     txtGhiChu.Text = pn.GhiChuPhieuNhap ?? "";
 
@@ -142,15 +198,8 @@ namespace QuanLyCuaHangSachMini.GUI
                     TaiLaiLuoiChiTiet();
                 }
 
-                if (chiXem)
-                {
-                    BatTatChucNang(false);
-                    btnHuyBo.Enabled = false;
-                }
-                else
-                {
-                    BatTatChucNang(true);
-                }
+                BatTatChucNang(false);
+                btnHuyBo.Enabled = !chiXem && LaAdmin();
             }
         }
 
@@ -179,7 +228,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
                 dgvChiTiet.ClearSelection();
                 dgvChiTiet.Rows[rowIndex].Selected = true;
-                dgvChiTiet.CurrentCell = dgvChiTiet.Rows[rowIndex].Cells["MaSach"];
+
+                if (dgvChiTiet.Columns["MaSach"] != null && dgvChiTiet.Columns["MaSach"].Visible)
+                    dgvChiTiet.CurrentCell = dgvChiTiet.Rows[rowIndex].Cells["MaSach"];
+
                 HienThiThongTinSachNhap();
             }
             else
@@ -191,6 +243,12 @@ namespace QuanLyCuaHangSachMini.GUI
         private void HienThiThongTinSachNhap()
         {
             if (dgvChiTiet.CurrentRow == null || dgvChiTiet.Rows.Count == 0)
+            {
+                XoaTrangThongTinSachNhap();
+                return;
+            }
+
+            if (dgvChiTiet.CurrentRow.Cells["SachID"].Value == null)
             {
                 XoaTrangThongTinSachNhap();
                 return;
@@ -218,7 +276,7 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void XoaTrangThongTinSachNhap()
         {
-            if (cboTenSach.Items.Count > 0 && !chiXem)
+            if (cboTenSach.Items.Count > 0 && !chiXem && LaAdmin())
             {
                 cboTenSach.SelectedIndex = 0;
                 cboTenSach_SelectedIndexChanged(null!, EventArgs.Empty);
@@ -258,6 +316,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnThemSach_Click(object sender, EventArgs e)
         {
+            if (!LaAdmin() || chiXem)
+                return;
+
             if (cboTenSach.SelectedValue == null)
             {
                 MessageBox.Show("Vui lòng chọn sách.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -293,15 +354,17 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
                 else
                 {
-                    DanhSachPhieuNhapChiTiet ct = new DanhSachPhieuNhapChiTiet();
-                    ct.ID = 0;
-                    ct.PhieuNhapID = 0;
-                    ct.SachID = sachID;
-                    ct.MaSach = s.MaSach;
-                    ct.TenSach = s.TenSach;
-                    ct.SoLuongNhap = Convert.ToInt32(numSoLuongNhap.Value);
-                    ct.DonGiaNhap = numDonGiaNhap.Value;
-                    ct.ThanhTien = ct.SoLuongNhap * ct.DonGiaNhap;
+                    DanhSachPhieuNhapChiTiet ct = new DanhSachPhieuNhapChiTiet
+                    {
+                        ID = 0,
+                        PhieuNhapID = 0,
+                        SachID = sachID,
+                        MaSach = s.MaSach,
+                        TenSach = s.TenSach,
+                        SoLuongNhap = Convert.ToInt32(numSoLuongNhap.Value),
+                        DonGiaNhap = numDonGiaNhap.Value,
+                        ThanhTien = Convert.ToInt32(numSoLuongNhap.Value) * numDonGiaNhap.Value
+                    };
 
                     dsChiTietTam.Add(ct);
                 }
@@ -316,6 +379,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnXoaSach_Click(object sender, EventArgs e)
         {
+            if (!LaAdmin() || chiXem)
+                return;
+
             if (dgvChiTiet.CurrentRow != null)
             {
                 int sachID = Convert.ToInt32(dgvChiTiet.CurrentRow.Cells["SachID"].Value.ToString());
@@ -335,6 +401,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnLuuPhieuNhap_Click(object sender, EventArgs e)
         {
+            if (!LaAdmin())
+            {
+                MessageBox.Show("Chỉ quản trị viên mới được lập phiếu nhập.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (cboNhaCungCap.SelectedValue == null)
             {
                 MessageBox.Show("Vui lòng chọn nhà cung cấp.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -344,8 +417,7 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (cboNhanVien.SelectedValue == null)
             {
-                MessageBox.Show("Vui lòng chọn nhân viên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                cboNhanVien.Focus();
+                MessageBox.Show("Không xác định được admin lập phiếu nhập.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -359,23 +431,27 @@ namespace QuanLyCuaHangSachMini.GUI
             using var transaction = context.Database.BeginTransaction();
             try
             {
-                PhieuNhap pn = new PhieuNhap();
-                pn.MaPhieuNhap = txtMaPhieuNhap.Text.Trim();
-                pn.NhaCungCapID = Convert.ToInt32(cboNhaCungCap.SelectedValue);
-                pn.NhanVienID = Convert.ToInt32(cboNhanVien.SelectedValue);
-                pn.NgayNhap = dtpNgayNhap.Value;
-                pn.GhiChuPhieuNhap = txtGhiChu.Text.Trim();
+                PhieuNhap pn = new PhieuNhap
+                {
+                    MaPhieuNhap = txtMaPhieuNhap.Text.Trim(),
+                    NhaCungCapID = Convert.ToInt32(cboNhaCungCap.SelectedValue),
+                    NhanVienID = nhanVienDangNhapID,
+                    NgayNhap = dtpNgayNhap.Value,
+                    GhiChuPhieuNhap = txtGhiChu.Text.Trim()
+                };
 
                 context.PhieuNhap.Add(pn);
                 context.SaveChanges();
 
                 foreach (var item in dsChiTietTam)
                 {
-                    PhieuNhap_ChiTiet ct = new PhieuNhap_ChiTiet();
-                    ct.PhieuNhapID = pn.ID;
-                    ct.SachID = item.SachID;
-                    ct.SoLuongNhap = item.SoLuongNhap;
-                    ct.DonGiaNhap = item.DonGiaNhap;
+                    PhieuNhap_ChiTiet ct = new PhieuNhap_ChiTiet
+                    {
+                        PhieuNhapID = pn.ID,
+                        SachID = item.SachID,
+                        SoLuongNhap = item.SoLuongNhap,
+                        DonGiaNhap = item.DonGiaNhap
+                    };
                     context.PhieuNhap_ChiTiet.Add(ct);
 
                     Sach? s = context.Sach.Find(item.SachID);
@@ -419,6 +495,9 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnHuyBo_Click(object sender, EventArgs e)
         {
+            if (!LaAdmin() || chiXem)
+                return;
+
             dsChiTietTam.Clear();
             txtTongTien.Text = "0";
             txtGhiChu.Clear();
@@ -438,6 +517,10 @@ namespace QuanLyCuaHangSachMini.GUI
         private void btnThoat_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void lblSoLuongNhap_Click(object sender, EventArgs e)
+        {
         }
     }
 }

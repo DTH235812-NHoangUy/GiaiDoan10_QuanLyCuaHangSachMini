@@ -8,14 +8,22 @@ namespace QuanLyCuaHangSachMini.GUI
 {
     public partial class frmNhaXuatBan : Form
     {
-        AppDbContext context = new AppDbContext();
-        bool xuLyThem = false;
-        int id = 0;
+        private readonly AppDbContext context = new AppDbContext();
+        private readonly BindingSource bindingSource = new BindingSource();
+        private bool xuLyThem = false;
+        private int id = 0;
 
         public frmNhaXuatBan()
         {
             InitializeComponent();
             txtDienThoai.KeyPress += txtDienThoai_KeyPress;
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            bindingSource.Dispose();
+            context.Dispose();
+            base.OnFormClosed(e);
         }
 
         private void txtDienThoai_KeyPress(object sender, KeyPressEventArgs e)
@@ -75,6 +83,9 @@ namespace QuanLyCuaHangSachMini.GUI
             btnXuat.Enabled = !giaTri;
 
             cboTenNhaXuatBan.Enabled = true;
+            cboTenNhaXuatBan.DropDownStyle = ComboBoxStyle.DropDown;
+            cboTenNhaXuatBan.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboTenNhaXuatBan.AutoCompleteSource = AutoCompleteSource.ListItems;
             txtDienThoai.Enabled = giaTri;
             txtEmail.Enabled = giaTri;
             txtDiaChi.Enabled = giaTri;
@@ -82,13 +93,35 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void frmNhaXuatBan_Load(object sender, EventArgs e)
         {
-            BatTatChucNang(false);
             txtDienThoai.MaxLength = 10;
             dgvNhaXuatBan.AutoGenerateColumns = false;
 
+            BatTatChucNang(false);
+            LoadData();
+        }
+
+        private string TaoMaNhaXuatBanMoi()
+        {
+            int soLonNhat = context.NhaXuatBan
+                .AsEnumerable()
+                .Select(r =>
+                {
+                    if (string.IsNullOrWhiteSpace(r.MaNhaXuatBan))
+                        return 0;
+
+                    string so = new string(r.MaNhaXuatBan.Where(char.IsDigit).ToArray());
+                    return int.TryParse(so, out int kq) ? kq : 0;
+                })
+                .DefaultIfEmpty(0)
+                .Max();
+
+            return $"NXB{soLonNhat + 1:000}";
+        }
+
+        private void LoadData()
+        {
             List<NhaXuatBan> nxb = context.NhaXuatBan.OrderBy(r => r.ID).ToList();
 
-            BindingSource bindingSource = new BindingSource();
             bindingSource.DataSource = nxb;
 
             txtMaNhaXuatBan.DataBindings.Clear();
@@ -108,25 +141,14 @@ namespace QuanLyCuaHangSachMini.GUI
 
             dgvNhaXuatBan.DataSource = bindingSource;
 
+            cboTenNhaXuatBan.BeginUpdate();
             cboTenNhaXuatBan.Items.Clear();
-            List<string> dsTenNhaXuatBan = context.NhaXuatBan
-                .OrderBy(r => r.TenNhaXuatBan)
-                .Select(r => r.TenNhaXuatBan)
-                .Distinct()
-                .ToList();
-
-            foreach (string item in dsTenNhaXuatBan)
-                cboTenNhaXuatBan.Items.Add(item);
-
-            AutoCompleteStringCollection auto = new AutoCompleteStringCollection();
-            auto.AddRange(dsTenNhaXuatBan.ToArray());
-            cboTenNhaXuatBan.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            cboTenNhaXuatBan.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            cboTenNhaXuatBan.AutoCompleteCustomSource = auto;
+            cboTenNhaXuatBan.Items.AddRange(nxb.Select(r => r.TenNhaXuatBan).Distinct().ToArray());
+            cboTenNhaXuatBan.EndUpdate();
 
             if (dgvNhaXuatBan.Rows.Count > 0 && dgvNhaXuatBan.CurrentRow != null)
             {
-                id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value.ToString());
+                id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
                 btnSua.Enabled = true;
                 btnXoa.Enabled = true;
                 btnXuat.Enabled = true;
@@ -135,7 +157,8 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 id = 0;
                 txtMaNhaXuatBan.Clear();
-                cboTenNhaXuatBan.Text = "";
+                cboTenNhaXuatBan.SelectedIndex = -1;
+                cboTenNhaXuatBan.Text = string.Empty;
                 txtDienThoai.Clear();
                 txtEmail.Clear();
                 txtDiaChi.Clear();
@@ -150,34 +173,19 @@ namespace QuanLyCuaHangSachMini.GUI
             xuLyThem = true;
             BatTatChucNang(true);
 
-            int soLonNhat = 0;
-            if (context.NhaXuatBan.Any())
-            {
-                soLonNhat = context.NhaXuatBan
-                    .AsEnumerable()
-                    .Select(r =>
-                    {
-                        if (string.IsNullOrWhiteSpace(r.MaNhaXuatBan))
-                            return 0;
-
-                        string so = new string(r.MaNhaXuatBan.Where(char.IsDigit).ToArray());
-                        return int.TryParse(so, out int kq) ? kq : 0;
-                    })
-                    .DefaultIfEmpty(0)
-                    .Max();
-            }
-
             txtMaNhaXuatBan.DataBindings.Clear();
             cboTenNhaXuatBan.DataBindings.Clear();
             txtDienThoai.DataBindings.Clear();
             txtEmail.DataBindings.Clear();
             txtDiaChi.DataBindings.Clear();
 
-            txtMaNhaXuatBan.Text = "NXB" + (soLonNhat + 1).ToString("000");
-            cboTenNhaXuatBan.Text = "";
-            txtDienThoai.Text = "";
-            txtEmail.Text = "";
-            txtDiaChi.Text = "";
+            txtMaNhaXuatBan.Text = TaoMaNhaXuatBanMoi();
+            cboTenNhaXuatBan.SelectedIndex = -1;
+            cboTenNhaXuatBan.DroppedDown = false;
+            cboTenNhaXuatBan.Text = string.Empty;
+            txtDienThoai.Text = string.Empty;
+            txtEmail.Text = string.Empty;
+            txtDiaChi.Text = string.Empty;
             cboTenNhaXuatBan.Focus();
         }
 
@@ -187,7 +195,7 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 xuLyThem = false;
                 BatTatChucNang(true);
-                id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value.ToString());
+                id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
                 cboTenNhaXuatBan.Focus();
             }
             else
@@ -213,8 +221,15 @@ namespace QuanLyCuaHangSachMini.GUI
                         return;
                     }
 
+                    string maNhaXuatBan = txtMaNhaXuatBan.Text.Trim();
+                    if (string.IsNullOrWhiteSpace(maNhaXuatBan))
+                    {
+                        maNhaXuatBan = TaoMaNhaXuatBanMoi();
+                        txtMaNhaXuatBan.Text = maNhaXuatBan;
+                    }
+
                     NhaXuatBan nxb = new NhaXuatBan();
-                    nxb.MaNhaXuatBan = txtMaNhaXuatBan.Text.Trim();
+                    nxb.MaNhaXuatBan = maNhaXuatBan;
                     nxb.TenNhaXuatBan = cboTenNhaXuatBan.Text.Trim();
                     nxb.DienThoai = txtDienThoai.Text.Trim();
                     nxb.Email = txtEmail.Text.Trim();
@@ -260,7 +275,8 @@ namespace QuanLyCuaHangSachMini.GUI
                     }
                 }
 
-                frmNhaXuatBan_Load(sender, e);
+                LoadData();
+                BatTatChucNang(false);
             }
             catch (Exception ex)
             {
@@ -277,7 +293,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 {
                     try
                     {
-                        id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value.ToString());
+                        id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
                         NhaXuatBan nxb = context.NhaXuatBan.Find(id);
                         if (nxb != null)
                         {
@@ -295,7 +311,8 @@ namespace QuanLyCuaHangSachMini.GUI
                             );
                         }
 
-                        frmNhaXuatBan_Load(sender, e);
+                        LoadData();
+                        BatTatChucNang(false);
                     }
                     catch (Exception ex)
                     {
@@ -312,7 +329,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnHuyBo_Click(object sender, EventArgs e)
         {
-            frmNhaXuatBan_Load(sender, e);
+            xuLyThem = false;
+            id = 0;
+            LoadData();
+            BatTatChucNang(false);
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
@@ -326,7 +346,8 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (string.IsNullOrWhiteSpace(tuKhoa))
             {
-                frmNhaXuatBan_Load(sender, e);
+                LoadData();
+                BatTatChucNang(false);
             }
             else
             {
@@ -335,7 +356,6 @@ namespace QuanLyCuaHangSachMini.GUI
                     .OrderBy(r => r.ID)
                     .ToList();
 
-                BindingSource bindingSource = new BindingSource();
                 bindingSource.DataSource = nxb;
 
                 txtMaNhaXuatBan.DataBindings.Clear();
@@ -357,7 +377,10 @@ namespace QuanLyCuaHangSachMini.GUI
 
                 if (dgvNhaXuatBan.Rows.Count > 0 && dgvNhaXuatBan.CurrentRow != null)
                 {
-                    id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value.ToString());
+                    id = Convert.ToInt32(dgvNhaXuatBan.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
+                    btnSua.Enabled = true;
+                    btnXoa.Enabled = true;
+                    btnXuat.Enabled = true;
 
                     NhatKyHelper.GhiLog(
                         "Tìm kiếm",
@@ -368,10 +391,14 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
                 else
                 {
+                    id = 0;
                     txtMaNhaXuatBan.Clear();
                     txtDienThoai.Clear();
                     txtEmail.Clear();
                     txtDiaChi.Clear();
+                    btnSua.Enabled = false;
+                    btnXoa.Enabled = false;
+                    btnXuat.Enabled = false;
 
                     MessageBox.Show("Không tìm thấy nhà xuất bản phù hợp.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -510,7 +537,8 @@ namespace QuanLyCuaHangSachMini.GUI
                             MessageBox.Show("Đã nhập thành công " + demThanhCong + " dòng.",
                                 "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                            frmNhaXuatBan_Load(sender, e);
+                            LoadData();
+                            BatTatChucNang(false);
                         }
                         else
                         {

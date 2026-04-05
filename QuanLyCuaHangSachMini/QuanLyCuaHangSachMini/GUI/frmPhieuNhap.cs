@@ -10,16 +10,34 @@ namespace QuanLyCuaHangSachMini.GUI
     {
         private readonly AppDbContext context = new AppDbContext();
         private int id = 0;
+        private readonly int nhanVienDangNhapID = 0;
+        private readonly string quyenHanNguoiDung = "";
 
         public frmPhieuNhap()
         {
             InitializeComponent();
         }
 
+        public frmPhieuNhap(int nhanVienID, string quyenHan)
+        {
+            InitializeComponent();
+            nhanVienDangNhapID = nhanVienID;
+            quyenHanNguoiDung = quyenHan ?? "";
+        }
+
         private void frmPhieuNhap_Load(object sender, EventArgs e)
         {
             dgvPhieuNhap.AutoGenerateColumns = false;
             TaiDuLieu();
+            PhanQuyenChucNang();
+        }
+
+        private void PhanQuyenChucNang()
+        {
+            bool laAdmin = quyenHanNguoiDung.Equals("admin", StringComparison.OrdinalIgnoreCase);
+
+            btnLapPhieuNhap.Enabled = laAdmin;
+            btnXoaPhieuNhap.Enabled = laAdmin && dgvPhieuNhap.Rows.Count > 0;
         }
 
         private void TaiDuLieu()
@@ -46,19 +64,26 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (dgvPhieuNhap.Rows.Count > 0 && dgvPhieuNhap.CurrentRow != null)
             {
-                id = Convert.ToInt32(dgvPhieuNhap.CurrentRow.Cells["ID"].Value.ToString());
-                btnXoaPhieuNhap.Enabled = true;
+                id = Convert.ToInt32(dgvPhieuNhap.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
             }
             else
             {
                 id = 0;
-                btnXoaPhieuNhap.Enabled = false;
             }
+
+            PhanQuyenChucNang();
         }
 
         private void btnLapPhieuNhap_Click(object sender, EventArgs e)
         {
-            using (frmPhieuNhapChiTiet frm = new frmPhieuNhapChiTiet())
+            if (!quyenHanNguoiDung.Equals("admin", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Chỉ quản trị viên mới được lập phiếu nhập.",
+                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (frmPhieuNhapChiTiet frm = new frmPhieuNhapChiTiet(0, false, nhanVienDangNhapID, quyenHanNguoiDung))
             {
                 if (frm.ShowDialog() == DialogResult.OK)
                     TaiDuLieu();
@@ -67,6 +92,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnXoaPhieuNhap_Click(object sender, EventArgs e)
         {
+            if (!quyenHanNguoiDung.Equals("admin", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Chỉ quản trị viên mới được xóa phiếu nhập.",
+                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (dgvPhieuNhap.CurrentRow == null)
             {
                 MessageBox.Show("Vui lòng chọn phiếu nhập cần xóa.", "Thông báo",
@@ -74,7 +106,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 return;
             }
 
-            int phieuNhapID = Convert.ToInt32(dgvPhieuNhap.CurrentRow.Cells["ID"].Value.ToString());
+            int phieuNhapID = Convert.ToInt32(dgvPhieuNhap.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
 
             if (MessageBox.Show("Xác nhận xóa phiếu nhập này?", "Xóa",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -158,7 +190,8 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             if (e.RowIndex >= 0 && dgvPhieuNhap.CurrentRow != null)
             {
-                id = Convert.ToInt32(dgvPhieuNhap.CurrentRow.Cells["ID"].Value.ToString());
+                id = Convert.ToInt32(dgvPhieuNhap.CurrentRow.Cells["ID"].Value?.ToString() ?? "0");
+                PhanQuyenChucNang();
             }
         }
 
@@ -166,9 +199,9 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             if (e.RowIndex >= 0 && dgvPhieuNhap.Columns[e.ColumnIndex].Name == "XemChiTiet")
             {
-                int phieuNhapID = Convert.ToInt32(dgvPhieuNhap.Rows[e.RowIndex].Cells["ID"].Value.ToString());
+                int phieuNhapID = Convert.ToInt32(dgvPhieuNhap.Rows[e.RowIndex].Cells["ID"].Value?.ToString() ?? "0");
 
-                using (frmPhieuNhapChiTiet frm = new frmPhieuNhapChiTiet(phieuNhapID, true))
+                using (frmPhieuNhapChiTiet frm = new frmPhieuNhapChiTiet(phieuNhapID, true, nhanVienDangNhapID, quyenHanNguoiDung))
                 {
                     frm.ShowDialog();
                 }
