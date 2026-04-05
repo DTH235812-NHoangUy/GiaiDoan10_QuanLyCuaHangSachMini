@@ -1,4 +1,4 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Helpers;
@@ -59,13 +59,20 @@ namespace QuanLyCuaHangSachMini.GUI
             TaiDuLieuLenForm();
         }
 
-        private void frmSach_Activated(object? sender, EventArgs e)
+        public void LamMoiSauKhiBanHang()
         {
-            if (!daTaiForm) return;
+            if (IsDisposed) return;
             if (btnLuu.Enabled) return;
 
             TaiLaiToanBoDuLieu();
             BatTatChucNang(false);
+        }
+
+        private void frmSach_Activated(object? sender, EventArgs e)
+        {
+            if (!daTaiForm) return;
+
+            LamMoiSauKhiBanHang();
         }
 
         private void BatTatChucNang(bool giaTri)

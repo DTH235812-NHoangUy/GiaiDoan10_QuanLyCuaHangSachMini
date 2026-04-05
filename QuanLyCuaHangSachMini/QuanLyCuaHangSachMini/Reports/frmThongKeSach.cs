@@ -1,23 +1,53 @@
-﻿using Microsoft.Reporting.WinForms;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Reporting.WinForms;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.DTOs;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
     public partial class frmThongKeSach : Form
     {
-        private readonly AppDbContext context = new AppDbContext();
+        private AppDbContext context = new AppDbContext();
+        private bool daTaiForm = false;
 
         public frmThongKeSach()
         {
             InitializeComponent();
+            Activated += frmThongKeSach_Activated;
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            context.Dispose();
+            base.OnFormClosed(e);
         }
 
         private void frmThongKeSach_Load(object sender, EventArgs e)
         {
+            TaiLaiBaoCao();
+            daTaiForm = true;
+        }
+
+        private void frmThongKeSach_Activated(object? sender, EventArgs e)
+        {
+            if (!daTaiForm || IsDisposed)
+                return;
+
+            TaiLaiBaoCao();
+        }
+
+        public void TaiLaiBaoCao()
+        {
             try
             {
+                LamMoiContext();
+
                 string reportPath = Path.GetFullPath(
                     Path.Combine(Application.StartupPath, @"..\..\..\Reports\rptThongKeSach.rdlc"));
 
@@ -29,6 +59,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
 
                 List<DanhSachSach> danhSachSach = context.Sach
+                    .AsNoTracking()
                     .Select(r => new DanhSachSach
                     {
                         ID = r.ID,
@@ -90,23 +121,15 @@ namespace QuanLyCuaHangSachMini.GUI
 
                 reportViewer1.Reset();
                 reportViewer1.ProcessingMode = ProcessingMode.Local;
-
                 reportViewer1.LocalReport.DataSources.Clear();
                 reportViewer1.LocalReport.ReportPath = reportPath;
+                reportViewer1.LocalReport.DataSources.Add(new ReportDataSource("DanhSachSach", table));
 
-                ReportDataSource reportDataSource = new ReportDataSource("DanhSachSach", table);
-                reportViewer1.LocalReport.DataSources.Add(reportDataSource);
-
-                bool coThamSoMoTa = reportViewer1.LocalReport.GetParameters()
-                    .Any(p => p.Name == "MoTaKetQuaHienThi");
-
-                if (coThamSoMoTa)
+                if (reportViewer1.LocalReport.GetParameters().Any(p => p.Name == "MoTaKetQuaHienThi"))
                 {
-                    ReportParameter[] parameters =
-                    {
-                        new ReportParameter("MoTaKetQuaHienThi", "(Tất cả sách)")
-                    };
-                    reportViewer1.LocalReport.SetParameters(parameters);
+                    reportViewer1.LocalReport.SetParameters(
+                        new[] { new ReportParameter("MoTaKetQuaHienThi", "(Tất cả sách)") }
+                    );
                 }
 
                 reportViewer1.SetDisplayMode(DisplayMode.PrintLayout);
@@ -117,15 +140,18 @@ namespace QuanLyCuaHangSachMini.GUI
             catch (Exception ex)
             {
                 string loi = ex.Message;
-
-                if (ex.InnerException != null)
-                    loi += "\n\n" + ex.InnerException.Message;
-
+                if (ex.InnerException != null) loi += "\n\n" + ex.InnerException.Message;
                 if (ex.InnerException != null && ex.InnerException.InnerException != null)
                     loi += "\n\n" + ex.InnerException.InnerException.Message;
 
                 MessageBox.Show(loi, "Lỗi report", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void LamMoiContext()
+        {
+            context.Dispose();
+            context = new AppDbContext();
         }
     }
 }

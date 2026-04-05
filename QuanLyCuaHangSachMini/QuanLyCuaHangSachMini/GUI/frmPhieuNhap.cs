@@ -2,6 +2,7 @@
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
+using QuanLyCuaHangSachMini.Reports;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
@@ -134,8 +135,18 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnInPhieuNhap_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng in phiếu nhập sẽ làm sau.", "Thông báo",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (dgvPhieuNhap.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn phiếu nhập cần in.");
+                return;
+            }
+
+            int id = Convert.ToInt32(dgvPhieuNhap.CurrentRow.Cells["ID"].Value);
+
+            using (frmInPhieuNhap inPhieuNhap = new frmInPhieuNhap(id))
+            {
+                inPhieuNhap.ShowDialog();
+            }
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
