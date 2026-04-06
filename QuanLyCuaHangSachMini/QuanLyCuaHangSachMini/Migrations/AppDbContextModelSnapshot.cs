@@ -315,6 +315,74 @@ namespace QuanLyCuaHangSachMini.Migrations
                     b.ToTable("NhatKyHeThong", (string)null);
                 });
 
+            modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuHoanTra", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("HoaDonID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LyDo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("MaPhieuHoanTra")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("NgayHoanTra")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NhanVienID")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("HoaDonID")
+                        .IsUnique();
+
+                    b.HasIndex("MaPhieuHoanTra")
+                        .IsUnique();
+
+                    b.HasIndex("NhanVienID");
+
+                    b.ToTable("PhieuHoanTra", (string)null);
+                });
+
+            modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuHoanTra_ChiTiet", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<decimal>("DonGiaHoanTra")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PhieuHoanTraID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SachID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoLuongTra")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PhieuHoanTraID");
+
+                    b.HasIndex("SachID");
+
+                    b.ToTable("PhieuHoanTra_ChiTiet", (string)null);
+                });
+
             modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuNhap", b =>
                 {
                     b.Property<int>("ID")
@@ -526,6 +594,44 @@ namespace QuanLyCuaHangSachMini.Migrations
                     b.Navigation("NhanVien");
                 });
 
+            modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuHoanTra", b =>
+                {
+                    b.HasOne("QuanLyCuaHangSachMini.Data.Entity.HoaDon", "HoaDon")
+                        .WithOne()
+                        .HasForeignKey("QuanLyCuaHangSachMini.Data.Entity.PhieuHoanTra", "HoaDonID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("QuanLyCuaHangSachMini.Data.Entity.NhanVien", "NhanVien")
+                        .WithMany("PhieuHoanTra")
+                        .HasForeignKey("NhanVienID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("HoaDon");
+
+                    b.Navigation("NhanVien");
+                });
+
+            modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuHoanTra_ChiTiet", b =>
+                {
+                    b.HasOne("QuanLyCuaHangSachMini.Data.Entity.PhieuHoanTra", "PhieuHoanTra")
+                        .WithMany("PhieuHoanTra_ChiTiet")
+                        .HasForeignKey("PhieuHoanTraID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuanLyCuaHangSachMini.Data.Entity.Sach", "Sach")
+                        .WithMany()
+                        .HasForeignKey("SachID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PhieuHoanTra");
+
+                    b.Navigation("Sach");
+                });
+
             modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuNhap", b =>
                 {
                     b.HasOne("QuanLyCuaHangSachMini.Data.Entity.NhaCungCap", "NhaCungCap")
@@ -609,7 +715,14 @@ namespace QuanLyCuaHangSachMini.Migrations
 
                     b.Navigation("NhatKyHeThong");
 
+                    b.Navigation("PhieuHoanTra");
+
                     b.Navigation("PhieuNhap");
+                });
+
+            modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuHoanTra", b =>
+                {
+                    b.Navigation("PhieuHoanTra_ChiTiet");
                 });
 
             modelBuilder.Entity("QuanLyCuaHangSachMini.Data.Entity.PhieuNhap", b =>

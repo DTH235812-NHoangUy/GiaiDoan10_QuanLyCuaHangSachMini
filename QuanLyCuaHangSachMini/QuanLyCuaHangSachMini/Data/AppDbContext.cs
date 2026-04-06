@@ -17,6 +17,8 @@ namespace QuanLyCuaHangSachMini.Data
         public DbSet<PhieuNhap> PhieuNhap { get; set; }
         public DbSet<PhieuNhap_ChiTiet> PhieuNhap_ChiTiet { get; set; }
         public DbSet<NhatKyHeThong> NhatKyHeThong { get; set; }
+        public DbSet<PhieuHoanTra> PhieuHoanTra { get; set; }
+        public DbSet<PhieuHoanTra_ChiTiet> PhieuHoanTra_ChiTiet { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -44,6 +46,8 @@ namespace QuanLyCuaHangSachMini.Data
             builder.Entity<PhieuNhap>().ToTable("PhieuNhap");
             builder.Entity<PhieuNhap_ChiTiet>().ToTable("PhieuNhap_ChiTiet");
             builder.Entity<NhatKyHeThong>().ToTable("NhatKyHeThong");
+            builder.Entity<PhieuHoanTra>().ToTable("PhieuHoanTra");
+            builder.Entity<PhieuHoanTra_ChiTiet>().ToTable("PhieuHoanTra_ChiTiet");
 
             // Key
             builder.Entity<TheLoai>().HasKey(x => x.ID);
@@ -57,6 +61,8 @@ namespace QuanLyCuaHangSachMini.Data
             builder.Entity<PhieuNhap>().HasKey(x => x.ID);
             builder.Entity<PhieuNhap_ChiTiet>().HasKey(x => x.ID);
             builder.Entity<NhatKyHeThong>().HasKey(x => x.ID);
+            builder.Entity<PhieuHoanTra>().HasKey(x => x.ID);
+            builder.Entity<PhieuHoanTra_ChiTiet>().HasKey(x => x.ID);
 
             // Unique mã
             builder.Entity<TheLoai>().HasIndex(x => x.MaTheLoai).IsUnique();
@@ -68,6 +74,8 @@ namespace QuanLyCuaHangSachMini.Data
             builder.Entity<KhachHang>().HasIndex(x => x.MaKhachHang).IsUnique();
             builder.Entity<HoaDon>().HasIndex(x => x.MaHoaDon).IsUnique();
             builder.Entity<PhieuNhap>().HasIndex(x => x.MaPhieuNhap).IsUnique();
+            builder.Entity<PhieuHoanTra>().HasIndex(x => x.MaPhieuHoanTra).IsUnique();
+            builder.Entity<PhieuHoanTra>().HasIndex(x => x.HoaDonID).IsUnique(); // 1 HoaDon chỉ hoàn trả 1 lần
 
             // TheLoai
             builder.Entity<TheLoai>().Property(x => x.MaTheLoai).HasMaxLength(10).IsRequired();
@@ -135,7 +143,13 @@ namespace QuanLyCuaHangSachMini.Data
             builder.Entity<NhatKyHeThong>().Property(x => x.TenDangNhap).HasMaxLength(50);
             builder.Entity<NhatKyHeThong>().Property(x => x.HoVaTen).HasMaxLength(150);
             builder.Entity<NhatKyHeThong>().Property(x => x.VaiTro).HasMaxLength(50);
-            
+
+            // PhieuHoanTra
+            builder.Entity<PhieuHoanTra>().Property(x => x.MaPhieuHoanTra).HasMaxLength(10).IsRequired();
+            builder.Entity<PhieuHoanTra>().Property(x => x.LyDo).HasMaxLength(500);
+
+            // PhieuHoanTra_ChiTiet
+            builder.Entity<PhieuHoanTra_ChiTiet>().Property(x => x.DonGiaHoanTra).HasColumnType("decimal(18,2)");
 
             // Relationship
             builder.Entity<Sach>()
@@ -203,6 +217,30 @@ namespace QuanLyCuaHangSachMini.Data
                 .WithMany(x => x.NhatKyHeThong)
                 .HasForeignKey(x => x.NhanVienID)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<PhieuHoanTra>()
+                .HasOne(x => x.HoaDon)
+                .WithOne()
+                .HasForeignKey<PhieuHoanTra>(x => x.HoaDonID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PhieuHoanTra>()
+                .HasOne(x => x.NhanVien)
+                .WithMany(x => x.PhieuHoanTra)
+                .HasForeignKey(x => x.NhanVienID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PhieuHoanTra_ChiTiet>()
+                .HasOne(x => x.PhieuHoanTra)
+                .WithMany(x => x.PhieuHoanTra_ChiTiet)
+                .HasForeignKey(x => x.PhieuHoanTraID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PhieuHoanTra_ChiTiet>()
+                .HasOne(x => x.Sach)
+                .WithMany()
+                .HasForeignKey(x => x.SachID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

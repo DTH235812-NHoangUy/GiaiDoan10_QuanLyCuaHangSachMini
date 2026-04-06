@@ -31,6 +31,8 @@
             this.mnuNhaCungCap = new Guna.UI2.WinForms.Guna2Button();
             this.mnuNhaXuatBan = new Guna.UI2.WinForms.Guna2Button();
             this.mnuLoaiSach = new Guna.UI2.WinForms.Guna2Button();
+            this.mnuPhieuHoanTra = new Guna.UI2.WinForms.Guna2Button();
+            this.mnuCaiDatGiaoDien = new Guna.UI2.WinForms.Guna2Button();
             this.mnuDangXuat = new Guna.UI2.WinForms.Guna2Button();
             this.pnLogo = new Guna.UI2.WinForms.Guna2Panel();
             this.lblLogo = new System.Windows.Forms.Label();
@@ -50,7 +52,7 @@
             // 
             // pnSidebar
             // 
-            this.pnSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.pnSidebar.BackColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.pnSidebar.Controls.Add(this.pnMenu);
             this.pnSidebar.Controls.Add(this.pnLogo);
             this.pnSidebar.Dock = System.Windows.Forms.DockStyle.Left;
@@ -73,6 +75,8 @@
             this.pnMenu.Controls.Add(this.mnuNhaCungCap);
             this.pnMenu.Controls.Add(this.mnuNhaXuatBan);
             this.pnMenu.Controls.Add(this.mnuLoaiSach);
+            this.pnMenu.Controls.Add(this.mnuPhieuHoanTra);
+            this.pnMenu.Controls.Add(this.mnuCaiDatGiaoDien);
             this.pnMenu.Controls.Add(this.mnuDangXuat);
             this.pnMenu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnMenu.Location = new System.Drawing.Point(0, 100);
@@ -84,10 +88,10 @@
             // 
             this.mnuNhatKyHeThong.Animated = true;
             this.mnuNhatKyHeThong.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuNhatKyHeThong.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuNhatKyHeThong.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuNhatKyHeThong.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuNhatKyHeThong.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuNhatKyHeThong.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuNhatKyHeThong.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuNhatKyHeThong.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuNhatKyHeThong.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuNhatKyHeThong.Height = 45;
             this.mnuNhatKyHeThong.Name = "mnuNhatKyHeThong";
@@ -100,10 +104,10 @@
             // 
             this.mnuThongKeDoanhThu.Animated = true;
             this.mnuThongKeDoanhThu.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuThongKeDoanhThu.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuThongKeDoanhThu.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuThongKeDoanhThu.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuThongKeDoanhThu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuThongKeDoanhThu.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuThongKeDoanhThu.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuThongKeDoanhThu.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuThongKeDoanhThu.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuThongKeDoanhThu.Height = 45;
             this.mnuThongKeDoanhThu.Name = "mnuThongKeDoanhThu";
@@ -116,10 +120,10 @@
             // 
             this.mnuThongKeSach.Animated = true;
             this.mnuThongKeSach.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuThongKeSach.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuThongKeSach.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuThongKeSach.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuThongKeSach.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuThongKeSach.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuThongKeSach.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuThongKeSach.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuThongKeSach.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuThongKeSach.Height = 45;
             this.mnuThongKeSach.Name = "mnuThongKeSach";
@@ -132,10 +136,10 @@
             // 
             this.mnuHoaDon.Animated = true;
             this.mnuHoaDon.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuHoaDon.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuHoaDon.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuHoaDon.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuHoaDon.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuHoaDon.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuHoaDon.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuHoaDon.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuHoaDon.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuHoaDon.Height = 45;
             this.mnuHoaDon.Name = "mnuHoaDon";
@@ -148,10 +152,10 @@
             // 
             this.mnuPhieuNhap.Animated = true;
             this.mnuPhieuNhap.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuPhieuNhap.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuPhieuNhap.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuPhieuNhap.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuPhieuNhap.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuPhieuNhap.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuPhieuNhap.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuPhieuNhap.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuPhieuNhap.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuPhieuNhap.Height = 45;
             this.mnuPhieuNhap.Name = "mnuPhieuNhap";
@@ -164,10 +168,10 @@
             // 
             this.mnuNhanVien.Animated = true;
             this.mnuNhanVien.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuNhanVien.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuNhanVien.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuNhanVien.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuNhanVien.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuNhanVien.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuNhanVien.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuNhanVien.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuNhanVien.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuNhanVien.Height = 45;
             this.mnuNhanVien.Name = "mnuNhanVien";
@@ -180,10 +184,10 @@
             // 
             this.mnuKhachHang.Animated = true;
             this.mnuKhachHang.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuKhachHang.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuKhachHang.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuKhachHang.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuKhachHang.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuKhachHang.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuKhachHang.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuKhachHang.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuKhachHang.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuKhachHang.Height = 45;
             this.mnuKhachHang.Name = "mnuKhachHang";
@@ -196,10 +200,10 @@
             // 
             this.mnuSach.Animated = true;
             this.mnuSach.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuSach.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuSach.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuSach.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuSach.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuSach.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuSach.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuSach.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuSach.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuSach.Height = 45;
             this.mnuSach.Name = "mnuSach";
@@ -212,10 +216,10 @@
             // 
             this.mnuNhaCungCap.Animated = true;
             this.mnuNhaCungCap.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuNhaCungCap.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuNhaCungCap.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuNhaCungCap.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuNhaCungCap.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuNhaCungCap.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuNhaCungCap.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuNhaCungCap.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuNhaCungCap.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuNhaCungCap.Height = 45;
             this.mnuNhaCungCap.Name = "mnuNhaCungCap";
@@ -228,10 +232,10 @@
             // 
             this.mnuNhaXuatBan.Animated = true;
             this.mnuNhaXuatBan.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuNhaXuatBan.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuNhaXuatBan.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuNhaXuatBan.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuNhaXuatBan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuNhaXuatBan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuNhaXuatBan.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuNhaXuatBan.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuNhaXuatBan.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuNhaXuatBan.Height = 45;
             this.mnuNhaXuatBan.Name = "mnuNhaXuatBan";
@@ -244,10 +248,10 @@
             // 
             this.mnuLoaiSach.Animated = true;
             this.mnuLoaiSach.Dock = System.Windows.Forms.DockStyle.Top;
-            this.mnuLoaiSach.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuLoaiSach.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuLoaiSach.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.mnuLoaiSach.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
-            this.mnuLoaiSach.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.mnuLoaiSach.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuLoaiSach.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.mnuLoaiSach.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuLoaiSach.Height = 45;
             this.mnuLoaiSach.Name = "mnuLoaiSach";
@@ -256,14 +260,32 @@
             this.mnuLoaiSach.TextOffset = new System.Drawing.Point(30, 0);
             this.mnuLoaiSach.Click += new System.EventHandler(this.mnuLoaiSach_Click);
             // 
+            // mnuPhieuHoanTra
+            // 
+            this.mnuPhieuHoanTra.Animated = true;
+            this.mnuPhieuHoanTra.Dock = System.Windows.Forms.DockStyle.Top;
+            this.mnuPhieuHoanTra.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
+            this.mnuPhieuHoanTra.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.mnuPhieuHoanTra.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
+            this.mnuPhieuHoanTra.HoverState.FillColor = System.Drawing.Color.FromArgb(54, 153, 255);
+            this.mnuPhieuHoanTra.HoverState.ForeColor = System.Drawing.Color.White;
+            this.mnuPhieuHoanTra.Height = 45;
+            this.mnuPhieuHoanTra.Name = "mnuPhieuHoanTra";
+            this.mnuPhieuHoanTra.Text = "  • Phiếu hoàn trả";
+            this.mnuPhieuHoanTra.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
+            this.mnuPhieuHoanTra.TextOffset = new System.Drawing.Point(30, 0);
+            this.mnuPhieuHoanTra.Click += new System.EventHandler(this.mnuPhieuHoanTra_Click);
+            // 
+           
+            // 
             // mnuDangXuat
             // 
             this.mnuDangXuat.Animated = true;
             this.mnuDangXuat.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.mnuDangXuat.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(45)))));
+            this.mnuDangXuat.FillColor = System.Drawing.Color.FromArgb(30, 30, 45);
             this.mnuDangXuat.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.mnuDangXuat.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(184)))), ((int)(((byte)(34)))));
-            this.mnuDangXuat.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(184)))), ((int)(((byte)(34)))));
+            this.mnuDangXuat.ForeColor = System.Drawing.Color.FromArgb(255, 184, 34);
+            this.mnuDangXuat.HoverState.FillColor = System.Drawing.Color.FromArgb(255, 184, 34);
             this.mnuDangXuat.HoverState.ForeColor = System.Drawing.Color.White;
             this.mnuDangXuat.Height = 45;
             this.mnuDangXuat.Name = "mnuDangXuat";
@@ -285,7 +307,7 @@
             // lblLogo
             // 
             this.lblLogo.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            this.lblLogo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(153)))), ((int)(((byte)(255)))));
+            this.lblLogo.ForeColor = System.Drawing.Color.FromArgb(54, 153, 255);
             this.lblLogo.Location = new System.Drawing.Point(0, 20);
             this.lblLogo.Name = "lblLogo";
             this.lblLogo.Size = new System.Drawing.Size(260, 40);
@@ -296,7 +318,7 @@
             // lblLienKet
             // 
             this.lblLienKet.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblLienKet.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(161)))), ((int)(((byte)(165)))), ((int)(((byte)(183)))));
+            this.lblLienKet.ForeColor = System.Drawing.Color.FromArgb(161, 165, 183);
             this.lblLienKet.Location = new System.Drawing.Point(0, 60);
             this.lblLienKet.Name = "lblLienKet";
             this.lblLienKet.Size = new System.Drawing.Size(260, 20);
@@ -307,7 +329,7 @@
             // 
             // pnHeader
             // 
-            this.pnHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(39)))));
+            this.pnHeader.BackColor = System.Drawing.Color.FromArgb(26, 26, 39);
             this.pnHeader.Controls.Add(this.lblTrangThai);
             this.pnHeader.Controls.Add(this.btnMinimize);
             this.pnHeader.Controls.Add(this.btnMaximize);
@@ -321,7 +343,7 @@
             // lblTrangThai
             // 
             this.lblTrangThai.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.lblTrangThai.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
+            this.lblTrangThai.ForeColor = System.Drawing.Color.FromArgb(16, 185, 129);
             this.lblTrangThai.Location = new System.Drawing.Point(20, 10);
             this.lblTrangThai.Name = "lblTrangThai";
             this.lblTrangThai.Size = new System.Drawing.Size(500, 30);
@@ -362,7 +384,7 @@
             // 
             // pnContainer
             // 
-            this.pnContainer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(39)))));
+            this.pnContainer.BackColor = System.Drawing.Color.FromArgb(26, 26, 39);
             this.pnContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnContainer.Location = new System.Drawing.Point(260, 50);
             this.pnContainer.Name = "pnContainer";
@@ -411,6 +433,8 @@
         private Guna.UI2.WinForms.Guna2Button mnuThongKeSach;
         private Guna.UI2.WinForms.Guna2Button mnuThongKeDoanhThu;
         private Guna.UI2.WinForms.Guna2Button mnuNhatKyHeThong;
+        private Guna.UI2.WinForms.Guna2Button mnuPhieuHoanTra;
+        private Guna.UI2.WinForms.Guna2Button mnuCaiDatGiaoDien;
         private Guna.UI2.WinForms.Guna2Panel pnHeader;
         private System.Windows.Forms.Label lblTrangThai;
         private Guna.UI2.WinForms.Guna2ControlBox btnClose;

@@ -1,13 +1,14 @@
-﻿
--- =============================================
+﻿-- =============================================
 -- CSDL: QuanLyCuaHangSachMini
--- Script 3: DELETE FROM + DBCC CHECKIDENT + SELECT * FROM
+-- Full Seed Script: nhiều dữ liệu + hoàn trả
 -- =============================================
 
 USE QuanLyCuaHangSachMini;
 GO
 
 -- Xóa dữ liệu theo thứ tự tránh lỗi khóa ngoại
+DELETE FROM dbo.PhieuHoanTra_ChiTiet;
+DELETE FROM dbo.PhieuHoanTra;
 DELETE FROM dbo.NhatKyHeThong;
 DELETE FROM dbo.HoaDon_ChiTiet;
 DELETE FROM dbo.PhieuNhap_ChiTiet;
@@ -21,7 +22,9 @@ DELETE FROM dbo.NhaCungCap;
 DELETE FROM dbo.TheLoai;
 GO
 
--- Reset IDENTITY về lại từ 1
+-- Reset IDENTITY
+DBCC CHECKIDENT ('dbo.PhieuHoanTra_ChiTiet', RESEED, 0);
+DBCC CHECKIDENT ('dbo.PhieuHoanTra', RESEED, 0);
 DBCC CHECKIDENT ('dbo.NhatKyHeThong', RESEED, 0);
 DBCC CHECKIDENT ('dbo.HoaDon_ChiTiet', RESEED, 0);
 DBCC CHECKIDENT ('dbo.PhieuNhap_ChiTiet', RESEED, 0);
@@ -34,12 +37,15 @@ DBCC CHECKIDENT ('dbo.NhaXuatBan', RESEED, 0);
 DBCC CHECKIDENT ('dbo.NhaCungCap', RESEED, 0);
 DBCC CHECKIDENT ('dbo.TheLoai', RESEED, 0);
 GO
+
 -- 1. Thể loại
 INSERT INTO dbo.TheLoai (MaTheLoai, TenTheLoai, MoTa) VALUES
 (N'TL001', N'Văn học', N'Sách văn học trong và ngoài nước'),
 (N'TL002', N'Kỹ năng sống', N'Sách phát triển bản thân'),
 (N'TL003', N'Công nghệ thông tin', N'Sách lập trình, phần mềm'),
-(N'TL004', N'Thiếu nhi', N'Sách dành cho trẻ em');
+(N'TL004', N'Thiếu nhi', N'Sách dành cho trẻ em'),
+(N'TL005', N'Kinh doanh', N'Sách kinh tế, quản trị'),
+(N'TL006', N'Tâm lý', N'Sách tâm lý học, phát triển cảm xúc');
 GO
 
 -- 2. Nhà xuất bản
@@ -47,18 +53,25 @@ INSERT INTO dbo.NhaXuatBan (MaNhaXuatBan, TenNhaXuatBan, DienThoai, Email, DiaCh
 (N'NXB001', N'NXB Trẻ', '0283825163', 'nxbtre@gmail.com', N'TP.HCM'),
 (N'NXB002', N'NXB Kim Đồng', '0243943473', 'kimdong@gmail.com', N'Hà Nội'),
 (N'NXB003', N'NXB Giáo Dục', '0243971718', 'giaoduc@gmail.com', N'Hà Nội'),
-(N'NXB004', N'NXB Lao Động', '0243944201', 'laodong@gmail.com', N'Hà Nội');
+(N'NXB004', N'NXB Lao Động', '0243944201', 'laodong@gmail.com', N'Hà Nội'),
+(N'NXB005', N'NXB Tổng Hợp', '0283920001', 'tonghop@gmail.com', N'TP.HCM');
 GO
 
 -- 3. Nhà cung cấp
 INSERT INTO dbo.NhaCungCap (MaNhaCungCap, TenNhaCungCap, DienThoai, Email, DiaChi) VALUES
 (N'NCC001', N'Công ty Phát Hành Sách A', '0901111111', 'phathanhA@gmail.com', N'Long Xuyên - An Giang'),
 (N'NCC002', N'Công ty Sách B', '0902222222', 'sachB@gmail.com', N'Cần Thơ'),
-(N'NCC003', N'Nhà sách Tổng Hợp C', '0903333333', 'tonghopC@gmail.com', N'TP.HCM');
+(N'NCC003', N'Nhà sách Tổng Hợp C', '0903333333', 'tonghopC@gmail.com', N'TP.HCM'),
+(N'NCC004', N'Đơn vị Sách D', '0904444444', 'sachD@gmail.com', N'Đà Nẵng');
 GO
 
 -- 4. Nhân viên
-INSERT INTO dbo.NhanVien (MaNhanVien, HoVaTen, DienThoai, DiaChi, TenDangNhap, MatKhau, QuyenHan, KichHoat) VALUES
+INSERT INTO dbo.NhanVien
+(
+    MaNhanVien, HoVaTen, DienThoai, DiaChi,
+    TenDangNhap, MatKhau, QuyenHan, KichHoat
+)
+VALUES
 (N'NV001', N'Nguyễn Hoàng Uy', '0911111111', N'Long Xuyên', 'admin', N'123456', 1, 1),
 (N'NV002', N'Trần Minh Khoa', '0922222222', N'Châu Đốc', 'nv01', N'123456', 0, 1),
 (N'NV003', N'Lê Thị Ngọc', '0933333333', N'Cần Thơ', 'nv02', N'123456', 0, 1);
@@ -69,7 +82,9 @@ INSERT INTO dbo.KhachHang (MaKhachHang, HoVaTen, DienThoai, DiaChi, Email) VALUE
 (N'KH001', N'Phạm Anh Tuấn', '0981111111', N'Long Xuyên', 'tuan@gmail.com'),
 (N'KH002', N'Nguyễn Thị Mai', '0982222222', N'Cần Thơ', 'mai@gmail.com'),
 (N'KH003', N'Trần Quốc Bảo', '0983333333', N'TP.HCM', 'bao@gmail.com'),
-(N'KH004', N'Lê Minh Thư', '0984444444', N'Châu Đốc', 'thu@gmail.com');
+(N'KH004', N'Lê Minh Thư', '0984444444', N'Châu Đốc', 'thu@gmail.com'),
+(N'KH005', N'Võ Thanh Sơn', '0985555555', N'Long An', 'son@gmail.com'),
+(N'KH006', N'Đặng Ngọc Lan', '0986666666', N'Huế', 'lan@gmail.com');
 GO
 
 -- 6. Sách
@@ -79,32 +94,60 @@ INSERT INTO dbo.Sach
     GiaNhap, GiaBan, SoLuongTon, HinhAnh, MoTa, TrangThai
 )
 VALUES
-((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL001'), (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB001'),
- N'S001', N'Nhà giả kim', N'Paulo Coelho', 2020, 50000, 78000, 42, N'nhagiakim.jpg', N'Tiểu thuyết nổi tiếng', N'Còn hàng'),
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL001'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB001'),
+ N'S001', N'Nhà giả kim', N'Paulo Coelho', 2020, 50000, 78000, 60, N'nhagiakim.jpg', N'Tiểu thuyết nổi tiếng', N'Còn hàng'),
 
-((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL002'), (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB004'),
- N'S002', N'Đắc nhân tâm', N'Dale Carnegie', 2019, 55000, 85000, 35, N'dacnhantam.jpg', N'Sách kỹ năng sống', N'Còn hàng'),
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL002'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB004'),
+ N'S002', N'Đắc nhân tâm', N'Dale Carnegie', 2019, 55000, 85000, 55, N'dacnhantam.jpg', N'Sách kỹ năng sống', N'Còn hàng'),
 
-((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL003'), (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB003'),
- N'S003', N'Lập trình C# cơ bản', N'Nhiều tác giả', 2023, 90000, 130000, 26, N'laptrinhcsharp.jpg', N'Sách học lập trình C#', N'Còn hàng'),
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL003'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB003'),
+ N'S003', N'Lập trình C# cơ bản', N'Nhiều tác giả', 2023, 90000, 130000, 40, N'laptrinhcsharp.jpg', N'Sách học lập trình C#', N'Còn hàng'),
 
-((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL003'), (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB003'),
- N'S004', N'Cơ sở dữ liệu SQL Server', N'Nhiều tác giả', 2022, 85000, 125000, 23, N'sqlserver.jpg', N'Sách học SQL Server', N'Còn hàng'),
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL003'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB003'),
+ N'S004', N'Cơ sở dữ liệu SQL Server', N'Nhiều tác giả', 2022, 85000, 125000, 35, N'sqlserver.jpg', N'Sách học SQL Server', N'Còn hàng'),
 
-((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL004'), (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB002'),
- N'S005', N'Dế mèn phiêu lưu ký', N'Tô Hoài', 2021, 45000, 70000, 29, N'demen.jpg', N'Sách thiếu nhi', N'Còn hàng'),
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL004'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB002'),
+ N'S005', N'Dế mèn phiêu lưu ký', N'Tô Hoài', 2021, 45000, 70000, 50, N'demen.jpg', N'Sách thiếu nhi', N'Còn hàng'),
 
-((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL001'), (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB001'),
- N'S006', N'Tôi thấy hoa vàng trên cỏ xanh', N'Nguyễn Nhật Ánh', 2020, 60000, 90000, 17, N'hoavang.jpg', N'Tiểu thuyết Việt Nam', N'Còn hàng');
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL001'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB001'),
+ N'S006', N'Tôi thấy hoa vàng trên cỏ xanh', N'Nguyễn Nhật Ánh', 2020, 60000, 90000, 45, N'hoavang.jpg', N'Tiểu thuyết Việt Nam', N'Còn hàng'),
+
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL002'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB004'),
+ N'S007', N'Thói quen tích cực', N'James Clear', 2022, 65000, 98000, 32, N'thoiquen.jpg', N'Sách phát triển bản thân', N'Còn hàng'),
+
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL005'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB005'),
+ N'S008', N'Bí mật của kinh doanh', N'Brian Tracy', 2021, 70000, 110000, 28, N'kinhdoanh.jpg', N'Sách kinh doanh', N'Còn hàng'),
+
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL006'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB005'),
+ N'S009', N'Đi tìm lẽ sống', N'Viktor Frankl', 2018, 62000, 95000, 22, N'tamly.jpg', N'Sách tâm lý', N'Còn hàng'),
+
+((SELECT ID FROM dbo.TheLoai WHERE MaTheLoai = N'TL004'),
+ (SELECT ID FROM dbo.NhaXuatBan WHERE MaNhaXuatBan = N'NXB002'),
+ N'S010', N'Truyện cổ tích Việt Nam', N'Nhiều tác giả', 2020, 40000, 65000, 48, N'truyencotich.jpg', N'Sách thiếu nhi', N'Còn hàng');
 GO
 
 -- 7. Phiếu nhập
 INSERT INTO dbo.PhieuNhap (NhaCungCapID, NhanVienID, MaPhieuNhap, NgayNhap, GhiChuPhieuNhap) VALUES
-((SELECT ID FROM dbo.NhaCungCap WHERE MaNhaCungCap = N'NCC001'), (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV001'),
+((SELECT ID FROM dbo.NhaCungCap WHERE MaNhaCungCap = N'NCC001'),
+ (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV001'),
  N'PN001', '2026-03-20 09:00:00', N'Nhập đợt 1'),
 
-((SELECT ID FROM dbo.NhaCungCap WHERE MaNhaCungCap = N'NCC002'), (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'),
- N'PN002', '2026-03-25 14:00:00', N'Nhập đợt 2');
+((SELECT ID FROM dbo.NhaCungCap WHERE MaNhaCungCap = N'NCC002'),
+ (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'),
+ N'PN002', '2026-03-25 14:00:00', N'Nhập đợt 2'),
+
+((SELECT ID FROM dbo.NhaCungCap WHERE MaNhaCungCap = N'NCC003'),
+ (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'),
+ N'PN003', '2026-03-26 09:30:00', N'Nhập đợt 3');
 GO
 
 -- 8. Chi tiết phiếu nhập
@@ -114,30 +157,128 @@ INSERT INTO dbo.PhieuNhap_ChiTiet (PhieuNhapID, SachID, SoLuongNhap, DonGiaNhap)
 ((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN001'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S003'), 30, 90000),
 ((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S004'), 25, 85000),
 ((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S005'), 35, 45000),
-((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S006'), 20, 60000);
+((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S006'), 20, 60000),
+((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S007'), 30, 65000),
+((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S008'), 25, 70000),
+((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S009'), 20, 62000),
+((SELECT ID FROM dbo.PhieuNhap WHERE MaPhieuNhap = N'PN003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S010'), 40, 40000);
 GO
 
--- 9. Hóa đơn
+-- 9. Cập nhật tồn kho sau nhập
+UPDATE s
+SET s.SoLuongTon = s.SoLuongTon + x.TongNhap,
+    s.TrangThai = CASE WHEN s.SoLuongTon + x.TongNhap > 0 THEN N'Còn hàng' ELSE N'Hết hàng' END
+FROM dbo.Sach s
+INNER JOIN (
+    SELECT SachID, SUM(SoLuongNhap) AS TongNhap
+    FROM dbo.PhieuNhap_ChiTiet
+    GROUP BY SachID
+) x ON x.SachID = s.ID;
+GO
+
+-- 10. Hóa đơn
+-- NV01 (login nv01): có 2 hóa đơn, 1 cái đã hoàn trả, 1 cái chưa hoàn trả
+-- NV02 (login nv02): có 2 hóa đơn, 1 cái đã hoàn trả, 1 cái chưa hoàn trả
 INSERT INTO dbo.HoaDon (NhanVienID, KhachHangID, MaHoaDon, NgayLap, GhiChuHoaDon) VALUES
-((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'), (SELECT ID FROM dbo.KhachHang WHERE MaKhachHang = N'KH001'),
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'),
+ (SELECT ID FROM dbo.KhachHang WHERE MaKhachHang = N'KH001'),
  N'HD001', '2026-03-28 10:15:00', N'Khách mua trực tiếp'),
 
-((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'), (SELECT ID FROM dbo.KhachHang WHERE MaKhachHang = N'KH002'),
- N'HD002', '2026-03-30 15:30:00', N'Khách quen');
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'),
+ (SELECT ID FROM dbo.KhachHang WHERE MaKhachHang = N'KH003'),
+ N'HD003', '2026-04-01 08:20:00', N'Hóa đơn của nv01 chưa hoàn trả'),
+
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'),
+ (SELECT ID FROM dbo.KhachHang WHERE MaKhachHang = N'KH002'),
+ N'HD002', '2026-03-30 15:30:00', N'Khách quen'),
+
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'),
+ (SELECT ID FROM dbo.KhachHang WHERE MaKhachHang = N'KH004'),
+ N'HD004', '2026-04-02 11:10:00', N'Hóa đơn của nv02 chưa hoàn trả');
 GO
 
--- 10. Chi tiết hóa đơn
+-- 11. Chi tiết hóa đơn
 INSERT INTO dbo.HoaDon_ChiTiet (HoaDonID, SachID, SoLuongBan, DonGiaBan) VALUES
+-- HD001 của NV002
 ((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD001'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S001'), 8, 78000),
 ((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD001'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S003'), 4, 130000),
 ((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD001'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S005'), 6, 70000),
 
+-- HD003 của NV002
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S007'), 2, 98000),
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S008'), 1, 110000),
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S010'), 3, 65000),
+
+-- HD002 của NV003
 ((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S002'), 5, 85000),
 ((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S004'), 2, 125000),
-((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S006'), 3, 90000);
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S006'), 3, 90000),
+
+-- HD004 của NV003
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD004'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S001'), 1, 78000),
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD004'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S009'), 2, 95000),
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD004'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S007'), 1, 98000);
 GO
 
--- 11. Nhật ký hệ thống
+-- 12. Cập nhật tồn kho sau bán
+UPDATE s
+SET s.SoLuongTon = s.SoLuongTon - x.TongBan,
+    s.TrangThai = CASE WHEN s.SoLuongTon - x.TongBan > 0 THEN N'Còn hàng' ELSE N'Hết hàng' END
+FROM dbo.Sach s
+INNER JOIN (
+    SELECT SachID, SUM(SoLuongBan) AS TongBan
+    FROM dbo.HoaDon_ChiTiet
+    GROUP BY SachID
+) x ON x.SachID = s.ID;
+GO
+
+-- 13. Phiếu hoàn trả
+-- PHT001: hoàn trả cho HD001, nhân viên NV002
+-- PHT002: hoàn trả cho HD002, nhân viên NV003
+-- PHT003: hoàn trả cho HD004, nhân viên NV003
+INSERT INTO dbo.PhieuHoanTra (HoaDonID, NhanVienID, MaPhieuHoanTra, NgayHoanTra, LyDo) VALUES
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD001'),
+ (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'),
+ N'PHT001', '2026-04-05 10:00:00', N'Khách trả lại do mua nhầm'),
+
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD002'),
+ (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'),
+ N'PHT002', '2026-04-05 11:00:00', N'Khách đổi ý, trả lại một phần'),
+
+((SELECT ID FROM dbo.HoaDon WHERE MaHoaDon = N'HD004'),
+ (SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'),
+ N'PHT003', '2026-04-06 09:00:00', N'Khách trả toàn bộ');
+GO
+
+-- 14. Chi tiết phiếu hoàn trả
+INSERT INTO dbo.PhieuHoanTra_ChiTiet (PhieuHoanTraID, SachID, SoLuongTra, DonGiaHoanTra) VALUES
+-- PHT001: trả một phần HD001
+((SELECT ID FROM dbo.PhieuHoanTra WHERE MaPhieuHoanTra = N'PHT001'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S001'), 2, 78000),
+((SELECT ID FROM dbo.PhieuHoanTra WHERE MaPhieuHoanTra = N'PHT001'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S005'), 1, 70000),
+
+-- PHT002: trả một phần HD002
+((SELECT ID FROM dbo.PhieuHoanTra WHERE MaPhieuHoanTra = N'PHT002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S002'), 1, 85000),
+((SELECT ID FROM dbo.PhieuHoanTra WHERE MaPhieuHoanTra = N'PHT002'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S006'), 1, 90000),
+
+-- PHT003: trả toàn bộ HD004
+((SELECT ID FROM dbo.PhieuHoanTra WHERE MaPhieuHoanTra = N'PHT003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S001'), 1, 78000),
+((SELECT ID FROM dbo.PhieuHoanTra WHERE MaPhieuHoanTra = N'PHT003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S009'), 2, 95000),
+((SELECT ID FROM dbo.PhieuHoanTra WHERE MaPhieuHoanTra = N'PHT003'), (SELECT ID FROM dbo.Sach WHERE MaSach = N'S007'), 1, 98000);
+GO
+
+-- 15. Cập nhật tồn kho sau hoàn trả
+UPDATE s
+SET s.SoLuongTon = s.SoLuongTon + x.TongTra,
+    s.TrangThai = CASE WHEN s.SoLuongTon + x.TongTra > 0 THEN N'Còn hàng' ELSE N'Hết hàng' END
+FROM dbo.Sach s
+INNER JOIN (
+    SELECT SachID, SUM(SoLuongTra) AS TongTra
+    FROM dbo.PhieuHoanTra_ChiTiet
+    GROUP BY SachID
+) x ON x.SachID = s.ID;
+GO
+
+-- 16. Nhật ký hệ thống
 INSERT INTO dbo.NhatKyHeThong
 (
     NhanVienID, ThoiGian, HanhDong, BangDuLieu, KhoaChinh, MoTa, TenDangNhap, HoVaTen, VaiTro
@@ -145,11 +286,15 @@ INSERT INTO dbo.NhatKyHeThong
 VALUES
 ((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV001'), '2026-04-04 08:00:00', N'Đăng nhập', N'Hệ thống', N'1', N'Đăng nhập vào hệ thống', N'admin', N'Nguyễn Hoàng Uy', N'Quản trị viên'),
 ((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'), '2026-04-04 08:30:00', N'Thêm', N'HoaDon', N'1', N'Lập hóa đơn: HD001', N'nv01', N'Trần Minh Khoa', N'Nhân viên'),
-((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'), '2026-04-04 09:00:00', N'Thêm', N'HoaDon', N'2', N'Lập hóa đơn: HD002', N'nv02', N'Lê Thị Ngọc', N'Nhân viên'),
-((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV001'), '2026-04-04 09:30:00', N'Xem', N'NhatKyHeThong', NULL, N'Xem nhật ký hệ thống', N'admin', N'Nguyễn Hoàng Uy', N'Quản trị viên');
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'), '2026-04-04 08:40:00', N'Thêm', N'HoaDon', N'2', N'Lập hóa đơn: HD003', N'nv01', N'Trần Minh Khoa', N'Nhân viên'),
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'), '2026-04-04 09:00:00', N'Thêm', N'HoaDon', N'3', N'Lập hóa đơn: HD002', N'nv02', N'Lê Thị Ngọc', N'Nhân viên'),
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'), '2026-04-04 09:10:00', N'Thêm', N'HoaDon', N'4', N'Lập hóa đơn: HD004', N'nv02', N'Lê Thị Ngọc', N'Nhân viên'),
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV002'), '2026-04-05 10:00:00', N'Thêm', N'PhieuHoanTra', N'1', N'Lập phiếu hoàn trả PHT001 cho hóa đơn HD001', N'nv01', N'Trần Minh Khoa', N'Nhân viên'),
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'), '2026-04-05 11:00:00', N'Thêm', N'PhieuHoanTra', N'2', N'Lập phiếu hoàn trả PHT002 cho hóa đơn HD002', N'nv02', N'Lê Thị Ngọc', N'Nhân viên'),
+((SELECT ID FROM dbo.NhanVien WHERE MaNhanVien = N'NV003'), '2026-04-06 09:00:00', N'Thêm', N'PhieuHoanTra', N'3', N'Lập phiếu hoàn trả PHT003 cho hóa đơn HD004', N'nv02', N'Lê Thị Ngọc', N'Nhân viên');
 GO
 
--- Kiểm tra dữ liệu
+-- 17. Kiểm tra dữ liệu
 SELECT * FROM dbo.TheLoai;
 SELECT * FROM dbo.NhaCungCap;
 SELECT * FROM dbo.NhaXuatBan;
@@ -160,5 +305,7 @@ SELECT * FROM dbo.PhieuNhap;
 SELECT * FROM dbo.PhieuNhap_ChiTiet;
 SELECT * FROM dbo.HoaDon;
 SELECT * FROM dbo.HoaDon_ChiTiet;
+SELECT * FROM dbo.PhieuHoanTra;
+SELECT * FROM dbo.PhieuHoanTra_ChiTiet;
 SELECT * FROM dbo.NhatKyHeThong;
 GO

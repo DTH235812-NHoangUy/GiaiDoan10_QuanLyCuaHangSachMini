@@ -37,7 +37,7 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 btnLapHoaDon.Enabled = false;
                 btnSua.Enabled = false;
-                btnXoa.Enabled = false;
+                btnHoanTra.Enabled = true;
 
                 btnInHoaDon.Enabled = true;
                 btnTimKiem.Enabled = true;
@@ -47,7 +47,7 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 btnLapHoaDon.Enabled = true;
                 btnSua.Enabled = true;
-                btnXoa.Enabled = true;
+                btnHoanTra.Enabled = true;
 
                 btnInHoaDon.Enabled = true;
                 btnTimKiem.Enabled = true;
@@ -104,14 +104,33 @@ namespace QuanLyCuaHangSachMini.GUI
 
             if (quyenHanNguoiDung == "admin")
             {
-                MessageBox.Show("Quản trị viên chỉ được xem hóa đơn, không được lập, sửa, xóa hóa đơn bán.",
+                MessageBox.Show("Quản trị viên chỉ được xem hóa đơn, không được lập, sửa hóa đơn bán.",
                     "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return false;
             }
 
-            if (hoaDonDangChon.NhanVienID != nhanVienDangNhapID)
+            if (quyenHanNguoiDung == "nhanvien" && hoaDonDangChon.NhanVienID != nhanVienDangNhapID)
             {
                 MessageBox.Show("Bạn chỉ được thao tác trên hóa đơn do chính bạn lập.",
+                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool KiemTraQuyenHoanTra(DanhSachHoaDon? hoaDonDangChon)
+        {
+            if (hoaDonDangChon == null)
+            {
+                MessageBox.Show("Vui lòng chọn hóa đơn.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (quyenHanNguoiDung == "nhanvien" && hoaDonDangChon.NhanVienID != nhanVienDangNhapID)
+            {
+                MessageBox.Show("Bạn chỉ được hoàn trả hóa đơn do chính bạn lập.",
                     "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
@@ -152,72 +171,56 @@ namespace QuanLyCuaHangSachMini.GUI
             HienThiDanhSachHoaDon();
         }
 
-        private void btnXoa_Click(object sender, EventArgs e)
+        private void btnHoanTra_Click(object sender, EventArgs e)
         {
+            if (quyenHanNguoiDung == "admin")
+            {
+                using (frmPhieuHoanTra frm = new frmPhieuHoanTra(nhanVienDangNhapID, quyenHanNguoiDung))
+                {
+                    frm.ShowDialog();
+                }
+
+                return;
+            }
+
             DanhSachHoaDon? hoaDonDangChon = LayHoaDonDangChon();
-            if (!KiemTraQuyenSuaXoa(hoaDonDangChon))
+            if (!KiemTraQuyenHoanTra(hoaDonDangChon))
                 return;
 
             id = hoaDonDangChon.ID;
 
+            PhieuHoanTra? phieuHoanTraDaCo = context.PhieuHoanTra
+                .FirstOrDefault(r => r.HoaDonID == id);
+
+            if (phieuHoanTraDaCo != null)
+            {
+                MessageBox.Show("Hóa đơn này đã có phiếu hoàn trả. Sẽ mở ở chế độ xem.",
+                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                using (frmPhieuHoanTra_ChiTiet frm = new frmPhieuHoanTra_ChiTiet(phieuHoanTraDaCo.ID, false, true,
+                    nhanVienDangNhapID, quyenHanNguoiDung))
+                {
+                    frm.ShowDialog();
+                }
+                HienThiDanhSachHoaDon();
+                return;
+            }
+
             DialogResult result = MessageBox.Show(
-                "Bạn có chắc chắn muốn xóa hóa đơn này không?\nKhi xóa sẽ xóa luôn chi tiết hóa đơn.",
-                "Xác nhận xóa",
+                "Lập phiếu hoàn trả cho hóa đơn này?",
+                "Xác nhận hoàn trả",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
-            if (result == DialogResult.Yes)
+            if (result != DialogResult.Yes)
+                return;
+
+            using (frmPhieuHoanTra_ChiTiet frm = new frmPhieuHoanTra_ChiTiet(id, true, false,
+                nhanVienDangNhapID, quyenHanNguoiDung))
             {
-                using var transaction = context.Database.BeginTransaction();
-                try
+                if (frm.ShowDialog() == DialogResult.OK)
                 {
-                    HoaDon? hd = context.HoaDon.Find(id);
-                    if (hd != null)
-                    {
-                        if (quyenHanNguoiDung == "nhanvien" && hd.NhanVienID != nhanVienDangNhapID)
-                        {
-                            MessageBox.Show("Bạn chỉ được xóa hóa đơn của chính mình.", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            transaction.Rollback();
-                            return;
-                        }
-
-                        List<HoaDon_ChiTiet> chiTiet = context.HoaDon_ChiTiet
-                            .Where(r => r.HoaDonID == id)
-                            .ToList();
-
-                        foreach (HoaDon_ChiTiet item in chiTiet)
-                        {
-                            Sach? sach = context.Sach.Find(item.SachID);
-                            if (sach != null)
-                            {
-                                sach.SoLuongTon += item.SoLuongBan;
-                                sach.TrangThai = sach.SoLuongTon > 0 ? "Còn hàng" : "Hết hàng";
-                            }
-                        }
-
-                        context.HoaDon_ChiTiet.RemoveRange(chiTiet);
-                        context.HoaDon.Remove(hd);
-                        context.SaveChanges();
-                        transaction.Commit();
-
-                        MessageBox.Show("Đã xóa hóa đơn thành công.", "Hoàn tất",
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        HienThiDanhSachHoaDon();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    string loi = ex.Message;
-                    if (ex.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.Message;
-                    if (ex.InnerException != null && ex.InnerException.InnerException != null)
-                        loi += "\n\n" + ex.InnerException.InnerException.Message;
-
-                    MessageBox.Show(loi, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    HienThiDanhSachHoaDon();
                 }
             }
         }

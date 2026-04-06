@@ -17,5 +17,6 @@ namespace QuanLyCuaHangSachMini.Data.Entity
         public virtual ObservableCollectionListSource<HoaDon> HoaDon { get; } = new();
         public virtual ObservableCollectionListSource<PhieuNhap> PhieuNhap { get; } = new();
         public virtual ObservableCollectionListSource<NhatKyHeThong> NhatKyHeThong { get; } = new();
+        public virtual ObservableCollectionListSource<PhieuHoanTra> PhieuHoanTra { get; } = new(); // thêm dòng này
     }
 }

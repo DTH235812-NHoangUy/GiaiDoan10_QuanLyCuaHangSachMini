@@ -48,6 +48,7 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             grpThongTinSach = new Guna.UI2.WinForms.Guna2GroupBox();
             btnDoiAnh = new Guna.UI2.WinForms.Guna2Button();
             picHinhAnh = new PictureBox();
@@ -708,6 +709,9 @@
             GiaBan.MinimumWidth = 6;
             GiaBan.Name = "GiaBan";
             GiaBan.ReadOnly = true;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle4.Format = "N0";
+            GiaBan.DefaultCellStyle = dataGridViewCellStyle4;
             // 
             // HinhAnh
             // 

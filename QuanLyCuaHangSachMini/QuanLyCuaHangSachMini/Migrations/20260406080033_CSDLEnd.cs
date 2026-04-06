@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QuanLyCuaHangSachMini.Migrations
 {
     /// <inheritdoc />
-    public partial class KhoiTaoCSDL : Migration
+    public partial class CSDLEnd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -219,6 +219,35 @@ namespace QuanLyCuaHangSachMini.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PhieuHoanTra",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    HoaDonID = table.Column<int>(type: "int", nullable: false),
+                    NhanVienID = table.Column<int>(type: "int", nullable: false),
+                    MaPhieuHoanTra = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    NgayHoanTra = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LyDo = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhieuHoanTra", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_PhieuHoanTra_HoaDon_HoaDonID",
+                        column: x => x.HoaDonID,
+                        principalTable: "HoaDon",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PhieuHoanTra_NhanVien_NhanVienID",
+                        column: x => x.NhanVienID,
+                        principalTable: "NhanVien",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "HoaDon_ChiTiet",
                 columns: table => new
                 {
@@ -268,6 +297,34 @@ namespace QuanLyCuaHangSachMini.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PhieuNhap_ChiTiet_Sach_SachID",
+                        column: x => x.SachID,
+                        principalTable: "Sach",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PhieuHoanTra_ChiTiet",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhieuHoanTraID = table.Column<int>(type: "int", nullable: false),
+                    SachID = table.Column<int>(type: "int", nullable: false),
+                    SoLuongTra = table.Column<int>(type: "int", nullable: false),
+                    DonGiaHoanTra = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhieuHoanTra_ChiTiet", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_PhieuHoanTra_ChiTiet_PhieuHoanTra_PhieuHoanTraID",
+                        column: x => x.PhieuHoanTraID,
+                        principalTable: "PhieuHoanTra",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PhieuHoanTra_ChiTiet_Sach_SachID",
                         column: x => x.SachID,
                         principalTable: "Sach",
                         principalColumn: "ID",
@@ -336,6 +393,33 @@ namespace QuanLyCuaHangSachMini.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_PhieuHoanTra_HoaDonID",
+                table: "PhieuHoanTra",
+                column: "HoaDonID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhieuHoanTra_MaPhieuHoanTra",
+                table: "PhieuHoanTra",
+                column: "MaPhieuHoanTra",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhieuHoanTra_NhanVienID",
+                table: "PhieuHoanTra",
+                column: "NhanVienID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhieuHoanTra_ChiTiet_PhieuHoanTraID",
+                table: "PhieuHoanTra_ChiTiet",
+                column: "PhieuHoanTraID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhieuHoanTra_ChiTiet_SachID",
+                table: "PhieuHoanTra_ChiTiet",
+                column: "SachID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PhieuNhap_MaPhieuNhap",
                 table: "PhieuNhap",
                 column: "MaPhieuNhap",
@@ -394,10 +478,13 @@ namespace QuanLyCuaHangSachMini.Migrations
                 name: "NhatKyHeThong");
 
             migrationBuilder.DropTable(
+                name: "PhieuHoanTra_ChiTiet");
+
+            migrationBuilder.DropTable(
                 name: "PhieuNhap_ChiTiet");
 
             migrationBuilder.DropTable(
-                name: "HoaDon");
+                name: "PhieuHoanTra");
 
             migrationBuilder.DropTable(
                 name: "PhieuNhap");
@@ -406,19 +493,22 @@ namespace QuanLyCuaHangSachMini.Migrations
                 name: "Sach");
 
             migrationBuilder.DropTable(
-                name: "KhachHang");
+                name: "HoaDon");
 
             migrationBuilder.DropTable(
                 name: "NhaCungCap");
-
-            migrationBuilder.DropTable(
-                name: "NhanVien");
 
             migrationBuilder.DropTable(
                 name: "NhaXuatBan");
 
             migrationBuilder.DropTable(
                 name: "TheLoai");
+
+            migrationBuilder.DropTable(
+                name: "KhachHang");
+
+            migrationBuilder.DropTable(
+                name: "NhanVien");
         }
     }
 }

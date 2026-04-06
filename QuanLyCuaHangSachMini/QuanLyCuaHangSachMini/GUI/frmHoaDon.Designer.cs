@@ -49,7 +49,7 @@
             btnLapHoaDon = new Guna.UI2.WinForms.Guna2Button();
             btnInHoaDon = new Guna.UI2.WinForms.Guna2Button();
             btnSua = new Guna.UI2.WinForms.Guna2Button();
-            btnXoa = new Guna.UI2.WinForms.Guna2Button();
+            btnHoanTra = new Guna.UI2.WinForms.Guna2Button();
             btnThoat = new Guna.UI2.WinForms.Guna2Button();
             btnTimKiem = new Guna.UI2.WinForms.Guna2Button();
             btnXuat = new Guna.UI2.WinForms.Guna2Button();
@@ -216,7 +216,7 @@
             btnLapHoaDon.FillColor = Color.FromArgb(16, 185, 129);
             btnLapHoaDon.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnLapHoaDon.ForeColor = Color.White;
-            btnLapHoaDon.Location = new Point(118, 458);
+            btnLapHoaDon.Location = new Point(69, 458);
             btnLapHoaDon.Name = "btnLapHoaDon";
             btnLapHoaDon.ShadowDecoration.CustomizableEdges = customizableEdges4;
             btnLapHoaDon.Size = new Size(130, 35);
@@ -232,7 +232,7 @@
             btnInHoaDon.FillColor = Color.FromArgb(27, 197, 189);
             btnInHoaDon.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnInHoaDon.ForeColor = Color.White;
-            btnInHoaDon.Location = new Point(264, 458);
+            btnInHoaDon.Location = new Point(217, 458);
             btnInHoaDon.Name = "btnInHoaDon";
             btnInHoaDon.ShadowDecoration.CustomizableEdges = customizableEdges6;
             btnInHoaDon.Size = new Size(120, 35);
@@ -248,7 +248,7 @@
             btnSua.FillColor = Color.FromArgb(54, 153, 255);
             btnSua.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnSua.ForeColor = Color.White;
-            btnSua.Location = new Point(400, 458);
+            btnSua.Location = new Point(497, 458);
             btnSua.Name = "btnSua";
             btnSua.ShadowDecoration.CustomizableEdges = customizableEdges8;
             btnSua.Size = new Size(70, 35);
@@ -256,21 +256,21 @@
             btnSua.Text = "Sửa";
             btnSua.Click += btnSua_Click;
             // 
-            // btnXoa
+            // btnHoanTra
             // 
-            btnXoa.Animated = true;
-            btnXoa.BorderRadius = 5;
-            btnXoa.CustomizableEdges = customizableEdges9;
-            btnXoa.FillColor = Color.FromArgb(246, 78, 96);
-            btnXoa.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnXoa.ForeColor = Color.White;
-            btnXoa.Location = new Point(486, 458);
-            btnXoa.Name = "btnXoa";
-            btnXoa.ShadowDecoration.CustomizableEdges = customizableEdges10;
-            btnXoa.Size = new Size(70, 35);
-            btnXoa.TabIndex = 4;
-            btnXoa.Text = "Xóa";
-            btnXoa.Click += btnXoa_Click;
+            btnHoanTra.Animated = true;
+            btnHoanTra.BorderRadius = 5;
+            btnHoanTra.CustomizableEdges = customizableEdges9;
+            btnHoanTra.FillColor = Color.FromArgb(255, 184, 34);
+            btnHoanTra.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnHoanTra.ForeColor = Color.White;
+            btnHoanTra.Location = new Point(356, 458);
+            btnHoanTra.Name = "btnHoanTra";
+            btnHoanTra.ShadowDecoration.CustomizableEdges = customizableEdges10;
+            btnHoanTra.Size = new Size(115, 35);
+            btnHoanTra.TabIndex = 4;
+            btnHoanTra.Text = "Hoàn trả";
+            btnHoanTra.Click += btnHoanTra_Click;
             // 
             // btnThoat
             // 
@@ -280,7 +280,7 @@
             btnThoat.FillColor = Color.FromArgb(63, 66, 84);
             btnThoat.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnThoat.ForeColor = Color.White;
-            btnThoat.Location = new Point(572, 458);
+            btnThoat.Location = new Point(863, 458);
             btnThoat.Name = "btnThoat";
             btnThoat.ShadowDecoration.CustomizableEdges = customizableEdges12;
             btnThoat.Size = new Size(80, 35);
@@ -296,7 +296,7 @@
             btnTimKiem.FillColor = Color.FromArgb(114, 57, 234);
             btnTimKiem.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnTimKiem.ForeColor = Color.White;
-            btnTimKiem.Location = new Point(668, 458);
+            btnTimKiem.Location = new Point(599, 458);
             btnTimKiem.Name = "btnTimKiem";
             btnTimKiem.ShadowDecoration.CustomizableEdges = customizableEdges14;
             btnTimKiem.Size = new Size(110, 35);
@@ -312,10 +312,10 @@
             btnXuat.FillColor = Color.FromArgb(27, 197, 189);
             btnXuat.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnXuat.ForeColor = Color.White;
-            btnXuat.Location = new Point(784, 458);
+            btnXuat.Location = new Point(735, 458);
             btnXuat.Name = "btnXuat";
             btnXuat.ShadowDecoration.CustomizableEdges = customizableEdges14;
-            btnXuat.Size = new Size(86, 35);
+            btnXuat.Size = new Size(102, 35);
             btnXuat.TabIndex = 7;
             btnXuat.Text = "Xuất";
             btnXuat.Click += btnXuat_Click;
@@ -329,7 +329,7 @@
             Controls.Add(btnXuat);
             Controls.Add(btnTimKiem);
             Controls.Add(btnThoat);
-            Controls.Add(btnXoa);
+            Controls.Add(btnHoanTra);
             Controls.Add(btnSua);
             Controls.Add(btnInHoaDon);
             Controls.Add(btnLapHoaDon);
@@ -350,7 +350,7 @@
         private Guna.UI2.WinForms.Guna2Button btnLapHoaDon;
         private Guna.UI2.WinForms.Guna2Button btnInHoaDon;
         private Guna.UI2.WinForms.Guna2Button btnSua;
-        private Guna.UI2.WinForms.Guna2Button btnXoa;
+        private Guna.UI2.WinForms.Guna2Button btnHoanTra;
         private Guna.UI2.WinForms.Guna2Button btnThoat;
         private Guna.UI2.WinForms.Guna2Button btnTimKiem;
         private Guna.UI2.WinForms.Guna2Button btnXuat;
