@@ -1,5 +1,4 @@
-﻿
-namespace QuanLyCuaHangSachMini.GUI
+﻿namespace QuanLyCuaHangSachMini.GUI
 {
     partial class frmPhieuHoanTra_ChiTiet
     {
@@ -10,20 +9,20 @@ namespace QuanLyCuaHangSachMini.GUI
             if (disposing && (components != null))
             {
                 components.Dispose();
-                context.Dispose();
+                context.Dispose(); // Lưu ý: Nếu context báo lỗi, bạn hãy xóa bỏ dòng này
             }
             base.Dispose(disposing);
         }
 
-        private Guna.UI2.WinForms.Guna2GroupBox grpThongTinPhieu;
-        private Guna.UI2.WinForms.Guna2GroupBox grpThongTinChiTiet;
-        private Guna.UI2.WinForms.Guna2GroupBox grpDanhSachChiTiet;
-        private Guna.UI2.WinForms.Guna2DataGridView dgvChiTiet;
-        private Guna.UI2.WinForms.Guna2Button btnThemSach;
-        private Guna.UI2.WinForms.Guna2Button btnXoaSach;
-        private Guna.UI2.WinForms.Guna2Button btnLuuPhieuHoanTra;
-        private Guna.UI2.WinForms.Guna2Button btnHuyBo;
-        private Guna.UI2.WinForms.Guna2Button btnThoat;
+        private GroupBox grpThongTinPhieu;
+        private GroupBox grpThongTinChiTiet;
+        private GroupBox grpDanhSachChiTiet;
+        private DataGridView dgvChiTiet;
+        private Button btnThemSach;
+        private Button btnXoaSach;
+        private Button btnLuuPhieuHoanTra;
+        private Button btnHuyBo;
+        private Button btnThoat;
         private System.Windows.Forms.TextBox txtMaPhieuHoanTra;
         private System.Windows.Forms.TextBox txtMaHoaDon;
         private System.Windows.Forms.TextBox txtNgayHoanTra;
@@ -46,7 +45,7 @@ namespace QuanLyCuaHangSachMini.GUI
         private System.Windows.Forms.Label lblSoLuongBan;
         private System.Windows.Forms.Label lblSoLuongTra;
         private System.Windows.Forms.Label lblDonGiaHoanTra;
-        private Guna.UI2.WinForms.Guna2DragControl dragControl;
+
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn HoaDonChiTietID;
         private System.Windows.Forms.DataGridViewTextBoxColumn HoaDonID;
@@ -60,31 +59,13 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges5 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges11 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges12 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges13 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges14 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges15 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges16 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            grpThongTinPhieu = new Guna.UI2.WinForms.Guna2GroupBox();
+            grpThongTinPhieu = new GroupBox();
             lblMaPhieuHoanTra = new Label();
             txtMaPhieuHoanTra = new TextBox();
             lblNgayHoanTra = new Label();
@@ -99,7 +80,7 @@ namespace QuanLyCuaHangSachMini.GUI
             txtTongTien = new TextBox();
             lblLyDo = new Label();
             txtLyDo = new TextBox();
-            grpThongTinChiTiet = new Guna.UI2.WinForms.Guna2GroupBox();
+            grpThongTinChiTiet = new GroupBox();
             lblSach = new Label();
             cboSach = new ComboBox();
             lblSoLuongBan = new Label();
@@ -108,10 +89,10 @@ namespace QuanLyCuaHangSachMini.GUI
             numDonGiaHoanTra = new NumericUpDown();
             lblSoLuongTra = new Label();
             numSoLuongTra = new NumericUpDown();
-            btnThemSach = new Guna.UI2.WinForms.Guna2Button();
-            btnXoaSach = new Guna.UI2.WinForms.Guna2Button();
-            grpDanhSachChiTiet = new Guna.UI2.WinForms.Guna2GroupBox();
-            dgvChiTiet = new Guna.UI2.WinForms.Guna2DataGridView();
+            btnThemSach = new Button();
+            btnXoaSach = new Button();
+            grpDanhSachChiTiet = new GroupBox();
+            dgvChiTiet = new DataGridView();
             ID = new DataGridViewTextBoxColumn();
             HoaDonChiTietID = new DataGridViewTextBoxColumn();
             HoaDonID = new DataGridViewTextBoxColumn();
@@ -122,10 +103,9 @@ namespace QuanLyCuaHangSachMini.GUI
             SoLuongTra = new DataGridViewTextBoxColumn();
             DonGiaHoanTra = new DataGridViewTextBoxColumn();
             ThanhTien = new DataGridViewTextBoxColumn();
-            btnLuuPhieuHoanTra = new Guna.UI2.WinForms.Guna2Button();
-            btnHuyBo = new Guna.UI2.WinForms.Guna2Button();
-            btnThoat = new Guna.UI2.WinForms.Guna2Button();
-            dragControl = new Guna.UI2.WinForms.Guna2DragControl(components);
+            btnLuuPhieuHoanTra = new Button();
+            btnHuyBo = new Button();
+            btnThoat = new Button();
             grpThongTinPhieu.SuspendLayout();
             grpThongTinChiTiet.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numDonGiaHoanTra).BeginInit();
@@ -136,8 +116,8 @@ namespace QuanLyCuaHangSachMini.GUI
             // 
             // grpThongTinPhieu
             // 
-            grpThongTinPhieu.BorderColor = Color.FromArgb(43, 43, 64);
-            grpThongTinPhieu.BorderRadius = 8;
+            grpThongTinPhieu.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpThongTinPhieu.BackColor = Color.White;
             grpThongTinPhieu.Controls.Add(lblMaPhieuHoanTra);
             grpThongTinPhieu.Controls.Add(txtMaPhieuHoanTra);
             grpThongTinPhieu.Controls.Add(lblNgayHoanTra);
@@ -152,34 +132,30 @@ namespace QuanLyCuaHangSachMini.GUI
             grpThongTinPhieu.Controls.Add(txtTongTien);
             grpThongTinPhieu.Controls.Add(lblLyDo);
             grpThongTinPhieu.Controls.Add(txtLyDo);
-            grpThongTinPhieu.CustomBorderColor = Color.FromArgb(43, 43, 64);
-            grpThongTinPhieu.CustomizableEdges = customizableEdges1;
-            grpThongTinPhieu.FillColor = Color.FromArgb(30, 30, 45);
             grpThongTinPhieu.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            grpThongTinPhieu.ForeColor = Color.White;
+            grpThongTinPhieu.ForeColor = Color.FromArgb(55, 38, 210);
             grpThongTinPhieu.Location = new Point(11, 12);
             grpThongTinPhieu.Name = "grpThongTinPhieu";
-            grpThongTinPhieu.Padding = new Padding(5, 45, 5, 5);
-            grpThongTinPhieu.ShadowDecoration.CustomizableEdges = customizableEdges2;
             grpThongTinPhieu.Size = new Size(1008, 178);
             grpThongTinPhieu.TabIndex = 0;
-            grpThongTinPhieu.Text = "THÔNG TIN PHIẾU HOÀN TRẢ";
+            grpThongTinPhieu.TabStop = false;
+            grpThongTinPhieu.Text = "Thông tin phiếu hoàn trả";
             // 
             // lblMaPhieuHoanTra
             // 
             lblMaPhieuHoanTra.AutoSize = true;
-            lblMaPhieuHoanTra.ForeColor = Color.FromArgb(161, 165, 183);
+            lblMaPhieuHoanTra.Font = new Font("Segoe UI", 10F);
+            lblMaPhieuHoanTra.ForeColor = Color.FromArgb(33, 37, 41);
             lblMaPhieuHoanTra.Location = new Point(18, 47);
             lblMaPhieuHoanTra.Name = "lblMaPhieuHoanTra";
-            lblMaPhieuHoanTra.Size = new Size(90, 23);
+            lblMaPhieuHoanTra.Size = new Size(86, 23);
             lblMaPhieuHoanTra.TabIndex = 0;
             lblMaPhieuHoanTra.Text = "Mã phiếu:";
             // 
             // txtMaPhieuHoanTra
             // 
-            txtMaPhieuHoanTra.BackColor = Color.FromArgb(26, 26, 39);
-            txtMaPhieuHoanTra.BorderStyle = BorderStyle.FixedSingle;
-            txtMaPhieuHoanTra.ForeColor = Color.White;
+            txtMaPhieuHoanTra.BackColor = Color.FromArgb(248, 250, 252);
+            txtMaPhieuHoanTra.Font = new Font("Segoe UI", 10F);
             txtMaPhieuHoanTra.Location = new Point(103, 44);
             txtMaPhieuHoanTra.Name = "txtMaPhieuHoanTra";
             txtMaPhieuHoanTra.ReadOnly = true;
@@ -189,18 +165,18 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblNgayHoanTra
             // 
             lblNgayHoanTra.AutoSize = true;
-            lblNgayHoanTra.ForeColor = Color.FromArgb(161, 165, 183);
+            lblNgayHoanTra.Font = new Font("Segoe UI", 10F);
+            lblNgayHoanTra.ForeColor = Color.FromArgb(33, 37, 41);
             lblNgayHoanTra.Location = new Point(18, 86);
             lblNgayHoanTra.Name = "lblNgayHoanTra";
-            lblNgayHoanTra.Size = new Size(57, 23);
+            lblNgayHoanTra.Size = new Size(54, 23);
             lblNgayHoanTra.TabIndex = 2;
             lblNgayHoanTra.Text = "Ngày:";
             // 
             // txtNgayHoanTra
             // 
-            txtNgayHoanTra.BackColor = Color.FromArgb(26, 26, 39);
-            txtNgayHoanTra.BorderStyle = BorderStyle.FixedSingle;
-            txtNgayHoanTra.ForeColor = Color.White;
+            txtNgayHoanTra.BackColor = Color.FromArgb(248, 250, 252);
+            txtNgayHoanTra.Font = new Font("Segoe UI", 10F);
             txtNgayHoanTra.Location = new Point(103, 83);
             txtNgayHoanTra.Name = "txtNgayHoanTra";
             txtNgayHoanTra.ReadOnly = true;
@@ -210,18 +186,18 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblMaHoaDon
             // 
             lblMaHoaDon.AutoSize = true;
-            lblMaHoaDon.ForeColor = Color.FromArgb(161, 165, 183);
+            lblMaHoaDon.Font = new Font("Segoe UI", 10F);
+            lblMaHoaDon.ForeColor = Color.FromArgb(33, 37, 41);
             lblMaHoaDon.Location = new Point(355, 47);
             lblMaHoaDon.Name = "lblMaHoaDon";
-            lblMaHoaDon.Size = new Size(84, 23);
+            lblMaHoaDon.Size = new Size(80, 23);
             lblMaHoaDon.TabIndex = 4;
             lblMaHoaDon.Text = "Hóa đơn:";
             // 
             // txtMaHoaDon
             // 
-            txtMaHoaDon.BackColor = Color.FromArgb(26, 26, 39);
-            txtMaHoaDon.BorderStyle = BorderStyle.FixedSingle;
-            txtMaHoaDon.ForeColor = Color.White;
+            txtMaHoaDon.BackColor = Color.FromArgb(248, 250, 252);
+            txtMaHoaDon.Font = new Font("Segoe UI", 10F);
             txtMaHoaDon.Location = new Point(455, 44);
             txtMaHoaDon.Name = "txtMaHoaDon";
             txtMaHoaDon.ReadOnly = true;
@@ -231,18 +207,18 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblKhachHang
             // 
             lblKhachHang.AutoSize = true;
-            lblKhachHang.ForeColor = Color.FromArgb(161, 165, 183);
+            lblKhachHang.Font = new Font("Segoe UI", 10F);
+            lblKhachHang.ForeColor = Color.FromArgb(33, 37, 41);
             lblKhachHang.Location = new Point(355, 86);
             lblKhachHang.Name = "lblKhachHang";
-            lblKhachHang.Size = new Size(63, 23);
+            lblKhachHang.Size = new Size(61, 23);
             lblKhachHang.TabIndex = 6;
             lblKhachHang.Text = "Khách:";
             // 
             // txtKhachHang
             // 
-            txtKhachHang.BackColor = Color.FromArgb(26, 26, 39);
-            txtKhachHang.BorderStyle = BorderStyle.FixedSingle;
-            txtKhachHang.ForeColor = Color.White;
+            txtKhachHang.BackColor = Color.FromArgb(248, 250, 252);
+            txtKhachHang.Font = new Font("Segoe UI", 10F);
             txtKhachHang.Location = new Point(455, 83);
             txtKhachHang.Name = "txtKhachHang";
             txtKhachHang.ReadOnly = true;
@@ -252,18 +228,18 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblNhanVienXuLy
             // 
             lblNhanVienXuLy.AutoSize = true;
-            lblNhanVienXuLy.ForeColor = Color.FromArgb(161, 165, 183);
+            lblNhanVienXuLy.Font = new Font("Segoe UI", 10F);
+            lblNhanVienXuLy.ForeColor = Color.FromArgb(33, 37, 41);
             lblNhanVienXuLy.Location = new Point(655, 47);
             lblNhanVienXuLy.Name = "lblNhanVienXuLy";
-            lblNhanVienXuLy.Size = new Size(139, 23);
+            lblNhanVienXuLy.Size = new Size(132, 23);
             lblNhanVienXuLy.TabIndex = 8;
             lblNhanVienXuLy.Text = "Nhân viên xử lý:";
             // 
             // txtNhanVienXuLy
             // 
-            txtNhanVienXuLy.BackColor = Color.FromArgb(26, 26, 39);
-            txtNhanVienXuLy.BorderStyle = BorderStyle.FixedSingle;
-            txtNhanVienXuLy.ForeColor = Color.White;
+            txtNhanVienXuLy.BackColor = Color.FromArgb(248, 250, 252);
+            txtNhanVienXuLy.Font = new Font("Segoe UI", 10F);
             txtNhanVienXuLy.Location = new Point(803, 44);
             txtNhanVienXuLy.Name = "txtNhanVienXuLy";
             txtNhanVienXuLy.ReadOnly = true;
@@ -273,18 +249,18 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblTongTien
             // 
             lblTongTien.AutoSize = true;
-            lblTongTien.ForeColor = Color.FromArgb(161, 165, 183);
+            lblTongTien.Font = new Font("Segoe UI", 10F);
+            lblTongTien.ForeColor = Color.FromArgb(33, 37, 41);
             lblTongTien.Location = new Point(655, 86);
             lblTongTien.Name = "lblTongTien";
-            lblTongTien.Size = new Size(92, 23);
+            lblTongTien.Size = new Size(87, 23);
             lblTongTien.TabIndex = 10;
             lblTongTien.Text = "Tổng tiền:";
             // 
             // txtTongTien
             // 
-            txtTongTien.BackColor = Color.FromArgb(26, 26, 39);
-            txtTongTien.BorderStyle = BorderStyle.FixedSingle;
-            txtTongTien.ForeColor = Color.White;
+            txtTongTien.BackColor = Color.FromArgb(248, 250, 252);
+            txtTongTien.Font = new Font("Segoe UI", 10F);
             txtTongTien.Location = new Point(803, 83);
             txtTongTien.Name = "txtTongTien";
             txtTongTien.ReadOnly = true;
@@ -294,28 +270,28 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblLyDo
             // 
             lblLyDo.AutoSize = true;
-            lblLyDo.ForeColor = Color.FromArgb(161, 165, 183);
+            lblLyDo.Font = new Font("Segoe UI", 10F);
+            lblLyDo.ForeColor = Color.FromArgb(33, 37, 41);
             lblLyDo.Location = new Point(18, 124);
             lblLyDo.Name = "lblLyDo";
-            lblLyDo.Size = new Size(59, 23);
+            lblLyDo.Size = new Size(54, 23);
             lblLyDo.TabIndex = 12;
             lblLyDo.Text = "Lý do:";
             // 
             // txtLyDo
             // 
-            txtLyDo.BackColor = Color.FromArgb(26, 26, 39);
-            txtLyDo.BorderStyle = BorderStyle.FixedSingle;
-            txtLyDo.ForeColor = Color.White;
+            txtLyDo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtLyDo.Font = new Font("Segoe UI", 10F);
             txtLyDo.Location = new Point(103, 121);
             txtLyDo.Multiline = true;
             txtLyDo.Name = "txtLyDo";
-            txtLyDo.Size = new Size(880, 30);
+            txtLyDo.Size = new Size(880, 40);
             txtLyDo.TabIndex = 13;
             // 
             // grpThongTinChiTiet
             // 
-            grpThongTinChiTiet.BorderColor = Color.FromArgb(43, 43, 64);
-            grpThongTinChiTiet.BorderRadius = 8;
+            grpThongTinChiTiet.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpThongTinChiTiet.BackColor = Color.White;
             grpThongTinChiTiet.Controls.Add(lblSach);
             grpThongTinChiTiet.Controls.Add(cboSach);
             grpThongTinChiTiet.Controls.Add(lblSoLuongBan);
@@ -326,35 +302,33 @@ namespace QuanLyCuaHangSachMini.GUI
             grpThongTinChiTiet.Controls.Add(numSoLuongTra);
             grpThongTinChiTiet.Controls.Add(btnThemSach);
             grpThongTinChiTiet.Controls.Add(btnXoaSach);
-            grpThongTinChiTiet.CustomBorderColor = Color.FromArgb(43, 43, 64);
-            grpThongTinChiTiet.CustomizableEdges = customizableEdges7;
-            grpThongTinChiTiet.FillColor = Color.FromArgb(30, 30, 45);
             grpThongTinChiTiet.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            grpThongTinChiTiet.ForeColor = Color.White;
+            grpThongTinChiTiet.ForeColor = Color.FromArgb(55, 38, 210);
             grpThongTinChiTiet.Location = new Point(11, 196);
             grpThongTinChiTiet.Name = "grpThongTinChiTiet";
-            grpThongTinChiTiet.Padding = new Padding(5, 45, 5, 5);
-            grpThongTinChiTiet.ShadowDecoration.CustomizableEdges = customizableEdges8;
             grpThongTinChiTiet.Size = new Size(1008, 95);
             grpThongTinChiTiet.TabIndex = 1;
-            grpThongTinChiTiet.Text = "THÔNG TIN CHI TIẾT HOÀN TRẢ";
+            grpThongTinChiTiet.TabStop = false;
+            grpThongTinChiTiet.Text = "Thông tin chi tiết hoàn trả";
             // 
             // lblSach
             // 
             lblSach.AutoSize = true;
-            lblSach.ForeColor = Color.FromArgb(161, 165, 183);
+            lblSach.Font = new Font("Segoe UI", 10F);
+            lblSach.ForeColor = Color.FromArgb(33, 37, 41);
             lblSach.Location = new Point(8, 51);
             lblSach.Name = "lblSach";
-            lblSach.Size = new Size(52, 23);
+            lblSach.Size = new Size(50, 23);
             lblSach.TabIndex = 0;
             lblSach.Text = "Sách:";
             // 
             // cboSach
             // 
-            cboSach.BackColor = Color.FromArgb(26, 26, 39);
+            cboSach.BackColor = Color.White;
             cboSach.DropDownStyle = ComboBoxStyle.DropDownList;
             cboSach.FlatStyle = FlatStyle.Flat;
-            cboSach.ForeColor = Color.White;
+            cboSach.Font = new Font("Segoe UI", 10F);
+            cboSach.FormattingEnabled = true;
             cboSach.Location = new Point(66, 48);
             cboSach.Name = "cboSach";
             cboSach.Size = new Size(305, 31);
@@ -364,18 +338,18 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblSoLuongBan
             // 
             lblSoLuongBan.AutoSize = true;
-            lblSoLuongBan.ForeColor = Color.FromArgb(161, 165, 183);
+            lblSoLuongBan.Font = new Font("Segoe UI", 10F);
+            lblSoLuongBan.ForeColor = Color.FromArgb(33, 37, 41);
             lblSoLuongBan.Location = new Point(377, 48);
             lblSoLuongBan.Name = "lblSoLuongBan";
-            lblSoLuongBan.Size = new Size(69, 23);
+            lblSoLuongBan.Size = new Size(65, 23);
             lblSoLuongBan.TabIndex = 2;
             lblSoLuongBan.Text = "SL bán:";
             // 
             // txtSoLuongBan
             // 
-            txtSoLuongBan.BackColor = Color.FromArgb(26, 26, 39);
-            txtSoLuongBan.BorderStyle = BorderStyle.FixedSingle;
-            txtSoLuongBan.ForeColor = Color.White;
+            txtSoLuongBan.BackColor = Color.FromArgb(248, 250, 252);
+            txtSoLuongBan.Font = new Font("Segoe UI", 10F);
             txtSoLuongBan.Location = new Point(452, 45);
             txtSoLuongBan.Name = "txtSoLuongBan";
             txtSoLuongBan.ReadOnly = true;
@@ -385,17 +359,17 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblDonGiaHoanTra
             // 
             lblDonGiaHoanTra.AutoSize = true;
-            lblDonGiaHoanTra.ForeColor = Color.FromArgb(161, 165, 183);
+            lblDonGiaHoanTra.Font = new Font("Segoe UI", 10F);
+            lblDonGiaHoanTra.ForeColor = Color.FromArgb(33, 37, 41);
             lblDonGiaHoanTra.Location = new Point(532, 47);
             lblDonGiaHoanTra.Name = "lblDonGiaHoanTra";
-            lblDonGiaHoanTra.Size = new Size(79, 23);
+            lblDonGiaHoanTra.Size = new Size(74, 23);
             lblDonGiaHoanTra.TabIndex = 4;
             lblDonGiaHoanTra.Text = "Đơn giá:";
             // 
             // numDonGiaHoanTra
             // 
-            numDonGiaHoanTra.BackColor = Color.FromArgb(26, 26, 39);
-            numDonGiaHoanTra.ForeColor = Color.White;
+            numDonGiaHoanTra.Font = new Font("Segoe UI", 10F);
             numDonGiaHoanTra.Location = new Point(617, 44);
             numDonGiaHoanTra.Maximum = new decimal(new int[] { 1000000000, 0, 0, 0 });
             numDonGiaHoanTra.Name = "numDonGiaHoanTra";
@@ -406,17 +380,17 @@ namespace QuanLyCuaHangSachMini.GUI
             // lblSoLuongTra
             // 
             lblSoLuongTra.AutoSize = true;
-            lblSoLuongTra.ForeColor = Color.FromArgb(161, 165, 183);
+            lblSoLuongTra.Font = new Font("Segoe UI", 10F);
+            lblSoLuongTra.ForeColor = Color.FromArgb(33, 37, 41);
             lblSoLuongTra.Location = new Point(736, 47);
             lblSoLuongTra.Name = "lblSoLuongTra";
-            lblSoLuongTra.Size = new Size(34, 23);
+            lblSoLuongTra.Size = new Size(31, 23);
             lblSoLuongTra.TabIndex = 6;
             lblSoLuongTra.Text = "SL:";
             // 
             // numSoLuongTra
             // 
-            numSoLuongTra.BackColor = Color.FromArgb(26, 26, 39);
-            numSoLuongTra.ForeColor = Color.White;
+            numSoLuongTra.Font = new Font("Segoe UI", 10F);
             numSoLuongTra.Location = new Point(776, 44);
             numSoLuongTra.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
             numSoLuongTra.Name = "numSoLuongTra";
@@ -426,115 +400,96 @@ namespace QuanLyCuaHangSachMini.GUI
             // 
             // btnThemSach
             // 
-            btnThemSach.Animated = true;
-            btnThemSach.BorderRadius = 5;
-            btnThemSach.CustomizableEdges = customizableEdges3;
-            btnThemSach.FillColor = Color.FromArgb(16, 185, 129);
-            btnThemSach.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnThemSach.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnThemSach.BackColor = Color.FromArgb(71, 51, 255);
+            btnThemSach.Cursor = Cursors.Hand;
+            btnThemSach.FlatAppearance.BorderSize = 0;
+            btnThemSach.FlatAppearance.MouseDownBackColor = Color.FromArgb(52, 35, 200);
+            btnThemSach.FlatAppearance.MouseOverBackColor = Color.FromArgb(100, 82, 255);
+            btnThemSach.FlatStyle = FlatStyle.Flat;
+            btnThemSach.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnThemSach.ForeColor = Color.White;
-            btnThemSach.Location = new Point(848, 44);
+            btnThemSach.Location = new Point(867, 42);
             btnThemSach.Name = "btnThemSach";
-            btnThemSach.ShadowDecoration.CustomizableEdges = customizableEdges4;
-            btnThemSach.Size = new Size(89, 35);
+            btnThemSach.Size = new Size(70, 30);
             btnThemSach.TabIndex = 8;
             btnThemSach.Text = "Thêm";
+            btnThemSach.UseVisualStyleBackColor = false;
             btnThemSach.Click += btnThemSach_Click;
             // 
             // btnXoaSach
             // 
-            btnXoaSach.Animated = true;
-            btnXoaSach.BorderRadius = 5;
-            btnXoaSach.CustomizableEdges = customizableEdges5;
-            btnXoaSach.FillColor = Color.FromArgb(246, 78, 96);
-            btnXoaSach.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnXoaSach.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnXoaSach.BackColor = Color.Red;
+            btnXoaSach.Cursor = Cursors.Hand;
+            btnXoaSach.FlatAppearance.BorderSize = 0;
+            btnXoaSach.FlatAppearance.MouseDownBackColor = Color.FromArgb(160, 25, 40);
+            btnXoaSach.FlatAppearance.MouseOverBackColor = Color.FromArgb(200, 35, 51);
+            btnXoaSach.FlatStyle = FlatStyle.Flat;
+            btnXoaSach.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnXoaSach.ForeColor = Color.White;
-            btnXoaSach.Location = new Point(943, 44);
+            btnXoaSach.Location = new Point(943, 42);
             btnXoaSach.Name = "btnXoaSach";
-            btnXoaSach.ShadowDecoration.CustomizableEdges = customizableEdges6;
-            btnXoaSach.Size = new Size(64, 35);
+            btnXoaSach.Size = new Size(59, 30);
             btnXoaSach.TabIndex = 9;
             btnXoaSach.Text = "Xóa";
+            btnXoaSach.UseVisualStyleBackColor = false;
             btnXoaSach.Click += btnXoaSach_Click;
             // 
             // grpDanhSachChiTiet
             // 
-            grpDanhSachChiTiet.BorderColor = Color.FromArgb(43, 43, 64);
-            grpDanhSachChiTiet.BorderRadius = 8;
+            grpDanhSachChiTiet.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            grpDanhSachChiTiet.BackColor = Color.White;
             grpDanhSachChiTiet.Controls.Add(dgvChiTiet);
-            grpDanhSachChiTiet.CustomBorderColor = Color.FromArgb(43, 43, 64);
-            grpDanhSachChiTiet.CustomizableEdges = customizableEdges9;
-            grpDanhSachChiTiet.FillColor = Color.FromArgb(30, 30, 45);
             grpDanhSachChiTiet.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            grpDanhSachChiTiet.ForeColor = Color.White;
+            grpDanhSachChiTiet.ForeColor = Color.FromArgb(55, 38, 210);
             grpDanhSachChiTiet.Location = new Point(11, 297);
             grpDanhSachChiTiet.Name = "grpDanhSachChiTiet";
-            grpDanhSachChiTiet.Padding = new Padding(5, 45, 5, 5);
-            grpDanhSachChiTiet.ShadowDecoration.CustomizableEdges = customizableEdges10;
             grpDanhSachChiTiet.Size = new Size(1008, 300);
             grpDanhSachChiTiet.TabIndex = 2;
-            grpDanhSachChiTiet.Text = "DANH SÁCH CHI TIẾT HOÀN TRẢ";
+            grpDanhSachChiTiet.TabStop = false;
+            grpDanhSachChiTiet.Text = "Danh sách chi tiết hoàn trả";
             // 
             // dgvChiTiet
             // 
             dgvChiTiet.AllowUserToAddRows = false;
             dgvChiTiet.AllowUserToDeleteRows = false;
             dgvChiTiet.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = Color.FromArgb(26, 26, 39);
+            dgvChiTiet.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvChiTiet.BackgroundColor = Color.White;
+            dgvChiTiet.BorderStyle = BorderStyle.None;
+            dgvChiTiet.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(55, 38, 210);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold);
             dataGridViewCellStyle1.ForeColor = Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(63, 66, 84);
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(55, 38, 210);
             dataGridViewCellStyle1.SelectionForeColor = Color.White;
-            dgvChiTiet.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            dgvChiTiet.BackgroundColor = Color.FromArgb(30, 30, 45);
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(54, 153, 255);
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle2.ForeColor = Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(54, 153, 255);
-            dataGridViewCellStyle2.SelectionForeColor = Color.White;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvChiTiet.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            dgvChiTiet.ColumnHeadersHeight = 40;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvChiTiet.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dgvChiTiet.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvChiTiet.Columns.AddRange(new DataGridViewColumn[] { ID, HoaDonChiTietID, HoaDonID, SachID, MaSach, TenSach, SoLuongBan, SoLuongTra, DonGiaHoanTra, ThanhTien });
-            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = Color.FromArgb(30, 30, 45);
-            dataGridViewCellStyle7.Font = new Font("Segoe UI", 10F);
-            dataGridViewCellStyle7.ForeColor = Color.White;
-            dataGridViewCellStyle7.SelectionBackColor = Color.FromArgb(63, 66, 84);
-            dataGridViewCellStyle7.SelectionForeColor = Color.White;
-            dataGridViewCellStyle7.WrapMode = DataGridViewTriState.False;
-            dgvChiTiet.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = Color.White;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 10F);
+            dataGridViewCellStyle6.ForeColor = Color.FromArgb(55, 38, 210);
+            dataGridViewCellStyle6.SelectionBackColor = Color.FromArgb(230, 232, 255);
+            dataGridViewCellStyle6.SelectionForeColor = Color.FromArgb(33, 37, 41);
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
+            dgvChiTiet.DefaultCellStyle = dataGridViewCellStyle6;
             dgvChiTiet.Dock = DockStyle.Fill;
-            dgvChiTiet.GridColor = Color.FromArgb(43, 43, 64);
-            dgvChiTiet.Location = new Point(5, 85);
+            dgvChiTiet.EnableHeadersVisualStyles = false;
+            dgvChiTiet.GridColor = Color.FromArgb(226, 232, 240);
+            dgvChiTiet.Location = new Point(3, 26);
             dgvChiTiet.MultiSelect = false;
             dgvChiTiet.Name = "dgvChiTiet";
             dgvChiTiet.ReadOnly = true;
             dgvChiTiet.RowHeadersVisible = false;
             dgvChiTiet.RowHeadersWidth = 51;
-            dgvChiTiet.RowTemplate.Height = 40;
-            dgvChiTiet.Size = new Size(998, 210);
+            dgvChiTiet.RowTemplate.Height = 32;
+            dgvChiTiet.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvChiTiet.Size = new Size(1002, 271);
             dgvChiTiet.TabIndex = 0;
-            dgvChiTiet.ThemeStyle.AlternatingRowsStyle.BackColor = Color.White;
-            dgvChiTiet.ThemeStyle.AlternatingRowsStyle.Font = null;
-            dgvChiTiet.ThemeStyle.AlternatingRowsStyle.ForeColor = Color.Empty;
-            dgvChiTiet.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = Color.Empty;
-            dgvChiTiet.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = Color.Empty;
-            dgvChiTiet.ThemeStyle.BackColor = Color.FromArgb(30, 30, 45);
-            dgvChiTiet.ThemeStyle.GridColor = Color.FromArgb(43, 43, 64);
-            dgvChiTiet.ThemeStyle.HeaderStyle.BackColor = Color.FromArgb(54, 153, 255);
-            dgvChiTiet.ThemeStyle.HeaderStyle.BorderStyle = DataGridViewHeaderBorderStyle.None;
-            dgvChiTiet.ThemeStyle.HeaderStyle.Font = new Font("Segoe UI", 9F);
-            dgvChiTiet.ThemeStyle.HeaderStyle.ForeColor = Color.White;
-            dgvChiTiet.ThemeStyle.HeaderStyle.HeaightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dgvChiTiet.ThemeStyle.HeaderStyle.Height = 40;
-            dgvChiTiet.ThemeStyle.ReadOnly = true;
-            dgvChiTiet.ThemeStyle.RowsStyle.BackColor = Color.FromArgb(30, 30, 45);
-            dgvChiTiet.ThemeStyle.RowsStyle.BorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgvChiTiet.ThemeStyle.RowsStyle.Font = new Font("Segoe UI", 9F);
-            dgvChiTiet.ThemeStyle.RowsStyle.ForeColor = Color.White;
-            dgvChiTiet.ThemeStyle.RowsStyle.Height = 40;
-            dgvChiTiet.ThemeStyle.RowsStyle.SelectionBackColor = Color.FromArgb(63, 66, 84);
-            dgvChiTiet.ThemeStyle.RowsStyle.SelectionForeColor = Color.White;
             dgvChiTiet.CellClick += dgvChiTiet_CellClick;
             dgvChiTiet.DataError += dgvChiTiet_DataError;
             dgvChiTiet.SelectionChanged += dgvChiTiet_SelectionChanged;
@@ -594,8 +549,8 @@ namespace QuanLyCuaHangSachMini.GUI
             // SoLuongBan
             // 
             SoLuongBan.DataPropertyName = "SoLuongBan";
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            SoLuongBan.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            SoLuongBan.DefaultCellStyle = dataGridViewCellStyle2;
             SoLuongBan.HeaderText = "SL bán";
             SoLuongBan.MinimumWidth = 6;
             SoLuongBan.Name = "SoLuongBan";
@@ -604,8 +559,8 @@ namespace QuanLyCuaHangSachMini.GUI
             // SoLuongTra
             // 
             SoLuongTra.DataPropertyName = "SoLuongTra";
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            SoLuongTra.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            SoLuongTra.DefaultCellStyle = dataGridViewCellStyle3;
             SoLuongTra.HeaderText = "SL hoàn";
             SoLuongTra.MinimumWidth = 6;
             SoLuongTra.Name = "SoLuongTra";
@@ -614,9 +569,9 @@ namespace QuanLyCuaHangSachMini.GUI
             // DonGiaHoanTra
             // 
             DonGiaHoanTra.DataPropertyName = "DonGiaHoanTra";
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle5.Format = "N0";
-            DonGiaHoanTra.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle4.Format = "N0";
+            DonGiaHoanTra.DefaultCellStyle = dataGridViewCellStyle4;
             DonGiaHoanTra.HeaderText = "Đơn giá";
             DonGiaHoanTra.MinimumWidth = 6;
             DonGiaHoanTra.Name = "DonGiaHoanTra";
@@ -625,10 +580,11 @@ namespace QuanLyCuaHangSachMini.GUI
             // ThanhTien
             // 
             ThanhTien.DataPropertyName = "ThanhTien";
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle6.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle6.Format = "N0";
-            ThanhTien.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            dataGridViewCellStyle5.ForeColor = Color.Blue;
+            dataGridViewCellStyle5.Format = "N0";
+            ThanhTien.DefaultCellStyle = dataGridViewCellStyle5;
             ThanhTien.HeaderText = "Thành tiền";
             ThanhTien.MinimumWidth = 6;
             ThanhTien.Name = "ThanhTien";
@@ -636,63 +592,66 @@ namespace QuanLyCuaHangSachMini.GUI
             // 
             // btnLuuPhieuHoanTra
             // 
-            btnLuuPhieuHoanTra.Animated = true;
-            btnLuuPhieuHoanTra.BorderRadius = 5;
-            btnLuuPhieuHoanTra.CustomizableEdges = customizableEdges11;
-            btnLuuPhieuHoanTra.FillColor = Color.FromArgb(16, 185, 129);
-            btnLuuPhieuHoanTra.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnLuuPhieuHoanTra.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnLuuPhieuHoanTra.BackColor = Color.Red;
+            btnLuuPhieuHoanTra.Cursor = Cursors.Hand;
+            btnLuuPhieuHoanTra.FlatAppearance.BorderSize = 0;
+            btnLuuPhieuHoanTra.FlatAppearance.MouseDownBackColor = Color.FromArgb(52, 35, 200);
+            btnLuuPhieuHoanTra.FlatAppearance.MouseOverBackColor = Color.FromArgb(100, 82, 255);
+            btnLuuPhieuHoanTra.FlatStyle = FlatStyle.Flat;
+            btnLuuPhieuHoanTra.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnLuuPhieuHoanTra.ForeColor = Color.White;
-            btnLuuPhieuHoanTra.Location = new Point(694, 611);
+            btnLuuPhieuHoanTra.Location = new Point(686, 611);
             btnLuuPhieuHoanTra.Name = "btnLuuPhieuHoanTra";
-            btnLuuPhieuHoanTra.ShadowDecoration.CustomizableEdges = customizableEdges12;
-            btnLuuPhieuHoanTra.Size = new Size(156, 38);
+            btnLuuPhieuHoanTra.Size = new Size(167, 38);
             btnLuuPhieuHoanTra.TabIndex = 2;
             btnLuuPhieuHoanTra.Text = "Lưu phiếu hoàn trả";
+            btnLuuPhieuHoanTra.UseVisualStyleBackColor = false;
             btnLuuPhieuHoanTra.Click += btnLuuPhieuHoanTra_Click;
             // 
             // btnHuyBo
             // 
-            btnHuyBo.Animated = true;
-            btnHuyBo.BorderRadius = 5;
-            btnHuyBo.CustomizableEdges = customizableEdges13;
-            btnHuyBo.FillColor = Color.FromArgb(114, 57, 234);
-            btnHuyBo.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnHuyBo.ForeColor = Color.White;
+            btnHuyBo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnHuyBo.BackColor = Color.White;
+            btnHuyBo.Cursor = Cursors.Hand;
+            btnHuyBo.FlatAppearance.BorderColor = Color.FromArgb(71, 51, 255);
+            btnHuyBo.FlatAppearance.MouseDownBackColor = Color.FromArgb(230, 232, 255);
+            btnHuyBo.FlatAppearance.MouseOverBackColor = Color.FromArgb(242, 244, 255);
+            btnHuyBo.FlatStyle = FlatStyle.Flat;
+            btnHuyBo.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnHuyBo.ForeColor = Color.FromArgb(71, 51, 255);
             btnHuyBo.Location = new Point(859, 611);
             btnHuyBo.Name = "btnHuyBo";
-            btnHuyBo.ShadowDecoration.CustomizableEdges = customizableEdges14;
             btnHuyBo.Size = new Size(69, 38);
             btnHuyBo.TabIndex = 1;
             btnHuyBo.Text = "Hủy";
+            btnHuyBo.UseVisualStyleBackColor = false;
             btnHuyBo.Click += btnHuyBo_Click;
             // 
             // btnThoat
             // 
-            btnThoat.Animated = true;
-            btnThoat.BorderRadius = 5;
-            btnThoat.CustomizableEdges = customizableEdges15;
-            btnThoat.FillColor = Color.FromArgb(63, 66, 84);
-            btnThoat.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnThoat.ForeColor = Color.White;
+            btnThoat.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnThoat.BackColor = Color.White;
+            btnThoat.Cursor = Cursors.Hand;
+            btnThoat.FlatAppearance.BorderColor = Color.FromArgb(71, 51, 255);
+            btnThoat.FlatAppearance.MouseDownBackColor = Color.FromArgb(230, 232, 255);
+            btnThoat.FlatAppearance.MouseOverBackColor = Color.FromArgb(242, 244, 255);
+            btnThoat.FlatStyle = FlatStyle.Flat;
+            btnThoat.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnThoat.ForeColor = Color.FromArgb(71, 51, 255);
             btnThoat.Location = new Point(936, 611);
             btnThoat.Name = "btnThoat";
-            btnThoat.ShadowDecoration.CustomizableEdges = customizableEdges16;
             btnThoat.Size = new Size(83, 38);
             btnThoat.TabIndex = 0;
             btnThoat.Text = "Đóng";
+            btnThoat.UseVisualStyleBackColor = false;
             btnThoat.Click += btnThoat_Click;
-            // 
-            // dragControl
-            // 
-            dragControl.DockIndicatorTransparencyValue = 0.6D;
-            dragControl.TargetControl = grpThongTinPhieu;
-            dragControl.UseTransparentDrag = true;
             // 
             // frmPhieuHoanTra_ChiTiet
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(9F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(26, 26, 39);
+            BackColor = Color.FromArgb(241, 245, 249);
             ClientSize = new Size(1030, 662);
             Controls.Add(btnThoat);
             Controls.Add(btnHuyBo);
@@ -700,7 +659,8 @@ namespace QuanLyCuaHangSachMini.GUI
             Controls.Add(grpDanhSachChiTiet);
             Controls.Add(grpThongTinChiTiet);
             Controls.Add(grpThongTinPhieu);
-            FormBorderStyle = FormBorderStyle.None;
+            Font = new Font("Segoe UI", 10F);
+            MinimumSize = new Size(1046, 701);
             Name = "frmPhieuHoanTra_ChiTiet";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Phiếu hoàn trả";
@@ -717,5 +677,3 @@ namespace QuanLyCuaHangSachMini.GUI
         }
     }
 }
-
-

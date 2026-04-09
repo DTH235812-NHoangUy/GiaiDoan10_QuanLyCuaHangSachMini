@@ -23,6 +23,8 @@ namespace QuanLyCuaHangSachMini.GUI
             chiXem = chiXemChiTiet;
             nhanVienDangNhapID = nhanVienID;
             quyenHanNguoiDung = quyenHan ?? "";
+            txtSdtTraCuu.KeyPress += txtSdtTraCuu_KeyPress;
+            txtSdtTraCuu.KeyDown += txtSdtTraCuu_KeyDown;
         }
 
         public void LayNhanVienVaoComboBox()
@@ -44,9 +46,349 @@ namespace QuanLyCuaHangSachMini.GUI
 
         public void LayKhachHangVaoComboBox()
         {
-            cboKhachHang.DataSource = context.KhachHang.ToList();
+            cboKhachHang.DataSource = context.KhachHang
+                .OrderBy(r => r.HoVaTen)
+                .ToList();
             cboKhachHang.ValueMember = "ID";
             cboKhachHang.DisplayMember = "HoVaTen";
+            cboKhachHang.DropDownStyle = ComboBoxStyle.DropDown;
+            cboKhachHang.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboKhachHang.AutoCompleteSource = AutoCompleteSource.ListItems;
+        }
+
+        private string PhatSinhMaKhachHang()
+        {
+            int soLonNhat = 0;
+            if (context.KhachHang.Any())
+            {
+                soLonNhat = context.KhachHang
+                    .AsEnumerable()
+                    .Select(r =>
+                    {
+                        if (string.IsNullOrWhiteSpace(r.MaKhachHang))
+                            return 0;
+
+                        string so = new string(r.MaKhachHang.Where(char.IsDigit).ToArray());
+                        return int.TryParse(so, out int kq) ? kq : 0;
+                    })
+                    .DefaultIfEmpty(0)
+                    .Max();
+            }
+
+            return "KH" + (soLonNhat + 1).ToString("000");
+        }
+
+        private static string ChuanHoaTenKhach(string? ten)
+        {
+            if (string.IsNullOrWhiteSpace(ten))
+                return string.Empty;
+
+            return string.Join(" ",
+                ten.Trim()
+                   .Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                .ToLowerInvariant();
+        }
+
+        private int DamBaoKhachHangTonTaiTrongHeThong()
+        {
+            string tenKhach = cboKhachHang.Text?.Trim() ?? string.Empty;
+            string sdtTraCuu = txtSdtTraCuu.Text?.Trim() ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(sdtTraCuu))
+            {
+                KhachHang? khTheoSdt = context.KhachHang
+                    .FirstOrDefault(r => (r.DienThoai ?? "") == sdtTraCuu);
+                if (khTheoSdt != null)
+                {
+                    cboKhachHang.SelectedValue = khTheoSdt.ID;
+                    return khTheoSdt.ID;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(tenKhach))
+                return 0;
+
+            int idDangChon = 0;
+            if (cboKhachHang.SelectedValue != null)
+            {
+                int.TryParse(cboKhachHang.SelectedValue.ToString(), out idDangChon);
+            }
+
+            if (idDangChon > 0)
+            {
+                KhachHang? khTheoId = context.KhachHang.Find(idDangChon);
+                if (khTheoId != null &&
+                    string.Equals(khTheoId.HoVaTen?.Trim(), tenKhach, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return khTheoId.ID;
+                }
+            }
+
+            string tenChuanHoa = ChuanHoaTenKhach(tenKhach);
+            KhachHang? khTonTai = context.KhachHang
+                .AsEnumerable()
+                .FirstOrDefault(r => ChuanHoaTenKhach(r.HoVaTen) == tenChuanHoa);
+            if (khTonTai != null)
+            {
+                cboKhachHang.SelectedValue = khTonTai.ID;
+                return khTonTai.ID;
+            }
+
+            KhachHang khMoi = new KhachHang
+            {
+                MaKhachHang = PhatSinhMaKhachHang(),
+                HoVaTen = tenKhach,
+                DienThoai = string.IsNullOrWhiteSpace(sdtTraCuu) ? null : sdtTraCuu,
+                Email = null,
+                DiaChi = null
+            };
+
+            context.KhachHang.Add(khMoi);
+            context.SaveChanges();
+
+            LayKhachHangVaoComboBox();
+            cboKhachHang.SelectedValue = khMoi.ID;
+            return khMoi.ID;
+        }
+
+        private void txtSdtTraCuu_KeyPress(object? sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void txtSdtTraCuu_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                TimKhachHangTheoSoDienThoai(true);
+            }
+        }
+
+        private void cboKhachHang_SelectionChangeCommitted(object? sender, EventArgs e)
+        {
+            if (cboKhachHang.SelectedValue == null || !int.TryParse(cboKhachHang.SelectedValue.ToString(), out int khachHangId))
+                return;
+
+            KhachHang? kh = context.KhachHang.Find(khachHangId);
+            if (kh != null)
+                txtSdtTraCuu.Text = kh.DienThoai ?? string.Empty;
+        }
+
+        private void TimKhachHangTheoSoDienThoai(bool hienThongBaoKhiKhongThay)
+        {
+            string sdt = txtSdtTraCuu.Text.Trim();
+            if (string.IsNullOrWhiteSpace(sdt))
+            {
+                if (hienThongBaoKhiKhongThay)
+                {
+                    MessageBox.Show("Vui lòng nhập số điện thoại để tra cứu.", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                return;
+            }
+
+            if (sdt.Length != 10 || !sdt.All(char.IsDigit))
+            {
+                MessageBox.Show("Số điện thoại phải đúng 10 số.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtSdtTraCuu.Focus();
+                return;
+            }
+
+            KhachHang? kh = context.KhachHang.FirstOrDefault(r => (r.DienThoai ?? "") == sdt);
+            if (kh == null)
+            {
+                if (hienThongBaoKhiKhongThay)
+                {
+                    MessageBox.Show("Chưa có khách hàng với số điện thoại này.", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                return;
+            }
+
+            cboKhachHang.SelectedValue = kh.ID;
+        }
+
+        private void btnTimKhachTheoSdt_Click(object sender, EventArgs e)
+        {
+            TimKhachHangTheoSoDienThoai(true);
+        }
+
+        private void btnLapKhachHangMoi_Click(object sender, EventArgs e)
+        {
+            if (chiXem || quyenHanNguoiDung == "admin")
+                return;
+
+            using Form frmTaoKhach = new Form
+            {
+                Text = "Lập khách hàng mới",
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                ClientSize = new Size(460, 290),
+                Font = new Font("Segoe UI", 10F)
+            };
+
+            Label lblHoTen = new Label { Text = "Họ và tên (*):", Left = 20, Top = 24, Width = 120 };
+            TextBox txtHoTen = new TextBox { Left = 145, Top = 20, Width = 285 };
+
+            Label lblDienThoai = new Label { Text = "Điện thoại (*):", Left = 20, Top = 64, Width = 120 };
+            TextBox txtDienThoai = new TextBox { Left = 145, Top = 60, Width = 285, MaxLength = 10 };
+            txtDienThoai.KeyPress += (_, keyPress) =>
+            {
+                if (!char.IsControl(keyPress.KeyChar) && !char.IsDigit(keyPress.KeyChar))
+                    keyPress.Handled = true;
+            };
+
+            Label lblEmail = new Label { Text = "Email:", Left = 20, Top = 104, Width = 120 };
+            TextBox txtEmail = new TextBox { Left = 145, Top = 100, Width = 285 };
+
+            Label lblDiaChi = new Label { Text = "Địa chỉ:", Left = 20, Top = 144, Width = 120 };
+            TextBox txtDiaChi = new TextBox { Left = 145, Top = 140, Width = 285 };
+
+            Button btnLuuKhach = new Button
+            {
+                Text = "Lưu",
+                Left = 245,
+                Top = 210,
+                Width = 88,
+                BackColor = Color.FromArgb(71, 51, 255),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnLuuKhach.FlatAppearance.BorderSize = 0;
+
+            Button btnHuy = new Button
+            {
+                Text = "Hủy",
+                Left = 342,
+                Top = 210,
+                Width = 88,
+                FlatStyle = FlatStyle.Flat
+            };
+
+            frmTaoKhach.Controls.AddRange(new Control[]
+            {
+                lblHoTen, txtHoTen,
+                lblDienThoai, txtDienThoai,
+                lblEmail, txtEmail,
+                lblDiaChi, txtDiaChi,
+                btnLuuKhach, btnHuy
+            });
+
+            bool daLuu = false;
+            int khachHangMoiId = 0;
+
+            btnLuuKhach.Click += (_, _) =>
+            {
+                string hoTen = txtHoTen.Text.Trim();
+                string dienThoai = txtDienThoai.Text.Trim();
+                string email = txtEmail.Text.Trim();
+                string diaChi = txtDiaChi.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(hoTen))
+                {
+                    MessageBox.Show("Vui lòng nhập họ và tên khách hàng.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtHoTen.Focus();
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(dienThoai))
+                {
+                    MessageBox.Show("Vui lòng nhập điện thoại khách hàng.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return;
+                }
+
+                if (dienThoai.Length != 10 || !dienThoai.All(char.IsDigit))
+                {
+                    MessageBox.Show("Điện thoại phải đúng 10 số.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDienThoai.Focus();
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
+                {
+                    MessageBox.Show("Email không hợp lệ.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtEmail.Focus();
+                    return;
+                }
+
+                KhachHang? khTonTai = null;
+
+                if (!string.IsNullOrWhiteSpace(dienThoai))
+                {
+                    khTonTai = context.KhachHang
+                        .FirstOrDefault(r => (r.DienThoai ?? "") == dienThoai);
+                }
+
+                if (khTonTai == null)
+                {
+                    string hoTenChuan = ChuanHoaTenKhach(hoTen);
+                    khTonTai = context.KhachHang
+                        .AsEnumerable()
+                        .FirstOrDefault(r => ChuanHoaTenKhach(r.HoVaTen) == hoTenChuan);
+                }
+
+                if (khTonTai != null)
+                {
+                    if (string.IsNullOrWhiteSpace(khTonTai.DienThoai) && !string.IsNullOrWhiteSpace(dienThoai))
+                        khTonTai.DienThoai = dienThoai;
+                    if (string.IsNullOrWhiteSpace(khTonTai.Email) && !string.IsNullOrWhiteSpace(email))
+                        khTonTai.Email = email;
+                    if (string.IsNullOrWhiteSpace(khTonTai.DiaChi) && !string.IsNullOrWhiteSpace(diaChi))
+                        khTonTai.DiaChi = diaChi;
+
+                    context.SaveChanges();
+
+                    khachHangMoiId = khTonTai.ID;
+                    daLuu = true;
+                    frmTaoKhach.DialogResult = DialogResult.OK;
+                    frmTaoKhach.Close();
+                    return;
+                }
+
+                KhachHang khMoi = new KhachHang
+                {
+                    MaKhachHang = PhatSinhMaKhachHang(),
+                    HoVaTen = hoTen,
+                    DienThoai = dienThoai,
+                    Email = string.IsNullOrWhiteSpace(email) ? null : email,
+                    DiaChi = string.IsNullOrWhiteSpace(diaChi) ? null : diaChi
+                };
+
+                context.KhachHang.Add(khMoi);
+                context.SaveChanges();
+
+                khachHangMoiId = khMoi.ID;
+                daLuu = true;
+                frmTaoKhach.DialogResult = DialogResult.OK;
+                frmTaoKhach.Close();
+            };
+
+            btnHuy.Click += (_, _) =>
+            {
+                frmTaoKhach.DialogResult = DialogResult.Cancel;
+                frmTaoKhach.Close();
+            };
+
+            frmTaoKhach.AcceptButton = btnLuuKhach;
+            frmTaoKhach.CancelButton = btnHuy;
+
+            if (frmTaoKhach.ShowDialog(this) == DialogResult.OK && daLuu && khachHangMoiId > 0)
+            {
+                LayKhachHangVaoComboBox();
+                cboKhachHang.SelectedValue = khachHangMoiId;
+                KhachHang? khMoi = context.KhachHang.Find(khachHangMoiId);
+                txtSdtTraCuu.Text = khMoi?.DienThoai ?? string.Empty;
+            }
         }
 
         public void LaySachVaoComboBox()
@@ -60,6 +402,9 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             cboNhanVien.Enabled = giaTri;
             cboKhachHang.Enabled = giaTri;
+            txtSdtTraCuu.Enabled = giaTri;
+            btnTimKhachTheoSdt.Enabled = giaTri;
+            btnLapKhachHangMoi.Enabled = giaTri;
             txtGhiChuHoaDon.Enabled = giaTri;
 
             cboSach.Enabled = giaTri;
@@ -77,6 +422,9 @@ namespace QuanLyCuaHangSachMini.GUI
             {
                 cboNhanVien.Enabled = false;
                 cboKhachHang.Enabled = false;
+                txtSdtTraCuu.Enabled = false;
+                btnTimKhachTheoSdt.Enabled = false;
+                btnLapKhachHangMoi.Enabled = false;
                 txtGhiChuHoaDon.Enabled = false;
                 cboSach.Enabled = false;
                 numSoLuongBan.Enabled = false;
@@ -92,6 +440,7 @@ namespace QuanLyCuaHangSachMini.GUI
             LayNhanVienVaoComboBox();
             LayKhachHangVaoComboBox();
             LaySachVaoComboBox();
+            cboKhachHang.SelectionChangeCommitted += cboKhachHang_SelectionChangeCommitted;
 
             dataGridView.AutoGenerateColumns = false;
             dataGridView.CellClick -= dataGridView_CellClick;
@@ -130,6 +479,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 }
 
                 cboKhachHang.SelectedIndex = -1;
+                txtSdtTraCuu.Clear();
                 if (cboSach.Items.Count > 0)
                     cboSach.SelectedIndex = 0;
 
@@ -154,6 +504,8 @@ namespace QuanLyCuaHangSachMini.GUI
 
                     cboNhanVien.SelectedValue = hoaDon.NhanVienID;
                     cboKhachHang.SelectedValue = hoaDon.KhachHangID;
+                    KhachHang? kh = context.KhachHang.Find(hoaDon.KhachHangID);
+                    txtSdtTraCuu.Text = kh?.DienThoai ?? string.Empty;
                     txtGhiChuHoaDon.Text = hoaDon.GhiChuHoaDon;
 
                     List<DanhSachHoaDonChiTiet> ct = context.HoaDon_ChiTiet
@@ -391,6 +743,15 @@ namespace QuanLyCuaHangSachMini.GUI
             using var transaction = context.Database.BeginTransaction();
             try
             {
+                int khachHangID = DamBaoKhachHangTonTaiTrongHeThong();
+                if (khachHangID <= 0)
+                {
+                    MessageBox.Show("Không xác định được khách hàng.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    transaction.Rollback();
+                    return;
+                }
+
                 List<DanhSachHoaDonChiTiet> danhSachMoi = hoaDonChiTiet.ToList();
                 bool dangSua = id != 0;
                 string maHoaDonLog = "";
@@ -450,7 +811,7 @@ namespace QuanLyCuaHangSachMini.GUI
                     }
 
                     hd.NhanVienID = nhanVienDangNhapID;
-                    hd.KhachHangID = Convert.ToInt32(cboKhachHang.SelectedValue.ToString());
+                    hd.KhachHangID = khachHangID;
                     hd.GhiChuHoaDon = txtGhiChuHoaDon.Text;
                     context.HoaDon.Update(hd);
 
@@ -521,7 +882,7 @@ namespace QuanLyCuaHangSachMini.GUI
                     {
                         MaHoaDon = PhatSinhMaHoaDon(),
                         NhanVienID = nhanVienDangNhapID,
-                        KhachHangID = Convert.ToInt32(cboKhachHang.SelectedValue.ToString()),
+                        KhachHangID = khachHangID,
                         NgayLap = DateTime.Now,
                         GhiChuHoaDon = txtGhiChuHoaDon.Text
                     };

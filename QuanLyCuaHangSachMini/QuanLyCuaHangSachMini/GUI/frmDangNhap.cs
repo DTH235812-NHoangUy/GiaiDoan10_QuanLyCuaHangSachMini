@@ -51,9 +51,11 @@ namespace QuanLyCuaHangSachMini.GUI
             string matKhau = txtMatKhau.Text;
 
             NhanVien? nv = context.NhanVien
-                .FirstOrDefault(r => r.TenDangNhap == tenDangNhap && r.MatKhau == matKhau);
+                .FirstOrDefault(r => r.TenDangNhap == tenDangNhap);
 
-            if (nv == null)
+            bool dangNhapHopLe = nv != null && PasswordHelper.VerifyPassword(matKhau, nv.MatKhau);
+
+            if (!dangNhapHopLe || nv == null)
             {
                 MessageBox.Show("Tên đăng nhập hoặc mật khẩu không đúng.", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -67,6 +69,13 @@ namespace QuanLyCuaHangSachMini.GUI
                 MessageBox.Show("Tài khoản này đã bị khóa hoặc ngừng hoạt động.", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
+            }
+
+            if (PasswordHelper.ShouldUpgradeLegacyPassword(nv.MatKhau))
+            {
+                nv.MatKhau = PasswordHelper.HashPassword(matKhau);
+                context.NhanVien.Update(nv);
+                context.SaveChanges();
             }
 
             SessionHelper.GanDuLieu(nv);

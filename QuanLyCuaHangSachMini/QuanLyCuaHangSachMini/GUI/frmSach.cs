@@ -39,12 +39,14 @@ namespace QuanLyCuaHangSachMini.GUI
         private void NapDanhMuc()
         {
             cboTheLoai.DataSource = context.TheLoai
+                .AsNoTracking()
                 .OrderBy(r => r.TenTheLoai)
                 .ToList();
             cboTheLoai.ValueMember = "ID";
             cboTheLoai.DisplayMember = "TenTheLoai";
 
             cboNhaXuatBan.DataSource = context.NhaXuatBan
+                .AsNoTracking()
                 .OrderBy(r => r.TenNhaXuatBan)
                 .ToList();
             cboNhaXuatBan.ValueMember = "ID";
@@ -571,10 +573,15 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnTimKiem_Click(object sender, EventArgs e)
         {
-            string tuKhoa = cboTenSach.Text.Trim().ToLower();
+            string tuKhoa = cboTenSach.Text.Trim();
 
-            List<DanhSachSach> dsSach = context.Sach
-                .AsNoTracking()
+            IQueryable<Sach> query = context.Sach.AsNoTracking();
+            if (!string.IsNullOrWhiteSpace(tuKhoa))
+            {
+                query = query.Where(r => EF.Functions.Like(r.TenSach, tuKhoa + "%"));
+            }
+
+            List<DanhSachSach> dsSach = query
                 .Select(r => new DanhSachSach
                 {
                     ID = r.ID,
@@ -594,14 +601,6 @@ namespace QuanLyCuaHangSachMini.GUI
                 })
                 .OrderBy(r => r.ID)
                 .ToList();
-
-            if (!string.IsNullOrWhiteSpace(tuKhoa))
-            {
-                dsSach = dsSach
-                    .Where(r => !string.IsNullOrWhiteSpace(r.TenSach) &&
-                                r.TenSach.ToLower().StartsWith(tuKhoa))
-                    .ToList();
-            }
 
             GanBinding(dsSach);
 

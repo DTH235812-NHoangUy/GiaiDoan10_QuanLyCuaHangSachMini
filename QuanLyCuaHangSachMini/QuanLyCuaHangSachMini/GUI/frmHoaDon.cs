@@ -36,7 +36,7 @@ namespace QuanLyCuaHangSachMini.GUI
             if (quyenHanNguoiDung == "admin")
             {
                 btnLapHoaDon.Enabled = false;
-                btnSua.Enabled = false;
+                //btnSua.Enabled = false;
                 btnHoanTra.Enabled = true;
 
                 btnInHoaDon.Enabled = true;
@@ -46,7 +46,7 @@ namespace QuanLyCuaHangSachMini.GUI
             else
             {
                 btnLapHoaDon.Enabled = true;
-                btnSua.Enabled = true;
+                //btnSua.Enabled = true;
                 btnHoanTra.Enabled = true;
 
                 btnInHoaDon.Enabled = true;
@@ -57,14 +57,22 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void HienThiDanhSachHoaDon()
         {
-            IQueryable<HoaDon> query = context.HoaDon;
+            IQueryable<HoaDon> query = context.HoaDon.AsNoTracking();
 
             if (quyenHanNguoiDung == "nhanvien")
             {
                 query = query.Where(r => r.NhanVienID == nhanVienDangNhapID);
             }
 
-            List<DanhSachHoaDon> hd = query
+            List<DanhSachHoaDon> hd = LayDanhSachHoaDon(query);
+
+            dataGridView.DataSource = null;
+            dataGridView.DataSource = hd;
+        }
+
+        private List<DanhSachHoaDon> LayDanhSachHoaDon(IQueryable<HoaDon> query)
+        {
+            return query
                 .Select(r => new DanhSachHoaDon
                 {
                     ID = r.ID,
@@ -80,9 +88,6 @@ namespace QuanLyCuaHangSachMini.GUI
                 })
                 .OrderBy(r => r.ID)
                 .ToList();
-
-            dataGridView.DataSource = null;
-            dataGridView.DataSource = hd;
         }
 
         private DanhSachHoaDon? LayHoaDonDangChon()
@@ -155,21 +160,21 @@ namespace QuanLyCuaHangSachMini.GUI
             HienThiDanhSachHoaDon();
         }
 
-        private void btnSua_Click(object sender, EventArgs e)
-        {
-            DanhSachHoaDon? hoaDonDangChon = LayHoaDonDangChon();
-            if (!KiemTraQuyenSuaXoa(hoaDonDangChon))
-                return;
+      //  private void btnSua_Click(object sender, EventArgs e)
+      //  {
+        //    DanhSachHoaDon? hoaDonDangChon = LayHoaDonDangChon();
+        //    if (!KiemTraQuyenSuaXoa(hoaDonDangChon))
+            //    return;
+       
+          //  id = hoaDonDangChon.ID;
 
-            id = hoaDonDangChon.ID;
+          //  using (frmHoaDon_ChiTiet chiTiet = new frmHoaDon_ChiTiet(id, false, nhanVienDangNhapID, quyenHanNguoiDung))
+           // {
+           //     chiTiet.ShowDialog();
+            //}
 
-            using (frmHoaDon_ChiTiet chiTiet = new frmHoaDon_ChiTiet(id, false, nhanVienDangNhapID, quyenHanNguoiDung))
-            {
-                chiTiet.ShowDialog();
-            }
-
-            HienThiDanhSachHoaDon();
-        }
+          //  HienThiDanhSachHoaDon();
+      //  }
 
         private void btnHoanTra_Click(object sender, EventArgs e)
         {
@@ -260,7 +265,29 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnInHoaDon_Click(object sender, EventArgs e)
         {
-            id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value.ToString());
+            DanhSachHoaDon? hoaDonDangChon = LayHoaDonDangChon();
+            if (hoaDonDangChon == null)
+            {
+                MessageBox.Show("Vui lòng chọn hóa đơn cần in.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (quyenHanNguoiDung == "nhanvien" && hoaDonDangChon.NhanVienID != nhanVienDangNhapID)
+            {
+                MessageBox.Show("Bạn chỉ được in hóa đơn do chính bạn lập.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            id = hoaDonDangChon.ID;
+            if (id <= 0)
+            {
+                MessageBox.Show("Mã hóa đơn không hợp lệ, không thể in.", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             using (frmInHoaDon inHoaDon = new frmInHoaDon(id))
             {
                 inHoaDon.ShowDialog();
@@ -274,7 +301,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 "Tìm kiếm hóa đơn",
                 "");
 
-            IQueryable<HoaDon> query = context.HoaDon;
+            IQueryable<HoaDon> query = context.HoaDon.AsNoTracking();
 
             if (quyenHanNguoiDung == "nhanvien")
             {
@@ -289,22 +316,7 @@ namespace QuanLyCuaHangSachMini.GUI
                     r.KhachHang.HoVaTen.Contains(tuKhoa));
             }
 
-            List<DanhSachHoaDon> hd = query
-                .Select(r => new DanhSachHoaDon
-                {
-                    ID = r.ID,
-                    MaHoaDon = r.MaHoaDon,
-                    NhanVienID = r.NhanVienID,
-                    HoVaTenNhanVien = r.NhanVien.HoVaTen,
-                    KhachHangID = r.KhachHangID,
-                    HoVaTenKhachHang = r.KhachHang.HoVaTen,
-                    NgayLap = r.NgayLap,
-                    GhiChuHoaDon = r.GhiChuHoaDon,
-                    TongTienHoaDon = r.HoaDon_ChiTiet.Sum(ct => (decimal?)ct.SoLuongBan * ct.DonGiaBan) ?? 0,
-                    XemChiTiet = "Xem chi tiết"
-                })
-                .OrderBy(r => r.ID)
-                .ToList();
+            List<DanhSachHoaDon> hd = LayDanhSachHoaDon(query);
 
             dataGridView.DataSource = null;
             dataGridView.DataSource = hd;
@@ -313,6 +325,7 @@ namespace QuanLyCuaHangSachMini.GUI
         private void btnXuat_Click(object sender, EventArgs e)
         {
             IQueryable<HoaDon> query = context.HoaDon
+                .AsNoTracking()
                 .Include(r => r.NhanVien)
                 .Include(r => r.KhachHang)
                 .Include(r => r.HoaDon_ChiTiet)

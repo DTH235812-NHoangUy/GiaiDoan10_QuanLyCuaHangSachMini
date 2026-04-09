@@ -2,6 +2,7 @@
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.Helpers;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq;
 using System;
@@ -47,11 +48,12 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             // Các ô nhập liệu
             txtMaTheLoai.Enabled = false; // Mã không cho sửa thủ công
-            cboTenTheLoai.Enabled = đangThaoTac;
+            cboTenTheLoai.Enabled = true; // Luôn bật để có thể tìm kiếm ngay, không cần bấm Thêm
             txtMoTa.Enabled = đangThaoTac;
             cboTenTheLoai.DropDownStyle = ComboBoxStyle.DropDown;
             cboTenTheLoai.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             cboTenTheLoai.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cboTenTheLoai.KeyDown += cboTenTheLoai_KeyDown;
 
             // Các nút điều khiển
             btnLuu.Enabled = đangThaoTac;
@@ -67,12 +69,44 @@ namespace QuanLyCuaHangSachMini.GUI
             dgvTheLoai.Enabled = !đangThaoTac;
         }
 
+        private List<TheLoai> LayDanhSachTheLoai(string tuKhoa = "")
+        {
+            var query = context.TheLoai.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(tuKhoa))
+            {
+                string keyword = tuKhoa.Trim();
+                string pattern = $"%{keyword}%";
+                query = query.Where(x =>
+                    EF.Functions.Like(x.TenTheLoai ?? string.Empty, pattern) ||
+                    EF.Functions.Like(x.MaTheLoai ?? string.Empty, pattern));
+            }
+
+            return query.OrderBy(t => t.MaTheLoai).ToList();
+        }
+
+        private void NapDanhSachTenTheLoai()
+        {
+            var danhSachTen = context.TheLoai
+                .AsNoTracking()
+                .Where(x => !string.IsNullOrWhiteSpace(x.TenTheLoai))
+                .Select(x => x.TenTheLoai.Trim())
+                .Distinct()
+                .OrderBy(x => x)
+                .ToArray();
+
+            cboTenTheLoai.BeginUpdate();
+            cboTenTheLoai.Items.Clear();
+            cboTenTheLoai.Items.AddRange(danhSachTen);
+            cboTenTheLoai.EndUpdate();
+        }
+
         private void LoadData()
         {
             try
             {
                 // Lấy dữ liệu từ Database
-                var list = context.TheLoai.OrderBy(t => t.MaTheLoai).ToList();
+                var list = LayDanhSachTheLoai();
                 bindingSource.DataSource = list;
                 dgvTheLoai.DataSource = bindingSource;
 
@@ -86,10 +120,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 txtMoTa.DataBindings.Clear();
                 txtMoTa.DataBindings.Add("Text", bindingSource, "MoTa", true, DataSourceUpdateMode.Never);
 
-                cboTenTheLoai.BeginUpdate();
-                cboTenTheLoai.Items.Clear();
-                cboTenTheLoai.Items.AddRange(list.Select(x => x.TenTheLoai).Distinct().ToArray());
-                cboTenTheLoai.EndUpdate();
+                NapDanhSachTenTheLoai();
             }
             catch (Exception ex)
             {
@@ -234,11 +265,33 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void btnTimKiem_Click(object sender, EventArgs e)
         {
-            string search = cboTenTheLoai.Text.ToLower().Trim();
-            var result = context.TheLoai
-                .Where(x => x.TenTheLoai.ToLower().Contains(search) || x.MaTheLoai.ToLower().Contains(search))
-                .ToList();
+            if (!btnTimKiem.Enabled)
+                return;
+
+            string search = cboTenTheLoai.Text?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                LoadData();
+                return;
+            }
+
+            var result = LayDanhSachTheLoai(search);
             bindingSource.DataSource = result;
+            dgvTheLoai.DataSource = bindingSource;
+
+            if (result.Count == 0)
+            {
+                MessageBox.Show("Không tìm thấy thể loại phù hợp.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void cboTenTheLoai_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter || !btnTimKiem.Enabled)
+                return;
+
+            e.SuppressKeyPress = true;
+            btnTimKiem.PerformClick();
         }
 
         private void btnXuat_Click(object sender, EventArgs e)

@@ -36,6 +36,7 @@ namespace QuanLyCuaHangSachMini.GUI
         private void TaiDuLieu()
         {
             IQueryable<Data.Entity.PhieuHoanTra> query = context.PhieuHoanTra
+                .AsNoTracking()
                 .Include(r => r.HoaDon)
                     .ThenInclude(r => r.KhachHang)
                 .Include(r => r.NhanVien)
@@ -60,8 +61,8 @@ namespace QuanLyCuaHangSachMini.GUI
                     TongTienHoan = r.PhieuHoanTra_ChiTiet.Sum(ct => (decimal?)ct.SoLuongTra * ct.DonGiaHoanTra) ?? 0,
                     XemChiTiet = "Xem chi tiết"
                 })
-                .OrderByDescending(r => r.NgayHoanTra)
-                .ThenByDescending(r => r.ID)
+                .OrderBy(r => r.NgayHoanTra)
+                .ThenBy(r => r.ID)
                 .ToList();
 
             dgvPhieuHoanTra.DataSource = null;

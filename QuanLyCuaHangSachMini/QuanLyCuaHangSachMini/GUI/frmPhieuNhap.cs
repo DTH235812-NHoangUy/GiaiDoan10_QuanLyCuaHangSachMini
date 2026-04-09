@@ -2,6 +2,7 @@
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.DTOs;
+using QuanLyCuaHangSachMini.Helpers;
 using QuanLyCuaHangSachMini.Reports;
 
 namespace QuanLyCuaHangSachMini.GUI
@@ -43,6 +44,7 @@ namespace QuanLyCuaHangSachMini.GUI
         private void TaiDuLieu()
         {
             List<DanhSachPhieuNhap> ds = context.PhieuNhap
+                .AsNoTracking()
                 .Select(r => new DanhSachPhieuNhap
                 {
                     ID = r.ID,
@@ -118,35 +120,59 @@ namespace QuanLyCuaHangSachMini.GUI
                         .Include(r => r.PhieuNhap_ChiTiet)
                         .FirstOrDefault(r => r.ID == phieuNhapID);
 
-                    if (pn != null)
+                    if (pn == null)
                     {
-                        foreach (var ct in pn.PhieuNhap_ChiTiet.ToList())
-                        {
-                            Sach? s = context.Sach.Find(ct.SachID);
-                            if (s != null)
-                            {
-                                s.SoLuongTon -= ct.SoLuongNhap;
-                                if (s.SoLuongTon < 0)
-                                    s.SoLuongTon = 0;
-
-                                s.TrangThai = s.SoLuongTon > 0 ? "Còn hàng" : "Hết hàng";
-
-                                var chiTietNhapConLai = context.PhieuNhap_ChiTiet
-                                    .Include(x => x.PhieuNhap)
-                                    .Where(x => x.SachID == s.ID && x.PhieuNhapID != pn.ID)
-                                    .OrderByDescending(x => x.PhieuNhap.NgayNhap)
-                                    .ThenByDescending(x => x.ID)
-                                    .FirstOrDefault();
-
-                                s.GiaNhap = chiTietNhapConLai != null ? chiTietNhapConLai.DonGiaNhap : 0;
-                            }
-                        }
-
-                        context.PhieuNhap_ChiTiet.RemoveRange(pn.PhieuNhap_ChiTiet);
-                        context.PhieuNhap.Remove(pn);
-                        context.SaveChanges();
-                        transaction.Commit();
+                        MessageBox.Show("Không tìm thấy phiếu nhập cần xóa.", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        transaction.Rollback();
+                        return;
                     }
+
+                    foreach (var ct in pn.PhieuNhap_ChiTiet)
+                    {
+                        Sach? s = context.Sach.Find(ct.SachID);
+                        if (s != null && s.SoLuongTon < ct.SoLuongNhap)
+                        {
+                            MessageBox.Show(
+                                $"Không thể xóa phiếu nhập {pn.MaPhieuNhap} vì sách \"{s.TenSach}\" chỉ còn {s.SoLuongTon} quyển trong kho.",
+                                "Không thể xóa",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                            transaction.Rollback();
+                            return;
+                        }
+                    }
+
+                    foreach (var ct in pn.PhieuNhap_ChiTiet.ToList())
+                    {
+                        Sach? s = context.Sach.Find(ct.SachID);
+                        if (s != null)
+                        {
+                            s.SoLuongTon -= ct.SoLuongNhap;
+                            s.TrangThai = s.SoLuongTon > 0 ? "Còn hàng" : "Hết hàng";
+
+                            var chiTietNhapConLai = context.PhieuNhap_ChiTiet
+                                .Include(x => x.PhieuNhap)
+                                .Where(x => x.SachID == s.ID && x.PhieuNhapID != pn.ID)
+                                .OrderByDescending(x => x.PhieuNhap.NgayNhap)
+                                .ThenByDescending(x => x.ID)
+                                .FirstOrDefault();
+
+                            s.GiaNhap = chiTietNhapConLai != null ? chiTietNhapConLai.DonGiaNhap : 0;
+                        }
+                    }
+
+                    context.PhieuNhap_ChiTiet.RemoveRange(pn.PhieuNhap_ChiTiet);
+                    context.PhieuNhap.Remove(pn);
+                    context.SaveChanges();
+                    transaction.Commit();
+
+                    NhatKyHelper.GhiLog(
+                        "Xóa",
+                        "PhieuNhap",
+                        pn.ID.ToString(),
+                        "Xóa phiếu nhập: " + pn.MaPhieuNhap
+                    );
 
                     TaiDuLieu();
                 }

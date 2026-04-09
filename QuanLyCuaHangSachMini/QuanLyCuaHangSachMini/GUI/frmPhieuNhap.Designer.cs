@@ -18,23 +18,12 @@
 
         private void InitializeComponent()
         {
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges1 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges2 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges3 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges4 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges5 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges6 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges7 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges8 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges9 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            Guna.UI2.WinForms.Suite.CustomizableEdges customizableEdges10 = new Guna.UI2.WinForms.Suite.CustomizableEdges();
-            grpDanhSachPhieuNhap = new Guna.UI2.WinForms.Guna2GroupBox();
-            dgvPhieuNhap = new Guna.UI2.WinForms.Guna2DataGridView();
+            DataGridViewCellStyle dataGridViewCellStyle13 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle16 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle14 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle15 = new DataGridViewCellStyle();
+            groupBox1 = new GroupBox();
+            dgvPhieuNhap = new DataGridView();
             ID = new DataGridViewTextBoxColumn();
             MaPhieuNhap = new DataGridViewTextBoxColumn();
             TenNhaCungCap = new DataGridViewTextBoxColumn();
@@ -42,94 +31,68 @@
             NgayNhap = new DataGridViewTextBoxColumn();
             TongTienPhieuNhap = new DataGridViewTextBoxColumn();
             XemChiTiet = new DataGridViewLinkColumn();
-            btnLapPhieuNhap = new Guna.UI2.WinForms.Guna2Button();
-            btnInPhieuNhap = new Guna.UI2.WinForms.Guna2Button();
-            btnXoaPhieuNhap = new Guna.UI2.WinForms.Guna2Button();
-            btnThoat = new Guna.UI2.WinForms.Guna2Button();
-            grpDanhSachPhieuNhap.SuspendLayout();
+            btnLapPhieuNhap = new Button();
+            btnInPhieuNhap = new Button();
+            btnXoaPhieuNhap = new Button();
+            btnThoat = new Button();
+            groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvPhieuNhap).BeginInit();
             SuspendLayout();
             // 
-            // grpDanhSachPhieuNhap
+            // groupBox1
             // 
-            grpDanhSachPhieuNhap.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            grpDanhSachPhieuNhap.BorderColor = Color.FromArgb(43, 43, 64);
-            grpDanhSachPhieuNhap.BorderRadius = 8;
-            grpDanhSachPhieuNhap.Controls.Add(dgvPhieuNhap);
-            grpDanhSachPhieuNhap.CustomBorderColor = Color.FromArgb(43, 43, 64);
-            grpDanhSachPhieuNhap.CustomizableEdges = customizableEdges1;
-            grpDanhSachPhieuNhap.FillColor = Color.FromArgb(30, 30, 45);
-            grpDanhSachPhieuNhap.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            grpDanhSachPhieuNhap.ForeColor = Color.White;
-            grpDanhSachPhieuNhap.Location = new Point(12, 12);
-            grpDanhSachPhieuNhap.Name = "grpDanhSachPhieuNhap";
-            grpDanhSachPhieuNhap.Padding = new Padding(5, 45, 5, 5);
-            grpDanhSachPhieuNhap.ShadowDecoration.CustomizableEdges = customizableEdges2;
-            grpDanhSachPhieuNhap.Size = new Size(886, 430);
-            grpDanhSachPhieuNhap.TabIndex = 0;
-            grpDanhSachPhieuNhap.Text = "DANH SÁCH PHIẾU NHẬP";
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.BackColor = Color.White;
+            groupBox1.Controls.Add(dgvPhieuNhap);
+            groupBox1.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            groupBox1.ForeColor = Color.FromArgb(55, 38, 210);
+            groupBox1.Location = new Point(11, 12);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(889, 430);
+            groupBox1.TabIndex = 0;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Danh sách phiếu nhập";
             // 
             // dgvPhieuNhap
             // 
             dgvPhieuNhap.AllowUserToAddRows = false;
             dgvPhieuNhap.AllowUserToDeleteRows = false;
             dgvPhieuNhap.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = Color.FromArgb(26, 26, 39);
-            dataGridViewCellStyle1.ForeColor = Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(63, 66, 84);
-            dataGridViewCellStyle1.SelectionForeColor = Color.White;
-            dgvPhieuNhap.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            dgvPhieuNhap.BackgroundColor = Color.FromArgb(30, 30, 45);
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(54, 153, 255);
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle2.ForeColor = Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(54, 153, 255);
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvPhieuNhap.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            dgvPhieuNhap.ColumnHeadersHeight = 40;
+            dgvPhieuNhap.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvPhieuNhap.BackgroundColor = Color.Gray;
+            dgvPhieuNhap.BorderStyle = BorderStyle.None;
+            dgvPhieuNhap.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dataGridViewCellStyle13.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = Color.FromArgb(55, 38, 210);
+            dataGridViewCellStyle13.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold);
+            dataGridViewCellStyle13.ForeColor = Color.White;
+            dataGridViewCellStyle13.SelectionBackColor = Color.FromArgb(55, 38, 210);
+            dataGridViewCellStyle13.SelectionForeColor = Color.White;
+            dataGridViewCellStyle13.WrapMode = DataGridViewTriState.True;
+            dgvPhieuNhap.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
+            dgvPhieuNhap.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvPhieuNhap.Columns.AddRange(new DataGridViewColumn[] { ID, MaPhieuNhap, TenNhaCungCap, HoVaTenNhanVien, NgayNhap, TongTienPhieuNhap, XemChiTiet });
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = Color.FromArgb(30, 30, 45);
-            dataGridViewCellStyle5.Font = new Font("Segoe UI", 10F);
-            dataGridViewCellStyle5.ForeColor = Color.White;
-            dataGridViewCellStyle5.SelectionBackColor = Color.FromArgb(63, 66, 84);
-            dataGridViewCellStyle5.SelectionForeColor = Color.White;
-            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.False;
-            dgvPhieuNhap.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle16.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = Color.White;
+            dataGridViewCellStyle16.Font = new Font("Segoe UI", 10F);
+            dataGridViewCellStyle16.ForeColor = Color.FromArgb(55, 38, 210);
+            dataGridViewCellStyle16.SelectionBackColor = Color.FromArgb(230, 232, 255);
+            dataGridViewCellStyle16.SelectionForeColor = Color.FromArgb(33, 37, 41);
+            dataGridViewCellStyle16.WrapMode = DataGridViewTriState.False;
+            dgvPhieuNhap.DefaultCellStyle = dataGridViewCellStyle16;
             dgvPhieuNhap.Dock = DockStyle.Fill;
-            dgvPhieuNhap.GridColor = Color.FromArgb(43, 43, 64);
-            dgvPhieuNhap.Location = new Point(5, 85);
+            dgvPhieuNhap.EnableHeadersVisualStyles = false;
+            dgvPhieuNhap.GridColor = Color.FromArgb(226, 232, 240);
+            dgvPhieuNhap.Location = new Point(3, 26);
             dgvPhieuNhap.MultiSelect = false;
             dgvPhieuNhap.Name = "dgvPhieuNhap";
             dgvPhieuNhap.ReadOnly = true;
             dgvPhieuNhap.RowHeadersVisible = false;
             dgvPhieuNhap.RowHeadersWidth = 51;
-            dgvPhieuNhap.RowTemplate.Height = 40;
-            dgvPhieuNhap.Size = new Size(876, 340);
+            dgvPhieuNhap.RowTemplate.Height = 32;
+            dgvPhieuNhap.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvPhieuNhap.Size = new Size(883, 401);
             dgvPhieuNhap.TabIndex = 0;
-            dgvPhieuNhap.ThemeStyle.AlternatingRowsStyle.BackColor = Color.White;
-            dgvPhieuNhap.ThemeStyle.AlternatingRowsStyle.Font = null;
-            dgvPhieuNhap.ThemeStyle.AlternatingRowsStyle.ForeColor = Color.Empty;
-            dgvPhieuNhap.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = Color.Empty;
-            dgvPhieuNhap.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = Color.Empty;
-            dgvPhieuNhap.ThemeStyle.BackColor = Color.FromArgb(30, 30, 45);
-            dgvPhieuNhap.ThemeStyle.GridColor = Color.FromArgb(43, 43, 64);
-            dgvPhieuNhap.ThemeStyle.HeaderStyle.BackColor = Color.FromArgb(54, 153, 255);
-            dgvPhieuNhap.ThemeStyle.HeaderStyle.BorderStyle = DataGridViewHeaderBorderStyle.None;
-            dgvPhieuNhap.ThemeStyle.HeaderStyle.Font = new Font("Segoe UI", 9F);
-            dgvPhieuNhap.ThemeStyle.HeaderStyle.ForeColor = Color.White;
-            dgvPhieuNhap.ThemeStyle.HeaderStyle.HeaightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dgvPhieuNhap.ThemeStyle.HeaderStyle.Height = 40;
-            dgvPhieuNhap.ThemeStyle.ReadOnly = true;
-            dgvPhieuNhap.ThemeStyle.RowsStyle.BackColor = Color.FromArgb(30, 30, 45);
-            dgvPhieuNhap.ThemeStyle.RowsStyle.BorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgvPhieuNhap.ThemeStyle.RowsStyle.Font = new Font("Segoe UI", 9F);
-            dgvPhieuNhap.ThemeStyle.RowsStyle.ForeColor = Color.White;
-            dgvPhieuNhap.ThemeStyle.RowsStyle.Height = 40;
-            dgvPhieuNhap.ThemeStyle.RowsStyle.SelectionBackColor = Color.FromArgb(63, 66, 84);
-            dgvPhieuNhap.ThemeStyle.RowsStyle.SelectionForeColor = Color.FromArgb(71, 69, 94);
             dgvPhieuNhap.CellClick += dgvPhieuNhap_CellClick;
             dgvPhieuNhap.CellContentClick += dgvPhieuNhap_CellContentClick;
             dgvPhieuNhap.DataError += dgvPhieuNhap_DataError;
@@ -142,7 +105,6 @@
             ID.MinimumWidth = 6;
             ID.Name = "ID";
             ID.ReadOnly = true;
-            ID.Visible = false;
             // 
             // MaPhieuNhap
             // 
@@ -171,9 +133,9 @@
             // NgayNhap
             // 
             NgayNhap.DataPropertyName = "NgayNhap";
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.Format = "dd/MM/yyyy";
-            NgayNhap.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle14.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle14.Format = "dd/MM/yyyy";
+            NgayNhap.DefaultCellStyle = dataGridViewCellStyle14;
             NgayNhap.HeaderText = "Ngày nhập";
             NgayNhap.MinimumWidth = 6;
             NgayNhap.Name = "NgayNhap";
@@ -182,11 +144,11 @@
             // TongTienPhieuNhap
             // 
             TongTienPhieuNhap.DataPropertyName = "TongTienPhieuNhap";
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            dataGridViewCellStyle4.ForeColor = Color.FromArgb(54, 153, 255);
-            dataGridViewCellStyle4.Format = "N0";
-            TongTienPhieuNhap.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle15.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle15.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            dataGridViewCellStyle15.ForeColor = Color.Blue;
+            dataGridViewCellStyle15.Format = "N0";
+            TongTienPhieuNhap.DefaultCellStyle = dataGridViewCellStyle15;
             TongTienPhieuNhap.HeaderText = "Tổng tiền";
             TongTienPhieuNhap.MinimumWidth = 6;
             TongTienPhieuNhap.Name = "TongTienPhieuNhap";
@@ -205,96 +167,110 @@
             // 
             // btnLapPhieuNhap
             // 
-            btnLapPhieuNhap.Animated = true;
-            btnLapPhieuNhap.BorderRadius = 5;
-            btnLapPhieuNhap.CustomizableEdges = customizableEdges3;
-            btnLapPhieuNhap.FillColor = Color.FromArgb(16, 185, 129);
-            btnLapPhieuNhap.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnLapPhieuNhap.Anchor = AnchorStyles.Bottom;
+            btnLapPhieuNhap.BackColor = Color.Red;
+            btnLapPhieuNhap.Cursor = Cursors.Hand;
+            btnLapPhieuNhap.FlatAppearance.BorderSize = 0;
+            btnLapPhieuNhap.FlatAppearance.MouseDownBackColor = Color.FromArgb(52, 35, 200);
+            btnLapPhieuNhap.FlatAppearance.MouseOverBackColor = Color.FromArgb(100, 82, 255);
+            btnLapPhieuNhap.FlatStyle = FlatStyle.Flat;
+            btnLapPhieuNhap.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnLapPhieuNhap.ForeColor = Color.White;
-            btnLapPhieuNhap.Location = new Point(166, 460);
+            btnLapPhieuNhap.Location = new Point(121, 458);
             btnLapPhieuNhap.Name = "btnLapPhieuNhap";
-            btnLapPhieuNhap.ShadowDecoration.CustomizableEdges = customizableEdges4;
-            btnLapPhieuNhap.Size = new Size(165, 40);
+            btnLapPhieuNhap.Size = new Size(165, 35);
             btnLapPhieuNhap.TabIndex = 1;
-            btnLapPhieuNhap.Text = "Lập phiếu nhập";
+            btnLapPhieuNhap.Text = "Lập phiếu nhập...";
+            btnLapPhieuNhap.UseVisualStyleBackColor = false;
             btnLapPhieuNhap.Click += btnLapPhieuNhap_Click;
             // 
             // btnInPhieuNhap
             // 
-            btnInPhieuNhap.Animated = true;
-            btnInPhieuNhap.BorderRadius = 5;
-            btnInPhieuNhap.CustomizableEdges = customizableEdges5;
-            btnInPhieuNhap.FillColor = Color.FromArgb(27, 197, 189);
-            btnInPhieuNhap.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnInPhieuNhap.ForeColor = Color.White;
-            btnInPhieuNhap.Location = new Point(348, 460);
+            btnInPhieuNhap.Anchor = AnchorStyles.Bottom;
+            btnInPhieuNhap.BackColor = Color.Yellow;
+            btnInPhieuNhap.Cursor = Cursors.Hand;
+            btnInPhieuNhap.FlatAppearance.BorderSize = 0;
+            btnInPhieuNhap.FlatAppearance.MouseDownBackColor = Color.FromArgb(52, 35, 200);
+            btnInPhieuNhap.FlatAppearance.MouseOverBackColor = Color.FromArgb(100, 82, 255);
+            btnInPhieuNhap.FlatStyle = FlatStyle.Flat;
+            btnInPhieuNhap.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnInPhieuNhap.ForeColor = Color.Black;
+            btnInPhieuNhap.Location = new Point(292, 458);
             btnInPhieuNhap.Name = "btnInPhieuNhap";
-            btnInPhieuNhap.ShadowDecoration.CustomizableEdges = customizableEdges6;
-            btnInPhieuNhap.Size = new Size(140, 40);
+            btnInPhieuNhap.Size = new Size(140, 35);
             btnInPhieuNhap.TabIndex = 2;
-            btnInPhieuNhap.Text = "In phiếu nhập";
+            btnInPhieuNhap.Text = "In phiếu nhập...";
+            btnInPhieuNhap.UseVisualStyleBackColor = false;
             btnInPhieuNhap.Click += btnInPhieuNhap_Click;
             // 
             // btnXoaPhieuNhap
             // 
-            btnXoaPhieuNhap.Animated = true;
-            btnXoaPhieuNhap.BorderRadius = 5;
-            btnXoaPhieuNhap.CustomizableEdges = customizableEdges7;
-            btnXoaPhieuNhap.FillColor = Color.FromArgb(246, 78, 96);
-            btnXoaPhieuNhap.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnXoaPhieuNhap.Anchor = AnchorStyles.Bottom;
+            btnXoaPhieuNhap.BackColor = Color.Red;
+            btnXoaPhieuNhap.Cursor = Cursors.Hand;
+            btnXoaPhieuNhap.FlatAppearance.BorderSize = 0;
+            btnXoaPhieuNhap.FlatAppearance.MouseDownBackColor = Color.FromArgb(160, 25, 40);
+            btnXoaPhieuNhap.FlatAppearance.MouseOverBackColor = Color.FromArgb(200, 35, 51);
+            btnXoaPhieuNhap.FlatStyle = FlatStyle.Flat;
+            btnXoaPhieuNhap.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btnXoaPhieuNhap.ForeColor = Color.White;
-            btnXoaPhieuNhap.Location = new Point(506, 458);
+            btnXoaPhieuNhap.Location = new Point(448, 458);
             btnXoaPhieuNhap.Name = "btnXoaPhieuNhap";
-            btnXoaPhieuNhap.ShadowDecoration.CustomizableEdges = customizableEdges8;
-            btnXoaPhieuNhap.Size = new Size(90, 40);
+            btnXoaPhieuNhap.Size = new Size(80, 35);
             btnXoaPhieuNhap.TabIndex = 3;
             btnXoaPhieuNhap.Text = "Xóa";
+            btnXoaPhieuNhap.UseVisualStyleBackColor = false;
             btnXoaPhieuNhap.Click += btnXoaPhieuNhap_Click;
             // 
             // btnThoat
             // 
-            btnThoat.Animated = true;
-            btnThoat.BorderRadius = 5;
-            btnThoat.CustomizableEdges = customizableEdges9;
-            btnThoat.FillColor = Color.FromArgb(63, 66, 84);
-            btnThoat.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnThoat.ForeColor = Color.White;
-            btnThoat.Location = new Point(612, 458);
+            btnThoat.Anchor = AnchorStyles.Bottom;
+            btnThoat.BackColor = Color.White;
+            btnThoat.Cursor = Cursors.Hand;
+            btnThoat.FlatAppearance.BorderColor = Color.FromArgb(71, 51, 255);
+            btnThoat.FlatAppearance.MouseDownBackColor = Color.FromArgb(230, 232, 255);
+            btnThoat.FlatAppearance.MouseOverBackColor = Color.FromArgb(242, 244, 255);
+            btnThoat.FlatStyle = FlatStyle.Flat;
+            btnThoat.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnThoat.ForeColor = Color.FromArgb(71, 51, 255);
+            btnThoat.Location = new Point(551, 458);
             btnThoat.Name = "btnThoat";
-            btnThoat.ShadowDecoration.CustomizableEdges = customizableEdges10;
-            btnThoat.Size = new Size(90, 40);
+            btnThoat.Size = new Size(80, 35);
             btnThoat.TabIndex = 4;
-            btnThoat.Text = "Đóng";
+            btnThoat.Text = "Thoát";
+            btnThoat.UseVisualStyleBackColor = false;
             btnThoat.Click += btnThoat_Click;
             // 
             // frmPhieuNhap
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(9F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(26, 26, 39);
+            BackColor = Color.FromArgb(241, 245, 249);
             ClientSize = new Size(910, 512);
             Controls.Add(btnThoat);
             Controls.Add(btnXoaPhieuNhap);
             Controls.Add(btnInPhieuNhap);
             Controls.Add(btnLapPhieuNhap);
-            Controls.Add(grpDanhSachPhieuNhap);
-            FormBorderStyle = FormBorderStyle.None;
+            Controls.Add(groupBox1);
+            Font = new Font("Segoe UI", 10F);
+            MinimumSize = new Size(926, 551);
             Name = "frmPhieuNhap";
-            Text = "Phiếu Nhập";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Phiếu nhập";
             Load += frmPhieuNhap_Load;
-            grpDanhSachPhieuNhap.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvPhieuNhap).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private Guna.UI2.WinForms.Guna2GroupBox grpDanhSachPhieuNhap;
-        private Guna.UI2.WinForms.Guna2DataGridView dgvPhieuNhap;
-        private Guna.UI2.WinForms.Guna2Button btnLapPhieuNhap;
-        private Guna.UI2.WinForms.Guna2Button btnInPhieuNhap;
-        private Guna.UI2.WinForms.Guna2Button btnXoaPhieuNhap;
-        private Guna.UI2.WinForms.Guna2Button btnThoat;
+        private GroupBox groupBox1;
+        private DataGridView dgvPhieuNhap;
+        private Button btnLapPhieuNhap;
+        private Button btnInPhieuNhap;
+        private Button btnXoaPhieuNhap;
+        private Button btnThoat;
         private DataGridViewTextBoxColumn ID;
         private DataGridViewTextBoxColumn MaPhieuNhap;
         private DataGridViewTextBoxColumn TenNhaCungCap;

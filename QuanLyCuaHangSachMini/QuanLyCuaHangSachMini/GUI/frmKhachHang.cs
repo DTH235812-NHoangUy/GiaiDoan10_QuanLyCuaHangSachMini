@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.EntityFrameworkCore;
 using QuanLyCuaHangSachMini.Data;
 using QuanLyCuaHangSachMini.Data.Entity;
 using QuanLyCuaHangSachMini.Helpers;
@@ -19,6 +20,12 @@ namespace QuanLyCuaHangSachMini.GUI
             InitializeComponent();
             quyenHanNguoiDung = quyenHan ?? "";
             txtDienThoai.KeyPress += txtDienThoai_KeyPress;
+            dgvKhachHang.DataBindingComplete += dgvKhachHang_DataBindingComplete;
+        }
+
+        private void dgvKhachHang_DataBindingComplete(object? sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            CapNhatCotPhanLoaiKhach();
         }
 
         private bool LaAdmin()
@@ -183,6 +190,7 @@ namespace QuanLyCuaHangSachMini.GUI
             txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
 
             dgvKhachHang.DataSource = bindingSource;
+            CapNhatCotPhanLoaiKhach();
 
             cboHoVaTen.Items.Clear();
             List<string> dsHoVaTen = context.KhachHang
@@ -227,6 +235,44 @@ namespace QuanLyCuaHangSachMini.GUI
             }
 
             ApDungQuyen();
+        }
+
+        private void CapNhatCotPhanLoaiKhach()
+        {
+            if (dgvKhachHang.Columns["LoaiKhach"] == null)
+                return;
+
+            Dictionary<int, int> soLanMuaTheoKhach = context.HoaDon
+                .AsNoTracking()
+                .GroupBy(r => r.KhachHangID)
+                .Select(g => new { KhachHangID = g.Key, SoLan = g.Count() })
+                .ToDictionary(x => x.KhachHangID, x => x.SoLan);
+
+            foreach (DataGridViewRow row in dgvKhachHang.Rows)
+            {
+                if (row.IsNewRow)
+                    continue;
+
+                int khachHangId = 0;
+                if (row.DataBoundItem is KhachHang khach)
+                {
+                    khachHangId = khach.ID;
+                }
+                else if (row.Cells["ID"].Value != null)
+                {
+                    khachHangId = Convert.ToInt32(row.Cells["ID"].Value);
+                }
+
+                if (khachHangId <= 0)
+                    continue;
+
+                int soLanMua = soLanMuaTheoKhach.TryGetValue(khachHangId, out int soLan) ? soLan : 0;
+
+                string phanLoai = soLanMua >= 2 ? "Khách quen" : "Khách mới";
+                row.Cells["LoaiKhach"].Value = phanLoai;
+                row.Cells["LoaiKhach"].Style.ForeColor = soLanMua >= 2 ? Color.FromArgb(22, 163, 74) : Color.FromArgb(71, 85, 105);
+                row.Cells["LoaiKhach"].Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            }
         }
 
         private void btnThem_Click(object sender, EventArgs e)
@@ -480,6 +526,7 @@ namespace QuanLyCuaHangSachMini.GUI
                 txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
 
                 dgvKhachHang.DataSource = bindingSource;
+                CapNhatCotPhanLoaiKhach();
 
                 if (dgvKhachHang.Rows.Count > 0 && dgvKhachHang.CurrentRow != null)
                 {

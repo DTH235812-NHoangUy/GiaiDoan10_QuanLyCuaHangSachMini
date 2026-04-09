@@ -23,15 +23,36 @@ namespace QuanLyCuaHangSachMini.GUI
 
             dtpTuNgay.Value = DateTime.Today.AddDays(-7);
             dtpDenNgay.Value = DateTime.Today;
-            HienThiDuLieu();
+            HienThiDuLieu(dtpTuNgay.Value.Date, dtpDenNgay.Value.Date);
         }
 
-        private void HienThiDuLieu()
+        private void HienThiDuLieu(DateTime? tuNgay = null, DateTime? denNgay = null, string tuKhoa = "")
         {
             using AppDbContext context = new AppDbContext();
 
-            var ds = context.NhatKyHeThong
-                .AsNoTracking()
+            var query = context.NhatKyHeThong.AsNoTracking();
+
+            if (tuNgay.HasValue && denNgay.HasValue)
+            {
+                DateTime tu = tuNgay.Value.Date;
+                DateTime den = denNgay.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(r => r.ThoiGian >= tu && r.ThoiGian <= den);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tuKhoa))
+            {
+                string mauTim = "%" + tuKhoa.Trim() + "%";
+                query = query.Where(r =>
+                    EF.Functions.Like(r.HanhDong, mauTim) ||
+                    EF.Functions.Like(r.BangDuLieu, mauTim) ||
+                    EF.Functions.Like(r.KhoaChinh ?? "", mauTim) ||
+                    EF.Functions.Like(r.MoTa ?? "", mauTim) ||
+                    EF.Functions.Like(r.TenDangNhap ?? "", mauTim) ||
+                    EF.Functions.Like(r.HoVaTen ?? "", mauTim) ||
+                    EF.Functions.Like(r.VaiTro ?? "", mauTim));
+            }
+
+            var ds = query
                 .OrderByDescending(r => r.ThoiGian)
                 .Select(r => new
                 {
@@ -79,44 +100,8 @@ namespace QuanLyCuaHangSachMini.GUI
         {
             DateTime tuNgay = dtpTuNgay.Value.Date;
             DateTime denNgay = dtpDenNgay.Value.Date.AddDays(1).AddTicks(-1);
-            string tuKhoa = txtTuKhoa.Text.Trim().ToLower();
-
-            using AppDbContext context = new AppDbContext();
-
-            var query = context.NhatKyHeThong
-                .AsNoTracking()
-                .Where(r => r.ThoiGian >= tuNgay && r.ThoiGian <= denNgay);
-
-            if (!string.IsNullOrWhiteSpace(tuKhoa))
-            {
-                query = query.Where(r =>
-                    (r.HanhDong ?? "").ToLower().Contains(tuKhoa) ||
-                    (r.BangDuLieu ?? "").ToLower().Contains(tuKhoa) ||
-                    (r.KhoaChinh ?? "").ToLower().Contains(tuKhoa) ||
-                    (r.MoTa ?? "").ToLower().Contains(tuKhoa) ||
-                    (r.TenDangNhap ?? "").ToLower().Contains(tuKhoa) ||
-                    (r.HoVaTen ?? "").ToLower().Contains(tuKhoa) ||
-                    (r.VaiTro ?? "").ToLower().Contains(tuKhoa));
-            }
-
-            var ds = query
-                .OrderByDescending(r => r.ThoiGian)
-                .Select(r => new
-                {
-                    r.ID,
-                    r.ThoiGian,
-                    r.HanhDong,
-                    r.BangDuLieu,
-                    r.KhoaChinh,
-                    r.MoTa,
-                    r.TenDangNhap,
-                    r.HoVaTen,
-                    r.VaiTro
-                })
-                .ToList();
-
-            dgvNhatKy.DataSource = ds;
-            DinhDangLuoi();
+            string tuKhoa = txtTuKhoa.Text.Trim();
+            HienThiDuLieu(tuNgay, denNgay, tuKhoa);
         }
 
         private void btnTaiLai_Click(object sender, EventArgs e)
@@ -124,7 +109,7 @@ namespace QuanLyCuaHangSachMini.GUI
             txtTuKhoa.Clear();
             dtpTuNgay.Value = DateTime.Today.AddDays(-7);
             dtpDenNgay.Value = DateTime.Today;
-            HienThiDuLieu();
+            HienThiDuLieu(dtpTuNgay.Value.Date, dtpDenNgay.Value.Date);
         }
 
         private void btnDong_Click(object sender, EventArgs e)

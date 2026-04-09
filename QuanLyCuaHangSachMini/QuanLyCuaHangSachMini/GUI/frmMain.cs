@@ -1,7 +1,6 @@
 ﻿using QuanLyCuaHangSachMini.Helpers;
-using System.Diagnostics;
-using System.Windows.Forms;
 using System;
+using System.Windows.Forms;
 
 namespace QuanLyCuaHangSachMini.GUI
 {
@@ -16,13 +15,16 @@ namespace QuanLyCuaHangSachMini.GUI
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-         
-            lblTrangThai.Text = $"Xin chào: {SessionHelper.HoVaTen} - Quyền: {SessionHelper.QuyenHan}";
+            lblNguoiDung.Text = $"Người dùng: {SessionHelper.HoVaTen}";
+            lblVaiTro.Text = $"Vai trò: {SessionHelper.QuyenHan}";
+
 
             if (SessionHelper.LaQuanTri)
                 QuyenAdmin();
             else
                 QuyenNhanVien();
+
+            OpenChildForm(new frmTrangChu(SessionHelper.LaQuanTri));
         }
 
         private void OpenChildForm(Form childForm)
@@ -38,8 +40,6 @@ namespace QuanLyCuaHangSachMini.GUI
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
 
-            //ThemeManager.Apply(childForm);
-
             pnContainer.Controls.Add(childForm);
             pnContainer.Tag = childForm;
             childForm.BringToFront();
@@ -48,122 +48,121 @@ namespace QuanLyCuaHangSachMini.GUI
 
         public void QuyenAdmin()
         {
-            mnuLoaiSach.Visible = true;
-            mnuNhaXuatBan.Visible = true;
-            mnuNhaCungCap.Visible = true;
-            mnuSach.Visible = true;
-            mnuKhachHang.Visible = true;
-            mnuNhanVien.Visible = true;
-            mnuPhieuNhap.Visible = true;
-            mnuPhieuHoanTra.Visible = true;
-            mnuHoaDon.Visible = true;
-            mnuThongKeSach.Visible = true;
-            mnuThongKeDoanhThu.Visible = true;
-            mnuNhatKyHeThong.Visible = true;
-            if (Controls.Find("mnuCaiDatGiaoDien", true).Length > 0)
-                Controls.Find("mnuCaiDatGiaoDien", true)[0].Visible = true;
+            btnTrangChu.Visible = true;
+            btnLoaiSach.Visible = true;
+            btnNhaXuatBan.Visible = true;
+            btnNhaCungCap.Visible = true;
+            btnSach.Visible = true;
+            btnKhachHang.Visible = true;
+            btnNhanVien.Visible = true;
+            btnPhieuNhap.Visible = true;
+            btnPhieuHoanTra.Visible = true;
+            btnBanSachHoaDon.Visible = true;
+            btnThongKeSach.Visible = true;
+            btnThongKeDoanhThu.Visible = true;
+            btnNhatKyHeThong.Visible = true;
+            btnDangXuat.Visible = true;
         }
 
         public void QuyenNhanVien()
         {
-            mnuLoaiSach.Visible = false;
-            mnuNhaXuatBan.Visible = false;
-            mnuNhaCungCap.Visible = false;
-            mnuSach.Visible = false;
-            mnuNhanVien.Visible = false;
-            mnuPhieuNhap.Visible = false;
-            mnuPhieuHoanTra.Visible = true;
-            mnuThongKeSach.Visible = false;
-            mnuThongKeDoanhThu.Visible = false;
-            mnuNhatKyHeThong.Visible = false;
+            btnTrangChu.Visible = true;
+            btnLoaiSach.Visible = false;
+            btnNhaXuatBan.Visible = false;
+            btnNhaCungCap.Visible = false;
+            btnSach.Visible = false;
+            btnNhanVien.Visible = false;
+            btnPhieuNhap.Visible = false;
+            btnPhieuHoanTra.Visible = true;
+            btnThongKeSach.Visible = false;
+            btnThongKeDoanhThu.Visible = false;
+            btnNhatKyHeThong.Visible = false;
 
-            mnuKhachHang.Visible = true;
-            mnuHoaDon.Visible = true;
-
-            if (Controls.Find("mnuCaiDatGiaoDien", true).Length > 0)
-                Controls.Find("mnuCaiDatGiaoDien", true)[0].Visible = true;
+            btnKhachHang.Visible = true;
+            btnBanSachHoaDon.Visible = true;
+            btnDangXuat.Visible = true;
         }
 
-        private void mnuDangXuat_Click(object sender, EventArgs e)
+        private void btnLoaiSach_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Bạn có chắc muốn đăng xuất không?", "Đăng xuất",
+            OpenChildForm(new frmTheLoai());
+        }
+
+        private void btnTrangChu_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmTrangChu(SessionHelper.LaQuanTri));
+        }
+
+        private void btnNhaXuatBan_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmNhaXuatBan());
+        }
+
+        private void btnNhaCungCap_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmNhaCungCap());
+        }
+
+        private void btnSach_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmSach());
+        }
+
+        private void btnKhachHang_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmKhachHang(SessionHelper.QuyenHan));
+        }
+
+        private void btnNhanVien_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmNhanVien());
+        }
+
+        private void btnPhieuNhap_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmPhieuNhap(SessionHelper.NhanVienID, SessionHelper.QuyenHan));
+        }
+
+        private void btnPhieuHoanTra_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmPhieuHoanTra(SessionHelper.NhanVienID, SessionHelper.QuyenHan));
+        }
+
+        private void btnHoaDon_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmHoaDon(SessionHelper.NhanVienID, SessionHelper.QuyenHan, SessionHelper.HoVaTen));
+        }
+
+        private void btnThongKeSach_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmThongKeSach());
+        }
+
+        private void btnThongKeDoanhThu_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmThongKeDoanhThu());
+        }
+
+        private void btnNhatKyHeThong_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmNhatKyHeThong());
+        }
+
+        private void btnDangXuat_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Bạn có chắc muốn đăng xuất không?", "Ðăng xuất",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                NhatKyHelper.GhiLog("Đăng xuất", "Hệ thống", SessionHelper.NhanVienID.ToString(), "Đăng xuất");
+                NhatKyHelper.GhiLog("Ðăng xuất", "Hệ thống", SessionHelper.NhanVienID.ToString(), "Ðang xuất");
                 SessionHelper.DangXuat();
                 Application.Restart();
             }
         }
 
-        private void mnuLoaiSach_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmTheLoai());
-        }
 
-        private void mnuNhaXuatBan_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmNhaXuatBan());
-        }
 
-        private void mnuNhaCungCap_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmNhaCungCap());
-        }
-
-        private void mnuSach_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmSach());
-        }
-
-        private void mnuKhachHang_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmKhachHang(SessionHelper.QuyenHan));
-        }
-
-        private void mnuNhanVien_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmNhanVien());
-        }
-
-        private void mnuPhieuNhap_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmPhieuNhap(SessionHelper.NhanVienID, SessionHelper.QuyenHan));
-        }
-
-        private void mnuPhieuHoanTra_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmPhieuHoanTra(SessionHelper.NhanVienID, SessionHelper.QuyenHan));
-        }
-
-        private void mnuHoaDon_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmHoaDon(SessionHelper.NhanVienID, SessionHelper.QuyenHan, SessionHelper.HoVaTen));
-        }
-
-        private void mnuThongKeSach_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmThongKeSach());
-        }
-
-        private void mnuThongKeDoanhThu_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmThongKeDoanhThu());
-        }
-
-        private void mnuNhatKyHeThong_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new frmNhatKyHeThong());
-        }
-
-    
-
-        private void lblLienKet_Click(object sender, EventArgs e)
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "https://fit.agu.edu.vn",
-                UseShellExecute = true
-            });
-        }
     }
 }
+
+
+
