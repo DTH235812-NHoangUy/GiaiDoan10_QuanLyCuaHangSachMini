@@ -459,7 +459,7 @@
                                 <TextRun>
                                   <Value>=Fields!DonGiaNhap.Value</Value>
                                   <Style>
-                                    <Format>0</Format>
+                                    <Format>#,0</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -521,7 +521,7 @@
                                 <TextRun>
                                   <Value>=Fields!ThanhTien.Value</Value>
                                   <Style>
-                                    <Format>0</Format>
+                                    <Format>#,0</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -593,7 +593,7 @@
                                 <TextRun>
                                   <Value>=Sum(Fields!ThanhTien.Value)</Value>
                                   <Style>
-                                    <Format>0</Format>
+                                    <Format>#,0</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>

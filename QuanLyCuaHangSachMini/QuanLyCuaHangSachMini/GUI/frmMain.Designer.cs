@@ -97,6 +97,26 @@ namespace QuanLyCuaHangSachMini.GUI
             pnlMenuButtons.Controls.Add(btnThongKeSach);
             pnlMenuButtons.Controls.Add(btnThongKeDoanhThu);
             pnlMenuButtons.Controls.Add(btnNhatKyHeThong);
+            // Thêm nút đổi mật khẩu (chỉ admin thấy ở runtime)
+            btnDoiMatKhau = new Button();
+            btnDoiMatKhau.BackColor = Color.FromArgb(71, 51, 255);
+            btnDoiMatKhau.FlatAppearance.BorderSize = 0;
+            btnDoiMatKhau.FlatAppearance.MouseDownBackColor = Color.FromArgb(52, 35, 200);
+            btnDoiMatKhau.FlatAppearance.MouseOverBackColor = Color.FromArgb(100, 82, 255);
+            btnDoiMatKhau.FlatStyle = FlatStyle.Flat;
+            btnDoiMatKhau.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnDoiMatKhau.ForeColor = Color.White;
+            btnDoiMatKhau.Location = new Point(8, 720);
+            btnDoiMatKhau.Margin = new Padding(0, 0, 0, 8);
+            btnDoiMatKhau.Name = "btnDoiMatKhau";
+            btnDoiMatKhau.Padding = new Padding(12, 0, 0, 0);
+            btnDoiMatKhau.Size = new Size(184, 48);
+            btnDoiMatKhau.TabIndex = 13;
+            btnDoiMatKhau.Text = "Đổi mật khẩu";
+            btnDoiMatKhau.TextAlign = ContentAlignment.MiddleLeft;
+            btnDoiMatKhau.UseVisualStyleBackColor = false;
+            btnDoiMatKhau.Click += btnDoiMatKhau_Click;
+            pnlMenuButtons.Controls.Add(btnDoiMatKhau);
             pnlMenuButtons.Dock = DockStyle.Fill;
             pnlMenuButtons.FlowDirection = FlowDirection.TopDown;
             pnlMenuButtons.Location = new Point(0, 120);
@@ -481,6 +501,7 @@ namespace QuanLyCuaHangSachMini.GUI
         private Panel panelMenu;
         private Button btnDangXuat;
         private FlowLayoutPanel pnlMenuButtons;
+        private Button btnDoiMatKhau;
         private Button btnTrangChu;
         private Button btnLoaiSach;
         private Button btnNhaXuatBan;

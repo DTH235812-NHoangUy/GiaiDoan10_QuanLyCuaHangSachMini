@@ -94,11 +94,18 @@ namespace QuanLyCuaHangSachMini.GUI
             cboNhanVien.DisplayMember = "HoVaTen";
             cboNhanVien.Enabled = false;
 
+            // Hiện thị danh sách sách theo mã sách (sắp xếp theo phần số của mã) và hiển thị dạng "Mã - Tên"
             cboTenSach.DataSource = context.Sach
-                .OrderBy(r => r.TenSach)
+                .AsEnumerable()
+                .OrderBy(r =>
+                {
+                    var digits = new string((r.MaSach ?? "").Where(char.IsDigit).ToArray());
+                    return int.TryParse(digits, out int n) ? n : int.MaxValue;
+                })
+                .Select(r => new { r.ID, TenHienThi = (r.MaSach ?? "") + " - " + (r.TenSach ?? "") })
                 .ToList();
             cboTenSach.ValueMember = "ID";
-            cboTenSach.DisplayMember = "TenSach";
+            cboTenSach.DisplayMember = "TenHienThi";
 
             if (idPhieuNhap == 0)
             {

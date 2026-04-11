@@ -755,7 +755,7 @@
                                 <TextRun>
                                   <Value>=Fields!GiaNhap.Value</Value>
                                   <Style>
-                                    <Format>0</Format>
+                                    <Format>#,0</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -787,7 +787,7 @@
                                 <TextRun>
                                   <Value>=Fields!GiaBan.Value</Value>
                                   <Style>
-                                    <Format>0</Format>
+                                    <Format>#,0</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>

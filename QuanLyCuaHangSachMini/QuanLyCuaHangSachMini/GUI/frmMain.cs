@@ -62,6 +62,7 @@ namespace QuanLyCuaHangSachMini.GUI
             btnThongKeDoanhThu.Visible = true;
             btnNhatKyHeThong.Visible = true;
             btnDangXuat.Visible = true;
+            btnDoiMatKhau.Visible = true;
         }
 
         public void QuyenNhanVien()
@@ -77,6 +78,9 @@ namespace QuanLyCuaHangSachMini.GUI
             btnThongKeSach.Visible = false;
             btnThongKeDoanhThu.Visible = false;
             btnNhatKyHeThong.Visible = false;
+
+            // Ẩn chức năng đổi mật khẩu nếu là nhân viên thường
+            btnDoiMatKhau.Visible = false;
 
             btnKhachHang.Visible = true;
             btnBanSachHoaDon.Visible = true;
@@ -146,6 +150,18 @@ namespace QuanLyCuaHangSachMini.GUI
         private void btnNhatKyHeThong_Click(object sender, EventArgs e)
         {
             OpenChildForm(new frmNhatKyHeThong());
+        }
+
+        private void btnDoiMatKhau_Click(object sender, EventArgs e)
+        {
+            if (!SessionHelper.LaQuanTri)
+            {
+                MessageBox.Show("Chỉ quản trị viên mới có quyền đổi mật khẩu.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var f = new frmDoiMatKhau();
+            f.ShowDialog(this);
         }
 
         private void btnDangXuat_Click(object sender, EventArgs e)
