@@ -108,6 +108,8 @@
             btnTimKhachTheoSdt.TabIndex = 8;
             btnTimKhachTheoSdt.Text = "Tìm kiếm sđt";
             btnTimKhachTheoSdt.UseVisualStyleBackColor = false;
+            btnTimKhachTheoSdt.Visible = false;
+            btnTimKhachTheoSdt.TabStop = false;
             btnTimKhachTheoSdt.Click += btnTimKhachTheoSdt_Click;
             // 
             // txtSdtTraCuu
@@ -117,7 +119,7 @@
             txtSdtTraCuu.Location = new Point(503, 78);
             txtSdtTraCuu.MaxLength = 10;
             txtSdtTraCuu.Name = "txtSdtTraCuu";
-            txtSdtTraCuu.Size = new Size(209, 30);
+            txtSdtTraCuu.Size = new Size(325, 30);
             txtSdtTraCuu.TabIndex = 7;
             // 
             // lblSdtTraCuu
@@ -542,3 +544,4 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ThanhTien;
     }
 }
+

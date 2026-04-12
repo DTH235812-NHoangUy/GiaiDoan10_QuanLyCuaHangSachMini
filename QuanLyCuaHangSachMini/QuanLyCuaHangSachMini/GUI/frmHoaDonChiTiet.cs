@@ -25,6 +25,7 @@ namespace QuanLyCuaHangSachMini.GUI
             quyenHanNguoiDung = quyenHan ?? "";
             txtSdtTraCuu.KeyPress += txtSdtTraCuu_KeyPress;
             txtSdtTraCuu.KeyDown += txtSdtTraCuu_KeyDown;
+            txtSdtTraCuu.TextChanged += txtSdtTraCuu_TextChanged;
         }
 
         public void LayNhanVienVaoComboBox()
@@ -175,7 +176,6 @@ namespace QuanLyCuaHangSachMini.GUI
             if (kh != null)
                 txtSdtTraCuu.Text = kh.DienThoai ?? string.Empty;
         }
-
         private void TimKhachHangTheoSoDienThoai(bool hienThongBaoKhiKhongThay)
         {
             string sdt = txtSdtTraCuu.Text.Trim();
@@ -186,14 +186,22 @@ namespace QuanLyCuaHangSachMini.GUI
                     MessageBox.Show("Vui lòng nhập số điện thoại để tra cứu.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                else
+                {
+                    cboKhachHang.SelectedIndex = -1;
+                }
                 return;
             }
 
-            if (sdt.Length != 10 || !sdt.All(char.IsDigit))
+            bool hopLe10So = sdt.Length == 10 && sdt.All(char.IsDigit);
+            if (!hopLe10So)
             {
-                MessageBox.Show("Số điện thoại phải đúng 10 số.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                txtSdtTraCuu.Focus();
+                if (hienThongBaoKhiKhongThay)
+                {
+                    MessageBox.Show("Số điện thoại phải đúng 10 số.", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtSdtTraCuu.Focus();
+                }
                 return;
             }
 
@@ -205,13 +213,16 @@ namespace QuanLyCuaHangSachMini.GUI
                     MessageBox.Show("Chưa có khách hàng với số điện thoại này.", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                else
+                {
+                    cboKhachHang.SelectedIndex = -1;
+                }
                 return;
             }
 
             cboKhachHang.SelectedValue = kh.ID;
         }
-
-        private void btnTimKhachTheoSdt_Click(object sender, EventArgs e)
+private void btnTimKhachTheoSdt_Click(object sender, EventArgs e)
         {
             TimKhachHangTheoSoDienThoai(true);
         }
@@ -441,6 +452,9 @@ namespace QuanLyCuaHangSachMini.GUI
             LayKhachHangVaoComboBox();
             LaySachVaoComboBox();
             cboKhachHang.SelectionChangeCommitted += cboKhachHang_SelectionChangeCommitted;
+
+            btnTimKhachTheoSdt.Visible = false;
+            btnTimKhachTheoSdt.Enabled = false;
 
             dataGridView.AutoGenerateColumns = false;
             dataGridView.CellClick -= dataGridView_CellClick;
@@ -986,6 +1000,22 @@ namespace QuanLyCuaHangSachMini.GUI
             MessageBox.Show("Phần in hóa đơn bạn làm sau như yêu cầu.", "Thông báo",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+        private void txtSdtTraCuu_TextChanged(object sender, EventArgs e)
+        {
+            if (chiXem || quyenHanNguoiDung == "admin")
+                return;
+
+            string sdt = txtSdtTraCuu.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(sdt))
+            {
+                cboKhachHang.SelectedIndex = -1;
+                return;
+            }
+
+            if (sdt.Length == 10)
+                TimKhachHangTheoSoDienThoai(false);
+        }
 
         private void btnThoat_Click(object sender, EventArgs e)
         {
@@ -993,3 +1023,4 @@ namespace QuanLyCuaHangSachMini.GUI
         }
     }
 }
+
